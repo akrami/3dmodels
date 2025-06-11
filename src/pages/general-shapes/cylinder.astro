@@ -1,0 +1,25 @@
+---
+import "../../styles/globals.css";
+import SidebarLayout from "@/layouts/sidebarLayout";
+import CylinderModel from "@/models/cylinder";
+
+const breadcrumbItems = [
+    { id: 0, title: "Home", href: "/" },
+    { id: 1, title: "General Shapes", href: "/general-shapes" },
+    { id: 2, title: "Cylinder" },
+];
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Cylinder</title>
+</head>
+<body>
+	<SidebarLayout client:load header={breadcrumbItems}>
+		<CylinderModel client:load/>
+	</SidebarLayout>
+</body>
+</html>
