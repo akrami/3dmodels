@@ -111,7 +111,7 @@ export default function WavePlanterModel() {
                 for (let i = 0; i < pos.count; i++) {
                     v.fromBufferAttribute(pos, i);
 
-                    const angle = i * rot / Math.PI;
+                    const angle = v.z / depth * rot;
 
                     const cos = Math.cos(angle);
                     const sin = Math.sin(angle);
