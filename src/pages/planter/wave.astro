@@ -4,23 +4,11 @@ import SidebarLayout from "@/layouts/sidebarLayout";
 import WavePlanterModel from "@/models/waveplanter";
 
 const breadcrumbItems = [
-    { id: 0, title: "Home", href: "/" },
-    { id: 1, title: "Planter", href: "/planter" },
-    { id: 2, title: "Wave" },
+  { id: 0, title: "Home", href: "/" },
+  { id: 1, title: "Planter", href: "/planter" },
+  { id: 2, title: "Wave" },
 ];
-
 ---
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Wave Planter</title>
-</head>
-<body>
-	<SidebarLayout client:load header={breadcrumbItems}>
-		<WavePlanterModel client:load />
-	</SidebarLayout>
-</body>
-</html>
+<SidebarLayout client:load header={breadcrumbItems}>
+  <WavePlanterModel client:load />
+</SidebarLayout>

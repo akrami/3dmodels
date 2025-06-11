@@ -2,20 +2,8 @@
 import "../styles/globals.css";
 import SidebarLayout from "@/layouts/sidebarLayout";
 
-const breadcrumbItems = [
-  { title: "Home" },
-];
+const breadcrumbItems = [{ title: "Home" }];
 ---
-<!DOCTYPE html>
-<html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Tools</title>
-</head>
-<body>
-	<SidebarLayout client:load header={breadcrumbItems}>
-		<p>Home page</p>
-	</SidebarLayout>
-</body>
-</html>
+<SidebarLayout client:load header={breadcrumbItems}>
+  <p>Home page</p>
+</SidebarLayout>
