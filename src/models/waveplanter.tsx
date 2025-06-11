@@ -1,8 +1,9 @@
 import { useRef, useState, useMemo, useLayoutEffect } from "react";
-import * as THREE from 'three';
+import * as THREE from "three";
 import { Canvas, type ThreeElements } from "@react-three/fiber";
-import { STLExporter } from "three-stdlib";
 import { OrbitControls } from "@react-three/drei";
+import { ModelControls } from "@/components/model-controls";
+import { useStlExport } from "@/hooks/use-stl-export";
 
 const OBJECT_TEMPLATE = {
     name: 'wave',
@@ -28,38 +29,11 @@ type RingGearProps = {
 
 export default function WavePlanterModel() {
     const [properties, setProperties] = useState(OBJECT_TEMPLATE.defaults);
-    const meshRef = useRef(null);
-
-    const handleExport = () => {
-        if (!meshRef.current) return;
-        const exporter = new STLExporter();
-        const stlString = exporter.parse(meshRef.current, { binary: true });
-        const blob = new Blob([stlString], { type: "model/stl" });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = `${OBJECT_TEMPLATE.name}.stl`;
-        link.click();
-        URL.revokeObjectURL(url);
-    };
+    const meshRef = useRef<THREE.Mesh>(null);
+    const exportModel = useStlExport(OBJECT_TEMPLATE.name, meshRef);
 
     const handlePropUpdate = (key: string, value: number) => {
-        setProperties((prev: any) => ({ ...prev, [key]: value }));
-    };
-
-    const renderInputs = () => {
-        return Object.keys(properties).map((key) => (
-            <label key={key} className="flex flex-col gap-1 mb-2 text-sm">
-                <span className="capitalize">{key}</span>
-                <input
-                    type="number"
-                    value={properties[key]}
-                    step={0.1}
-                    onChange={(e) => handlePropUpdate(key, parseFloat(e.target.value))}
-                    className="border rounded p-1 bg-white text-black"
-                />
-            </label>
-        ));
+        setProperties((prev) => ({ ...prev, [key]: value }));
     };
 
     const RingGear = ({
@@ -115,7 +89,6 @@ export default function WavePlanterModel() {
 
                     const cos = Math.cos(angle);
                     const sin = Math.sin(angle);
-                    console.log({angle, sin, cos});
 
                     const x = v.x * cos - v.y * sin;
                     const y = v.x * sin + v.y * cos;
@@ -146,9 +119,13 @@ export default function WavePlanterModel() {
                 {/* Side Panel */}
                 <aside className="w-64 p-4 overflow-y-auto bg-gray-800 border-r border-gray-700">
                     <h2 className="text-lg font-semibold mb-4">Properties</h2>
-                    {renderInputs()}
+                    <ModelControls
+                        values={properties}
+                        onChange={handlePropUpdate}
+                        steps={{ amplitude: 0.1, density: 0.1, rotation: 0.1 }}
+                    />
                     <button
-                        onClick={handleExport}
+                        onClick={exportModel}
                         className="mt-4 w-full py-2 bg-blue-600 hover:bg-blue-700 rounded text-white"
                     >
                         Export as .stl file
