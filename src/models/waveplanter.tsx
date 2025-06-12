@@ -3,6 +3,7 @@ import * as THREE from "three";
 import { Canvas, type ThreeElements } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import { ModelControls } from "@/components/model-controls";
+import { SceneHelpers } from "@/components/scene-helpers";
 import { useStlExport } from "@/hooks/use-stl-export";
 
 const OBJECT_TEMPLATE = {
@@ -31,6 +32,10 @@ export default function WavePlanterModel() {
     const [properties, setProperties] = useState(OBJECT_TEMPLATE.defaults);
     const meshRef = useRef<THREE.Mesh>(null);
     const exportModel = useStlExport(OBJECT_TEMPLATE.name, meshRef);
+    const polarAngle = useMemo(() => {
+        const [x, y, z] = [0, -400, 300];
+        return Math.acos(z / Math.hypot(x, y, z));
+    }, []);
 
     const handlePropUpdate = (key: string, value: number) => {
         setProperties((prev) => ({ ...prev, [key]: value }));
@@ -141,6 +146,7 @@ export default function WavePlanterModel() {
                     >
                         <ambientLight intensity={0.6} />
                         <directionalLight position={[800, 1000, 700]} intensity={1} castShadow />
+                        <SceneHelpers />
                         <mesh ref={meshRef} castShadow receiveShadow>
                             <RingGear
                                 R={properties.radius}
@@ -154,7 +160,10 @@ export default function WavePlanterModel() {
                             />
                             <meshStandardMaterial color="#AAAAAA" />
                         </mesh>
-                        <OrbitControls />
+                        <OrbitControls
+                            minPolarAngle={polarAngle}
+                            maxPolarAngle={polarAngle}
+                        />
                     </Canvas>
                 </main>
             </div>

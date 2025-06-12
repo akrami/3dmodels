@@ -1,7 +1,8 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useMemo } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import { ModelControls } from "@/components/model-controls";
+import { SceneHelpers } from "@/components/scene-helpers";
 import { useStlExport } from "@/hooks/use-stl-export";
 
 const OBJECT_TEMPLATE = {
@@ -18,6 +19,10 @@ export default function CylinderModel() {
     const [properties, setProperties] = useState(OBJECT_TEMPLATE.defaults);
     const meshRef = useRef<THREE.Mesh>(null);
     const exportModel = useStlExport(OBJECT_TEMPLATE.name, meshRef);
+    const polarAngle = useMemo(() => {
+        const [x, y, z] = [4, 4, 4];
+        return Math.acos(z / Math.hypot(x, y, z));
+    }, []);
     const geometryArgs = [
         properties.radiusTop,
         properties.radiusBottom,
@@ -50,11 +55,16 @@ export default function CylinderModel() {
                     >
                         <ambientLight intensity={0.6} />
                         <directionalLight position={[5, 10, 7]} intensity={1} castShadow />
+                        <SceneHelpers />
                         <mesh ref={meshRef} castShadow receiveShadow>
                             <cylinderGeometry args={geometryArgs} />
                             <meshStandardMaterial color="#AAAAAA" />
                         </mesh>
-                        <OrbitControls enablePan={false} />
+                        <OrbitControls
+                            enablePan={false}
+                            minPolarAngle={polarAngle}
+                            maxPolarAngle={polarAngle}
+                        />
                     </Canvas>
                 </main>
             </div>
