@@ -7,19 +7,42 @@ export function SceneHelpers({ size = 500 }: { size?: number }) {
 
   return (
     <>
-      <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+      <mesh receiveShadow>
         <planeGeometry args={[size, size]} />
-        <meshStandardMaterial color="#555555" transparent opacity={0.3} side={THREE.DoubleSide} />
+        <meshStandardMaterial
+          color="#555555"
+          transparent
+          opacity={0.3}
+          side={THREE.DoubleSide}
+        />
       </mesh>
-      <gridHelper args={[size, 20, "#888888", "#444444"]} rotation={[-Math.PI / 2, 0, 0]} />
+      <gridHelper args={[size, 20, "#888888", "#444444"]} />
       <axesHelper args={[axisLength]} />
-      <Text position={[axisLength + labelOffset, 0, 0]} fontSize={axisLength * 0.05} color="red" anchorX="center" anchorY="middle">
+      <Text
+        position={[axisLength + labelOffset, 0, 0]}
+        fontSize={axisLength * 0.05}
+        color="red"
+        anchorX="center"
+        anchorY="middle"
+      >
         X
       </Text>
-      <Text position={[0, axisLength + labelOffset, 0]} fontSize={axisLength * 0.05} color="green" anchorX="center" anchorY="middle">
+      <Text
+        position={[0, axisLength + labelOffset, 0]}
+        fontSize={axisLength * 0.05}
+        color="green"
+        anchorX="center"
+        anchorY="middle"
+      >
         Y
       </Text>
-      <Text position={[0, 0, axisLength + labelOffset]} fontSize={axisLength * 0.05} color="blue" anchorX="center" anchorY="middle">
+      <Text
+        position={[0, 0, axisLength + labelOffset]}
+        fontSize={axisLength * 0.05}
+        color="blue"
+        anchorX="center"
+        anchorY="middle"
+      >
         Z
       </Text>
     </>

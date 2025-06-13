@@ -46,7 +46,7 @@ export default function CylinderModel() {
                 </aside>
                 <main className="flex-1 relative">
                     <Canvas
-                        camera={{ position: [4, 4, 4], fov: 60 }}
+                        camera={{ position: [4, 4, 4], fov: 60, up: [0, 0, 1] }}
                         className="bg-gray-900"
                         shadows
                     >

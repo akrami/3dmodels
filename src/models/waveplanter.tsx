@@ -137,7 +137,7 @@ export default function WavePlanterModel() {
                 {/* Viewer */}
                 <main className="flex-1 relative">
                     <Canvas
-                        camera={{ position: [0, -400, 300], fov: 60 }}
+                        camera={{ position: [0, -400, 300], fov: 60, up: [0, 0, 1] }}
                         className="bg-gray-900"
                         shadows
                     >
