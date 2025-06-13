@@ -16,10 +16,10 @@ export const DEFAULT_PROPS: CylinderProps = {
 }
 
 export function CylinderMesh({
-  props,
+  props = DEFAULT_PROPS,
   meshRef,
 }: {
-  props: CylinderProps
+  props?: CylinderProps
   meshRef: React.RefObject<THREE.Mesh>
 }) {
   const geometryArgs = React.useMemo(

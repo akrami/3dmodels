@@ -20,10 +20,10 @@ export const DEFAULT_PROPS: WavePlanterProps = {
 }
 
 export function WavePlanterMesh({
-  props,
+  props = DEFAULT_PROPS,
   meshRef,
 }: {
-  props: WavePlanterProps
+  props?: WavePlanterProps
   meshRef: React.RefObject<THREE.Mesh>
 }) {
   const RingGear = ({
