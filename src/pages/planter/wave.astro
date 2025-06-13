@@ -1,7 +1,11 @@
 ---
 import "../../styles/globals.css";
 import ModelLayout from "@/layouts/modelLayout";
-import { WavePlanterMesh, DEFAULT_PROPS, MODEL_NAME, type WavePlanterProps } from "@/models/waveplanter";
+import { WavePlanterMesh, DEFAULT_PROPS, MODEL_NAME } from "@/models/waveplanter";
+import * as React from "react";
+
+const renderWave = (values: any, ref: any) =>
+  React.createElement(WavePlanterMesh, { props: values, meshRef: ref });
 ---
 <!DOCTYPE html>
 <html lang="en">
@@ -17,7 +21,7 @@ import { WavePlanterMesh, DEFAULT_PROPS, MODEL_NAME, type WavePlanterProps } fro
       defaultValues={DEFAULT_PROPS}
       camera={[0, -400, 300]}
       orbitDistance={500}
-      render={(values, ref) => <WavePlanterMesh props={values as WavePlanterProps} meshRef={ref} />}
+      render={renderWave}
     />
   </body>
 </html>

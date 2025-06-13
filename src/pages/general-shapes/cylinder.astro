@@ -1,7 +1,11 @@
 ---
 import "../../styles/globals.css";
 import ModelLayout from "@/layouts/modelLayout";
-import { CylinderMesh, DEFAULT_PROPS, MODEL_NAME, type CylinderProps } from "@/models/cylinder";
+import { CylinderMesh, DEFAULT_PROPS, MODEL_NAME } from "@/models/cylinder";
+import * as React from "react";
+
+const renderCylinder = (values: any, ref: any) =>
+  React.createElement(CylinderMesh, { props: values, meshRef: ref });
 ---
 <!DOCTYPE html>
 <html lang="en">
@@ -15,7 +19,7 @@ import { CylinderMesh, DEFAULT_PROPS, MODEL_NAME, type CylinderProps } from "@/m
       client:load
       name={MODEL_NAME}
       defaultValues={DEFAULT_PROPS}
-      render={(values, ref) => <CylinderMesh props={values as CylinderProps} meshRef={ref} />}
+      render={renderCylinder}
     />
   </body>
 </html>
