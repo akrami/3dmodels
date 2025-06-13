@@ -9,6 +9,7 @@ export interface WavePlanterProps {
   density: number
   depth: number
   rotation: number
+  twistWaves: number
 }
 
 export const MODEL_NAME = "wave"
@@ -18,6 +19,7 @@ export const DEFAULT_PROPS: WavePlanterProps = {
   density: 0.6,
   depth: 123,
   rotation: 12,
+  twistWaves: 2,
 }
 
 export function WavePlanterMesh({
@@ -33,6 +35,7 @@ export function WavePlanterMesh({
     n,
     depth,
     rot = 0,
+    twistWaves = 1,
     segments = 1024,
     material,
     ...meshProps
@@ -42,6 +45,7 @@ export function WavePlanterMesh({
     n: number
     depth: number
     rot?: number
+    twistWaves?: number
     segments?: number
     material?: THREE.Material | THREE.Material[]
   } & ThreeElements["mesh"]) => {
@@ -75,7 +79,8 @@ export function WavePlanterMesh({
         const v = new THREE.Vector3()
         for (let i = 0; i < pos.count; i++) {
           v.fromBufferAttribute(pos, i)
-          const e = new THREE.Euler(0, 0, (v.z / depth) * rot)
+          const angle = Math.sin((v.z / depth) * twistWaves * Math.PI) * rot
+          const e = new THREE.Euler(0, 0, angle)
           v.applyEuler(e)
           pos.setXYZ(i, v.x, v.y, v.z)
         }
@@ -83,7 +88,7 @@ export function WavePlanterMesh({
         geom.computeVertexNormals()
       }
       return geom
-    }, [R, A, n, depth, segments])
+    }, [R, A, n, depth, segments, rot, twistWaves])
 
     React.useLayoutEffect(() => () => geometry.dispose(), [geometry])
 
@@ -104,6 +109,7 @@ export function WavePlanterMesh({
         n={props.density}
         depth={props.depth}
         rot={Math.PI / props.rotation}
+        twistWaves={props.twistWaves}
         position={[0, 0, 0]}
         castShadow
         receiveShadow
@@ -121,7 +127,7 @@ export default function WavePlanterModel() {
       defaultValues={DEFAULT_PROPS}
       camera={[0, -400, 300]}
       orbitDistance={500}
-      steps={{ amplitude: 0.1, density: 0.1, rotation: 0.1 }}
+      steps={{ amplitude: 0.1, density: 0.1, rotation: 0.1, twistWaves: 1 }}
       mesh={meshElement}
     />
   )
