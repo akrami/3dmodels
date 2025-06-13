@@ -1,18 +1,18 @@
-import * as React from "react"
-import * as THREE from "three"
-import { type ThreeElements } from "@react-three/fiber"
-import ModelLayout from "@/layouts/modelLayout"
+import * as React from "react";
+import * as THREE from "three";
+import { type ThreeElements } from "@react-three/fiber";
+import ModelLayout from "@/layouts/modelLayout";
 
 export interface WavePlanterProps {
-  radius: number
-  amplitude: number
-  density: number
-  depth: number
-  rotation: number
-  twistWaves: number
+  radius: number;
+  amplitude: number;
+  density: number;
+  depth: number;
+  rotation: number;
+  twistWaves: number;
 }
 
-export const MODEL_NAME = "wave"
+export const MODEL_NAME = "wave";
 export const DEFAULT_PROPS: WavePlanterProps = {
   radius: 100,
   amplitude: 0.2,
@@ -20,14 +20,14 @@ export const DEFAULT_PROPS: WavePlanterProps = {
   depth: 123,
   rotation: 12,
   twistWaves: 2,
-}
+};
 
 export function WavePlanterMesh({
   props = DEFAULT_PROPS,
   meshRef,
 }: {
-  props?: WavePlanterProps
-  meshRef: React.RefObject<THREE.Mesh>
+  props?: WavePlanterProps;
+  meshRef: React.RefObject<THREE.Mesh>;
 }) {
   const RingGear = ({
     R,
@@ -40,70 +40,72 @@ export function WavePlanterMesh({
     material,
     ...meshProps
   }: {
-    R: number
-    A: number
-    n: number
-    depth: number
-    rot?: number
-    twistWaves?: number
-    segments?: number
-    material?: THREE.Material | THREE.Material[]
+    R: number;
+    A: number;
+    n: number;
+    depth: number;
+    rot?: number;
+    twistWaves?: number;
+    segments?: number;
+    material?: THREE.Material | THREE.Material[];
   } & ThreeElements["mesh"]) => {
     const geometry = React.useMemo(() => {
-      const k = Math.round(R * n)
-      const rOuter = (t: number) => R + A - Math.abs(Math.sin(k * t))
-      const rInner = R - (A + 4)
+      const k = Math.round(R * n);
+      const rOuter = (t: number) => R + A - Math.abs(Math.sin(k * t));
+      const rInner = R - (A + 4);
 
-      const shape = new THREE.Shape()
+      const shape = new THREE.Shape();
       for (let i = 0; i <= segments; i++) {
-        const t = (i / segments) * Math.PI * 2
-        const r = rOuter(t)
-        const x = r * Math.cos(t)
-        const y = r * Math.sin(t)
-        i === 0 ? shape.moveTo(x, y) : shape.lineTo(x, y)
+        const t = (i / segments) * Math.PI * 2;
+        const r = rOuter(t);
+        const x = r * Math.cos(t);
+        const y = r * Math.sin(t);
+        i === 0 ? shape.moveTo(x, y) : shape.lineTo(x, y);
       }
-      shape.closePath()
+      shape.closePath();
 
-      const hole = new THREE.Path().absarc(0, 0, rInner, 0, Math.PI * 2, true)
-      shape.holes.push(hole)
+      const hole = new THREE.Path().absarc(0, 0, rInner, 0, Math.PI * 2, true);
+      shape.holes.push(hole);
 
       const geom = new THREE.ExtrudeGeometry(shape, {
         steps: 1,
         depth,
         bevelEnabled: false,
         curveSegments: 128,
-      })
+      });
 
       if (rot !== 0) {
-        const pos = geom.attributes.position as THREE.BufferAttribute
-        const v = new THREE.Vector3()
+        const pos = geom.attributes.position as THREE.BufferAttribute;
+        const v = new THREE.Vector3();
         for (let i = 0; i < pos.count; i++) {
-          v.fromBufferAttribute(pos, i)
-          const t = v.z / depth
-          // Apply a baseline twist plus an oscillating wave component
-          const base = t * rot
-          const wave = Math.sin(t * twistWaves * Math.PI * 2) * (rot * 0.5)
-          const angle = base + wave
-          const e = new THREE.Euler(0, 0, angle)
-          v.applyEuler(e)
-          pos.setXYZ(i, v.x, v.y, v.z)
+          v.fromBufferAttribute(pos, i);
+          const t = v.z / depth;
+          // Oscillating twist: snake-like rotation along the depth
+          const angle = Math.sin(t * twistWaves * Math.PI * 2) * rot;
+          const e = new THREE.Euler(0, 0, angle);
+          v.applyEuler(e);
+          pos.setXYZ(i, v.x, v.y, v.z);
         }
-        pos.needsUpdate = true
-        geom.computeVertexNormals()
+        pos.needsUpdate = true;
+        geom.computeVertexNormals();
       }
-      return geom
-    }, [R, A, n, depth, segments, rot, twistWaves])
+      return geom;
+    }, [R, A, n, depth, segments, rot, twistWaves]);
 
-    React.useLayoutEffect(() => () => geometry.dispose(), [geometry])
+    React.useLayoutEffect(() => () => geometry.dispose(), [geometry]);
 
     return (
       <mesh geometry={geometry} {...meshProps}>
         {material ?? (
-          <meshStandardMaterial attach="material" color="#4477ff" side={THREE.DoubleSide} />
+          <meshStandardMaterial
+            attach="material"
+            color="#4477ff"
+            side={THREE.DoubleSide}
+          />
         )}
       </mesh>
-    )
-  }
+    );
+  };
 
   return (
     <mesh ref={meshRef} castShadow receiveShadow>
@@ -120,11 +122,11 @@ export function WavePlanterMesh({
       />
       <meshStandardMaterial color="#AAAAAA" />
     </mesh>
-  )
+  );
 }
 
 export default function WavePlanterModel() {
-  const meshElement = React.createElement(WavePlanterMesh)
+  const meshElement = React.createElement(WavePlanterMesh);
   return (
     <ModelLayout
       name={MODEL_NAME}
@@ -134,5 +136,5 @@ export default function WavePlanterModel() {
       steps={{ amplitude: 0.1, density: 0.1, rotation: 0.1, twistWaves: 1 }}
       mesh={meshElement}
     />
-  )
+  );
 }
