@@ -86,15 +86,9 @@ export default function WavePlanterModel() {
                 for (let i = 0; i < pos.count; i++) {
                     v.fromBufferAttribute(pos, i);
 
-                    const angle = v.z / depth * rot;
-
-                    const cos = Math.cos(angle);
-                    const sin = Math.sin(angle);
-
-                    const x = v.x * cos - v.y * sin;
-                    const y = v.x * sin + v.y * cos;
-
-                    pos.setXYZ(i, x, y, v.z);
+                    const e = new THREE.Euler(0, 0, (v.z / depth) * rot);
+                    v.applyEuler(e);
+                    pos.setXYZ(i, v.x, v.y, v.z);
                 }
                 pos.needsUpdate = true;
                 geom.computeVertexNormals();
