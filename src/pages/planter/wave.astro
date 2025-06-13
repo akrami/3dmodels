@@ -1,13 +1,6 @@
 ---
 import "../../styles/globals.css";
-import SidebarLayout from "@/layouts/sidebarLayout";
 import WavePlanterModel from "@/models/waveplanter";
-
-const breadcrumbItems = [
-  { id: 0, title: "Home", href: "/" },
-  { id: 1, title: "Planter", href: "/planter" },
-  { id: 2, title: "Wave" },
-];
 ---
 <!DOCTYPE html>
 <html lang="en">
@@ -17,8 +10,6 @@ const breadcrumbItems = [
     <title>Wave Planter</title>
   </head>
   <body>
-    <SidebarLayout client:load header={breadcrumbItems}>
-      <WavePlanterModel client:load />
-    </SidebarLayout>
+    <WavePlanterModel client:load />
   </body>
 </html>
