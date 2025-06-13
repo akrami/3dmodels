@@ -11,13 +11,6 @@ import { Button } from "@/components/ui/button"
 export function Navbar() {
   const menu = [
     {
-      title: "General Shapes",
-      url: "/general-shapes",
-      items: [
-        { title: "Cylinder", url: "/general-shapes/cylinder" },
-      ],
-    },
-    {
       title: "Planter",
       url: "/planter",
       items: [
@@ -39,10 +32,6 @@ export function Navbar() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start">
-                <DropdownMenuItem asChild>
-                  <a href={item.url}>Overview</a>
-                </DropdownMenuItem>
-                {item.items.length ? <DropdownMenuSeparator /> : null}
                 {item.items.map((sub) => (
                   <DropdownMenuItem key={sub.title} asChild>
                     <a href={sub.url}>{sub.title}</a>
