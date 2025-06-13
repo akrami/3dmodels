@@ -11,13 +11,6 @@ import { Button } from "@/components/ui/button"
 export function Navbar() {
   const menu = [
     {
-      title: "General Shapes",
-      url: "/general-shapes",
-      items: [
-        { title: "Cylinder", url: "/general-shapes/cylinder" },
-      ],
-    },
-    {
       title: "Planter",
       url: "/planter",
       items: [
