@@ -1,4 +1,4 @@
-import { useRef, useState, useMemo, useLayoutEffect } from "react";
+import { useRef, useState, useLayoutEffect, useMemo } from "react";
 import * as THREE from "three";
 import { Canvas, type ThreeElements } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
@@ -32,10 +32,7 @@ export default function WavePlanterModel() {
     const [properties, setProperties] = useState(OBJECT_TEMPLATE.defaults);
     const meshRef = useRef<THREE.Mesh>(null);
     const exportModel = useStlExport(OBJECT_TEMPLATE.name, meshRef);
-    const polarAngle = useMemo(() => {
-        const [x, y, z] = [0, -400, 300];
-        return Math.acos(z / Math.hypot(x, y, z));
-    }, []);
+    const polarAngle = Math.PI / 2;
 
     const handlePropUpdate = (key: string, value: number) => {
         setProperties((prev) => ({ ...prev, [key]: value }));

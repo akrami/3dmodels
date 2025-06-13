@@ -1,4 +1,4 @@
-import { useRef, useState, useMemo } from "react";
+import { useRef, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import { ModelControls } from "@/components/model-controls";
@@ -19,10 +19,7 @@ export default function CylinderModel() {
     const [properties, setProperties] = useState(OBJECT_TEMPLATE.defaults);
     const meshRef = useRef<THREE.Mesh>(null);
     const exportModel = useStlExport(OBJECT_TEMPLATE.name, meshRef);
-    const polarAngle = useMemo(() => {
-        const [x, y, z] = [4, 4, 4];
-        return Math.acos(z / Math.hypot(x, y, z));
-    }, []);
+    const polarAngle = Math.PI / 2;
     const geometryArgs = [
         properties.radiusTop,
         properties.radiusBottom,
