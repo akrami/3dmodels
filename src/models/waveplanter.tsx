@@ -8,7 +8,6 @@ export interface WavePlanterProps {
   amplitude: number;
   density: number;
   depth: number;
-  rotation: number;
   twistWaves: number;
   twistSegments: number;
 }
@@ -19,7 +18,6 @@ export const DEFAULT_PROPS: WavePlanterProps = {
   amplitude: 0.2,
   density: 0.6,
   depth: 123,
-  rotation: 12,
   twistWaves: 2,
   twistSegments: 64,
 };
@@ -117,7 +115,7 @@ export function WavePlanterMesh({
         A={props.amplitude}
         n={props.density}
         depth={props.depth}
-        rot={Math.PI / props.rotation}
+        rot={Math.PI / 12}
         twistWaves={props.twistWaves}
         twistSegments={props.twistSegments}
         position={[0, 0, 0]}
@@ -137,7 +135,14 @@ export default function WavePlanterModel() {
       defaultValues={DEFAULT_PROPS}
       camera={[0, -400, 300]}
       orbitDistance={500}
-      steps={{ amplitude: 0.1, density: 0.1, rotation: 0.1, twistWaves: 1, twistSegments: 1 }}
+      steps={{
+        radius: 1,
+        amplitude: 0.1,
+        density: 0.1,
+        depth: 1,
+        twistWaves: 1,
+        twistSegments: 1,
+      }}
       mesh={meshElement}
     />
   );
