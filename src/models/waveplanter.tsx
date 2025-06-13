@@ -9,17 +9,16 @@ export interface WavePlanterProps {
   density: number;
   depth: number;
   twistWaves: number;
-  twistSegments: number;
 }
 
 export const MODEL_NAME = "wave";
+const TWIST_SEGMENTS = 128;
 export const DEFAULT_PROPS: WavePlanterProps = {
   radius: 100,
   amplitude: 0.2,
   density: 0.6,
   depth: 123,
-  twistWaves: 2,
-  twistSegments: 64,
+  twistWaves: 1,
 };
 
 export function WavePlanterMesh({
@@ -36,7 +35,6 @@ export function WavePlanterMesh({
     depth,
     rot = 0,
     twistWaves = 1,
-    twistSegments = 64,
     segments = 1024,
     material,
     ...meshProps
@@ -47,7 +45,6 @@ export function WavePlanterMesh({
     depth: number;
     rot?: number;
     twistWaves?: number;
-    twistSegments?: number;
     segments?: number;
     material?: THREE.Material | THREE.Material[];
   } & ThreeElements["mesh"]) => {
@@ -70,7 +67,7 @@ export function WavePlanterMesh({
       shape.holes.push(hole);
 
       const geom = new THREE.ExtrudeGeometry(shape, {
-        steps: twistSegments,
+        steps: TWIST_SEGMENTS,
         depth,
         bevelEnabled: false,
         curveSegments: 128,
@@ -91,7 +88,7 @@ export function WavePlanterMesh({
         geom.computeVertexNormals();
       }
       return geom;
-    }, [R, A, n, depth, segments, rot, twistWaves, twistSegments]);
+    }, [R, A, n, depth, segments, rot, twistWaves]);
 
     React.useLayoutEffect(() => () => geometry.dispose(), [geometry]);
 
@@ -117,7 +114,6 @@ export function WavePlanterMesh({
         depth={props.depth}
         rot={Math.PI / 12}
         twistWaves={props.twistWaves}
-        twistSegments={props.twistSegments}
         position={[0, 0, 0]}
         castShadow
         receiveShadow
@@ -140,8 +136,7 @@ export default function WavePlanterModel() {
         amplitude: 0.1,
         density: 0.1,
         depth: 1,
-        twistWaves: 1,
-        twistSegments: 1,
+        twistWaves: 0.1,
       }}
       mesh={meshElement}
     />
