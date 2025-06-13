@@ -1,7 +1,7 @@
 import { useRef, useState, useLayoutEffect, useMemo } from "react";
 import * as THREE from "three";
 import { Canvas, type ThreeElements } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
+import { XZOrbitControls } from "@/components/xz-orbit-controls";
 import { ModelControls } from "@/components/model-controls";
 import { SceneHelpers } from "@/components/scene-helpers";
 import { useStlExport } from "@/hooks/use-stl-export";
@@ -32,7 +32,6 @@ export default function WavePlanterModel() {
     const [properties, setProperties] = useState(OBJECT_TEMPLATE.defaults);
     const meshRef = useRef<THREE.Mesh>(null);
     const exportModel = useStlExport(OBJECT_TEMPLATE.name, meshRef);
-    const polarAngle = Math.PI / 2;
 
     const handlePropUpdate = (key: string, value: number) => {
         setProperties((prev) => ({ ...prev, [key]: value }));
@@ -157,10 +156,7 @@ export default function WavePlanterModel() {
                             />
                             <meshStandardMaterial color="#AAAAAA" />
                         </mesh>
-                        <OrbitControls
-                            minPolarAngle={polarAngle}
-                            maxPolarAngle={polarAngle}
-                        />
+                        <XZOrbitControls distance={500} />
                     </Canvas>
                 </main>
             </div>

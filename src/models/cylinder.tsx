@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
+import { XZOrbitControls } from "@/components/xz-orbit-controls";
 import { ModelControls } from "@/components/model-controls";
 import { SceneHelpers } from "@/components/scene-helpers";
 import { useStlExport } from "@/hooks/use-stl-export";
@@ -19,7 +19,6 @@ export default function CylinderModel() {
     const [properties, setProperties] = useState(OBJECT_TEMPLATE.defaults);
     const meshRef = useRef<THREE.Mesh>(null);
     const exportModel = useStlExport(OBJECT_TEMPLATE.name, meshRef);
-    const polarAngle = Math.PI / 2;
     const geometryArgs = [
         properties.radiusTop,
         properties.radiusBottom,
@@ -57,11 +56,7 @@ export default function CylinderModel() {
                             <cylinderGeometry args={geometryArgs} />
                             <meshStandardMaterial color="#AAAAAA" />
                         </mesh>
-                        <OrbitControls
-                            enablePan={false}
-                            minPolarAngle={polarAngle}
-                            maxPolarAngle={polarAngle}
-                        />
+                        <XZOrbitControls distance={7} />
                     </Canvas>
                 </main>
             </div>
