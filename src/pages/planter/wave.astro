@@ -2,6 +2,9 @@
 import "../../styles/globals.css";
 import ModelLayout from "@/layouts/modelLayout";
 import { WavePlanterMesh, DEFAULT_PROPS, MODEL_NAME } from "@/models/waveplanter";
+import * as React from "react";
+
+const meshElement = React.createElement(WavePlanterMesh);
 ---
 <!DOCTYPE html>
 <html lang="en">
@@ -17,8 +20,7 @@ import { WavePlanterMesh, DEFAULT_PROPS, MODEL_NAME } from "@/models/waveplanter
       defaultValues={DEFAULT_PROPS}
       camera={[0, -400, 300]}
       orbitDistance={500}
-    >
-      <WavePlanterMesh />
-    </ModelLayout>
+      mesh={meshElement}
+      />
   </body>
 </html>

@@ -19,8 +19,8 @@ export interface ModelLayoutProps<T extends Record<string, number>> {
   steps?: Partial<Record<keyof T, number>>
   camera?: [number, number, number]
   orbitDistance?: number
-  children: React.ReactElement<{
-    props: T
+  mesh: React.ReactElement<{
+    props?: T
     meshRef: React.RefObject<THREE.Mesh>
   }>
 }
@@ -31,7 +31,7 @@ export default function ModelLayout<T extends Record<string, number>>({
   steps,
   camera = [4, 4, 4],
   orbitDistance = 7,
-  children,
+  mesh,
 }: ModelLayoutProps<T>) {
   const [values, setValues] = React.useState<T>(defaultValues)
   const meshRef = React.useRef<THREE.Mesh>(null)
@@ -41,8 +41,8 @@ export default function ModelLayout<T extends Record<string, number>>({
     setValues((prev) => ({ ...prev, [key]: value }))
   }
 
-  const meshElement = React.isValidElement(children)
-    ? React.cloneElement(children, { props: values, meshRef })
+  const meshElement = React.isValidElement(mesh)
+    ? React.cloneElement(mesh, { props: values, meshRef })
     : null
 
   return (
