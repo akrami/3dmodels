@@ -6,15 +6,21 @@ import { ModelControls } from "@/components/model-controls";
 import { SceneHelpers } from "@/components/scene-helpers";
 import { useStlExport } from "@/hooks/use-stl-export";
 
-const OBJECT_TEMPLATE = {
-    name: 'wave',
-    defaults: {
-        radius: 100,
-        amplitude: 0.2,
-        density: 0.6,
-        depth: 123,
-        rotation: 12,
-    }
+interface WavePlanterProps {
+    radius: number;
+    amplitude: number;
+    density: number;
+    depth: number;
+    rotation: number;
+}
+
+const MODEL_NAME = "wave";
+const DEFAULT_PROPS: WavePlanterProps = {
+    radius: 100,
+    amplitude: 0.2,
+    density: 0.6,
+    depth: 123,
+    rotation: 12,
 };
 
 type MeshProps = ThreeElements['mesh'];
@@ -29,11 +35,11 @@ type RingGearProps = {
 } & MeshProps;
 
 export default function WavePlanterModel() {
-    const [properties, setProperties] = useState(OBJECT_TEMPLATE.defaults);
+    const [properties, setProperties] = useState<WavePlanterProps>(DEFAULT_PROPS);
     const meshRef = useRef<THREE.Mesh>(null);
-    const exportModel = useStlExport(OBJECT_TEMPLATE.name, meshRef);
+    const exportModel = useStlExport(MODEL_NAME, meshRef);
 
-    const handlePropUpdate = (key: string, value: number) => {
+    const handlePropUpdate = (key: keyof WavePlanterProps, value: number) => {
         setProperties((prev) => ({ ...prev, [key]: value }));
     };
 
@@ -157,3 +163,4 @@ export default function WavePlanterModel() {
         </div>
     );
 }
+
