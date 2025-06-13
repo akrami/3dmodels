@@ -16,7 +16,10 @@ export function SceneHelpers({ size = 500 }: { size?: number }) {
           side={THREE.DoubleSide}
         />
       </mesh>
-      <gridHelper args={[size, 20, "#888888", "#444444"]} />
+      <gridHelper
+        args={[size, 20, "#888888", "#444444"]}
+        rotation={[Math.PI / 2, 0, 0]}
+      />
       <axesHelper args={[axisLength]} />
       <Text
         position={[axisLength + labelOffset, 0, 0]}
