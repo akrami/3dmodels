@@ -32,10 +32,6 @@ export function Navbar() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start">
-                <DropdownMenuItem asChild>
-                  <a href={item.url}>Overview</a>
-                </DropdownMenuItem>
-                {item.items.length ? <DropdownMenuSeparator /> : null}
                 {item.items.map((sub) => (
                   <DropdownMenuItem key={sub.title} asChild>
                     <a href={sub.url}>{sub.title}</a>
