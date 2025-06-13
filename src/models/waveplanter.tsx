@@ -10,6 +10,7 @@ export interface WavePlanterProps {
   depth: number;
   rotation: number;
   twistWaves: number;
+  twistSegments: number;
 }
 
 export const MODEL_NAME = "wave";
@@ -20,6 +21,7 @@ export const DEFAULT_PROPS: WavePlanterProps = {
   depth: 123,
   rotation: 12,
   twistWaves: 2,
+  twistSegments: 64,
 };
 
 export function WavePlanterMesh({
@@ -36,6 +38,7 @@ export function WavePlanterMesh({
     depth,
     rot = 0,
     twistWaves = 1,
+    twistSegments = 64,
     segments = 1024,
     material,
     ...meshProps
@@ -46,6 +49,7 @@ export function WavePlanterMesh({
     depth: number;
     rot?: number;
     twistWaves?: number;
+    twistSegments?: number;
     segments?: number;
     material?: THREE.Material | THREE.Material[];
   } & ThreeElements["mesh"]) => {
@@ -68,7 +72,7 @@ export function WavePlanterMesh({
       shape.holes.push(hole);
 
       const geom = new THREE.ExtrudeGeometry(shape, {
-        steps: 1,
+        steps: twistSegments,
         depth,
         bevelEnabled: false,
         curveSegments: 128,
@@ -80,8 +84,9 @@ export function WavePlanterMesh({
         for (let i = 0; i < pos.count; i++) {
           v.fromBufferAttribute(pos, i);
           const t = v.z / depth;
-          // Oscillating twist: snake-like rotation along the depth
-          const angle = Math.sin(t * twistWaves * Math.PI * 2) * rot;
+          const base = t * rot;
+          const wave = Math.sin(t * twistWaves * Math.PI * 2) * rot * 0.5;
+          const angle = base + wave;
           const e = new THREE.Euler(0, 0, angle);
           v.applyEuler(e);
           pos.setXYZ(i, v.x, v.y, v.z);
@@ -90,7 +95,7 @@ export function WavePlanterMesh({
         geom.computeVertexNormals();
       }
       return geom;
-    }, [R, A, n, depth, segments, rot, twistWaves]);
+    }, [R, A, n, depth, segments, rot, twistWaves, twistSegments]);
 
     React.useLayoutEffect(() => () => geometry.dispose(), [geometry]);
 
@@ -116,6 +121,7 @@ export function WavePlanterMesh({
         depth={props.depth}
         rot={Math.PI / props.rotation}
         twistWaves={props.twistWaves}
+        twistSegments={props.twistSegments}
         position={[0, 0, 0]}
         castShadow
         receiveShadow
@@ -133,7 +139,7 @@ export default function WavePlanterModel() {
       defaultValues={DEFAULT_PROPS}
       camera={[0, -400, 300]}
       orbitDistance={500}
-      steps={{ amplitude: 0.1, density: 0.1, rotation: 0.1, twistWaves: 1 }}
+      steps={{ amplitude: 0.1, density: 0.1, rotation: 0.1, twistWaves: 1, twistSegments: 1 }}
       mesh={meshElement}
     />
   );
