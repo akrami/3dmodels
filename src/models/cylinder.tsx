@@ -1,75 +1,41 @@
-import { useMemo, useRef, useState } from "react";
-import { Canvas } from "@react-three/fiber";
-import { XZOrbitControls } from "@/components/xz-orbit-controls";
-import { ModelControls } from "@/components/model-controls";
-import { SceneHelpers } from "@/components/scene-helpers";
-import { useStlExport } from "@/hooks/use-stl-export";
+import * as React from "react"
 
-interface CylinderProps {
-    radiusTop: number;
-    radiusBottom: number;
-    height: number;
-    radialSegments: number;
+export interface CylinderProps {
+  radiusTop: number
+  radiusBottom: number
+  height: number
+  radialSegments: number
 }
 
-const MODEL_NAME = "cylinder";
-const DEFAULT_PROPS: CylinderProps = {
-    radiusTop: 1,
-    radiusBottom: 1,
-    height: 2,
-    radialSegments: 32,
-};
-
-export default function CylinderModel() {
-    const [properties, setProperties] = useState<CylinderProps>(DEFAULT_PROPS);
-    const meshRef = useRef<THREE.Mesh>(null);
-    const exportModel = useStlExport(MODEL_NAME, meshRef);
-
-    const geometryArgs = useMemo(
-        () => [
-            properties.radiusTop,
-            properties.radiusBottom,
-            properties.height,
-            properties.radialSegments,
-        ],
-        [properties],
-    );
-
-    const handlePropUpdate = (key: keyof CylinderProps, value: number) => {
-        setProperties((prev) => ({ ...prev, [key]: value }));
-    };
-
-    return (
-        <div className="h-screen flex flex-col bg-gray-900 text-gray-100">
-            <div className="flex flex-1 overflow-hidden">
-                <aside className="w-64 p-4 overflow-y-auto bg-gray-800 border-r border-gray-700">
-                    <h2 className="text-lg font-semibold mb-4">Properties</h2>
-                    <ModelControls values={properties} onChange={handlePropUpdate} />
-                    <button
-                        onClick={exportModel}
-                        className="mt-4 w-full py-2 bg-blue-600 hover:bg-blue-700 rounded text-white"
-                    >
-                        Export as .stl file
-                    </button>
-                </aside>
-                <main className="flex-1 relative">
-                    <Canvas
-                        camera={{ position: [4, 4, 4], fov: 60, up: [0, 0, 1] }}
-                        className="bg-gray-900"
-                        shadows
-                    >
-                        <ambientLight intensity={0.6} />
-                        <directionalLight position={[5, 10, 7]} intensity={1} castShadow />
-                        <SceneHelpers />
-                        <mesh ref={meshRef} castShadow receiveShadow>
-                            <cylinderGeometry args={geometryArgs} />
-                            <meshStandardMaterial color="#AAAAAA" />
-                        </mesh>
-                        <XZOrbitControls distance={7} />
-                    </Canvas>
-                </main>
-            </div>
-        </div>
-    );
+export const MODEL_NAME = "cylinder"
+export const DEFAULT_PROPS: CylinderProps = {
+  radiusTop: 1,
+  radiusBottom: 1,
+  height: 2,
+  radialSegments: 32,
 }
 
+export function CylinderMesh({
+  props,
+  meshRef,
+}: {
+  props: CylinderProps
+  meshRef: React.RefObject<THREE.Mesh>
+}) {
+  const geometryArgs = React.useMemo(
+    () => [
+      props.radiusTop,
+      props.radiusBottom,
+      props.height,
+      props.radialSegments,
+    ],
+    [props]
+  )
+
+  return (
+    <mesh ref={meshRef} castShadow receiveShadow>
+      <cylinderGeometry args={geometryArgs} />
+      <meshStandardMaterial color="#AAAAAA" />
+    </mesh>
+  )
+}

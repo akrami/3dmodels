@@ -1,8 +1,6 @@
 ---
 import "../styles/globals.css";
-import SidebarLayout from "@/layouts/sidebarLayout";
-
-const breadcrumbItems = [{ title: "Home" }];
+import AppLayout from "@/layouts/appLayout";
 ---
 <!DOCTYPE html>
 <html lang="en">
@@ -12,8 +10,8 @@ const breadcrumbItems = [{ title: "Home" }];
     <title>Tools</title>
   </head>
   <body>
-    <SidebarLayout client:load header={breadcrumbItems}>
+    <AppLayout client:load>
       <p>Home page</p>
-    </SidebarLayout>
+    </AppLayout>
   </body>
 </html>

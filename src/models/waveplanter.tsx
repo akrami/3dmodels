@@ -1,166 +1,113 @@
-import { useRef, useState, useLayoutEffect, useMemo } from "react";
-import * as THREE from "three";
-import { Canvas, type ThreeElements } from "@react-three/fiber";
-import { XZOrbitControls } from "@/components/xz-orbit-controls";
-import { ModelControls } from "@/components/model-controls";
-import { SceneHelpers } from "@/components/scene-helpers";
-import { useStlExport } from "@/hooks/use-stl-export";
+import * as React from "react"
+import * as THREE from "three"
+import { type ThreeElements } from "@react-three/fiber"
 
-interface WavePlanterProps {
-    radius: number;
-    amplitude: number;
-    density: number;
-    depth: number;
-    rotation: number;
+export interface WavePlanterProps {
+  radius: number
+  amplitude: number
+  density: number
+  depth: number
+  rotation: number
 }
 
-const MODEL_NAME = "wave";
-const DEFAULT_PROPS: WavePlanterProps = {
-    radius: 100,
-    amplitude: 0.2,
-    density: 0.6,
-    depth: 123,
-    rotation: 12,
-};
+export const MODEL_NAME = "wave"
+export const DEFAULT_PROPS: WavePlanterProps = {
+  radius: 100,
+  amplitude: 0.2,
+  density: 0.6,
+  depth: 123,
+  rotation: 12,
+}
 
-type MeshProps = ThreeElements['mesh'];
-type RingGearProps = {
-    R: number;
-    A: number;
-    n: number;
-    depth: number;
-    rot?: number;
-    segments?: number;
-    material?: THREE.Material | THREE.Material[];
-} & MeshProps;
+export function WavePlanterMesh({
+  props,
+  meshRef,
+}: {
+  props: WavePlanterProps
+  meshRef: React.RefObject<THREE.Mesh>
+}) {
+  const RingGear = ({
+    R,
+    A,
+    n,
+    depth,
+    rot = 0,
+    segments = 1024,
+    material,
+    ...meshProps
+  }: {
+    R: number
+    A: number
+    n: number
+    depth: number
+    rot?: number
+    segments?: number
+    material?: THREE.Material | THREE.Material[]
+  } & ThreeElements["mesh"]) => {
+    const geometry = React.useMemo(() => {
+      const k = Math.round(R * n)
+      const rOuter = (t: number) => R + A - Math.abs(Math.sin(k * t))
+      const rInner = R - (A + 4)
 
-export default function WavePlanterModel() {
-    const [properties, setProperties] = useState<WavePlanterProps>(DEFAULT_PROPS);
-    const meshRef = useRef<THREE.Mesh>(null);
-    const exportModel = useStlExport(MODEL_NAME, meshRef);
+      const shape = new THREE.Shape()
+      for (let i = 0; i <= segments; i++) {
+        const t = (i / segments) * Math.PI * 2
+        const r = rOuter(t)
+        const x = r * Math.cos(t)
+        const y = r * Math.sin(t)
+        i === 0 ? shape.moveTo(x, y) : shape.lineTo(x, y)
+      }
+      shape.closePath()
 
-    const handlePropUpdate = (key: keyof WavePlanterProps, value: number) => {
-        setProperties((prev) => ({ ...prev, [key]: value }));
-    };
+      const hole = new THREE.Path().absarc(0, 0, rInner, 0, Math.PI * 2, true)
+      shape.holes.push(hole)
 
-    const RingGear = ({
-        R,
-        A,
-        n,
+      const geom = new THREE.ExtrudeGeometry(shape, {
+        steps: 1,
         depth,
-        rot = 0,
-        segments = 1024,
-        material,
-        ...meshProps
-    }: RingGearProps) => {
-        const geometry = useMemo(() => {
-            const k = Math.round(R * n); // tooth count
-            const rOuter = (θ: number) => R + A - Math.abs(Math.sin(k * θ));
-            const rInner = R - (A + 4);
+        bevelEnabled: false,
+        curveSegments: 128,
+      })
 
-            const shape = new THREE.Shape();
-            for (let i = 0; i <= segments; i++) {
-                const θ = (i / segments) * Math.PI * 2;
-                const r = rOuter(θ);
-                const x = r * Math.cos(θ);
-                const y = r * Math.sin(θ);
-                i === 0 ? shape.moveTo(x, y) : shape.lineTo(x, y);
-            }
-            shape.closePath();
+      if (rot !== 0) {
+        const pos = geom.attributes.position as THREE.BufferAttribute
+        const v = new THREE.Vector3()
+        for (let i = 0; i < pos.count; i++) {
+          v.fromBufferAttribute(pos, i)
+          const e = new THREE.Euler(0, 0, (v.z / depth) * rot)
+          v.applyEuler(e)
+          pos.setXYZ(i, v.x, v.y, v.z)
+        }
+        pos.needsUpdate = true
+        geom.computeVertexNormals()
+      }
+      return geom
+    }, [R, A, n, depth, segments])
 
-            const hole = new THREE.Path().absarc(
-                0,           // x-centre
-                0,           // y-centre
-                rInner,      // radius
-                0,           // startAngle
-                Math.PI * 2, // endAngle
-                true         // clockwise = hole
-            );
-            shape.holes.push(hole);
-
-            const geom = new THREE.ExtrudeGeometry(shape, {
-                steps: 1,
-                depth,
-                bevelEnabled: false,
-                curveSegments: 128
-            });
-
-            if (rot !== 0) {
-                const pos = geom.attributes.position as THREE.BufferAttribute;
-                const v = new THREE.Vector3();
-
-                for (let i = 0; i < pos.count; i++) {
-                    v.fromBufferAttribute(pos, i);
-
-                    const e = new THREE.Euler(0, 0, (v.z / depth) * rot);
-                    v.applyEuler(e);
-                    pos.setXYZ(i, v.x, v.y, v.z);
-                }
-                pos.needsUpdate = true;
-                geom.computeVertexNormals();
-            }
-
-            return geom;
-        }, [R, A, n, depth, segments]);
-
-        useLayoutEffect(() => () => geometry.dispose(), [geometry]);
-
-        return (
-            <mesh geometry={geometry} {...meshProps} >
-                {material ?? (<meshStandardMaterial attach="material" color="#4477ff" side={THREE.DoubleSide} />)}
-            </mesh>
-        );
-    }
+    React.useLayoutEffect(() => () => geometry.dispose(), [geometry])
 
     return (
-        <div className="h-screen flex flex-col bg-gray-900 text-gray-100">
+      <mesh geometry={geometry} {...meshProps}>
+        {material ?? (
+          <meshStandardMaterial attach="material" color="#4477ff" side={THREE.DoubleSide} />
+        )}
+      </mesh>
+    )
+  }
 
-            {/* Main layout */}
-            <div className="flex flex-1 overflow-hidden">
-                {/* Side Panel */}
-                <aside className="w-64 p-4 overflow-y-auto bg-gray-800 border-r border-gray-700">
-                    <h2 className="text-lg font-semibold mb-4">Properties</h2>
-                    <ModelControls
-                        values={properties}
-                        onChange={handlePropUpdate}
-                        steps={{ amplitude: 0.1, density: 0.1, rotation: 0.1 }}
-                    />
-                    <button
-                        onClick={exportModel}
-                        className="mt-4 w-full py-2 bg-blue-600 hover:bg-blue-700 rounded text-white"
-                    >
-                        Export as .stl file
-                    </button>
-                </aside>
-
-                {/* Viewer */}
-                <main className="flex-1 relative">
-                    <Canvas
-                        camera={{ position: [0, -400, 300], fov: 60, up: [0, 0, 1] }}
-                        className="bg-gray-900"
-                        shadows
-                    >
-                        <ambientLight intensity={0.6} />
-                        <directionalLight position={[800, 1000, 700]} intensity={1} castShadow />
-                        <SceneHelpers />
-                        <mesh ref={meshRef} castShadow receiveShadow>
-                            <RingGear
-                                R={properties.radius}
-                                A={properties.amplitude}
-                                n={properties.density}
-                                depth={properties.depth}
-                                rot={Math.PI / properties.rotation}
-                                position={[0, 0, 0]}
-                                castShadow
-                                receiveShadow
-                            />
-                            <meshStandardMaterial color="#AAAAAA" />
-                        </mesh>
-                        <XZOrbitControls distance={500} />
-                    </Canvas>
-                </main>
-            </div>
-        </div>
-    );
+  return (
+    <mesh ref={meshRef} castShadow receiveShadow>
+      <RingGear
+        R={props.radius}
+        A={props.amplitude}
+        n={props.density}
+        depth={props.depth}
+        rot={Math.PI / props.rotation}
+        position={[0, 0, 0]}
+        castShadow
+        receiveShadow
+      />
+      <meshStandardMaterial color="#AAAAAA" />
+    </mesh>
+  )
 }
-

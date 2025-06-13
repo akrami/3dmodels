@@ -1,13 +1,7 @@
 ---
 import "../../styles/globals.css";
-import SidebarLayout from "@/layouts/sidebarLayout";
-import CylinderModel from "@/models/cylinder";
-
-const breadcrumbItems = [
-  { id: 0, title: "Home", href: "/" },
-  { id: 1, title: "General Shapes", href: "/general-shapes" },
-  { id: 2, title: "Cylinder" },
-];
+import ModelLayout from "@/layouts/modelLayout";
+import { CylinderMesh, DEFAULT_PROPS, MODEL_NAME, type CylinderProps } from "@/models/cylinder";
 ---
 <!DOCTYPE html>
 <html lang="en">
@@ -17,8 +11,11 @@ const breadcrumbItems = [
     <title>Cylinder</title>
   </head>
   <body>
-    <SidebarLayout client:load header={breadcrumbItems}>
-      <CylinderModel client:load />
-    </SidebarLayout>
+    <ModelLayout
+      client:load
+      name={MODEL_NAME}
+      defaultValues={DEFAULT_PROPS}
+      render={(values, ref) => <CylinderMesh props={values as CylinderProps} meshRef={ref} />}
+    />
   </body>
 </html>
