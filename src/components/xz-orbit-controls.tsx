@@ -18,13 +18,20 @@ export function XZOrbitControls({
   zoomSpeed = 0.1,
 }: XZOrbitControlsProps) {
   const { camera, gl } = useThree()
-  const angles = useRef({ theta: Math.PI / 4, phi: 0 })
+  const angles = useRef({ theta: Math.PI / 4, phi: Math.PI / 4 })
   const radius = useRef(distance)
   const isDragging = useRef(false)
   const pointer = useRef({ x: 0, y: 0 })
 
   useEffect(() => {
     camera.up.set(0, 0, 1)
+    const r = radius.current
+    const { theta, phi } = angles.current
+    const x = r * Math.cos(theta) * Math.cos(phi)
+    const y = r * Math.sin(theta) * Math.cos(phi)
+    const z = r * Math.sin(phi)
+    camera.position.set(x, y, z)
+    camera.lookAt(new THREE.Vector3(0, 0, 0))
     const element = gl.domElement
 
     const onPointerDown = (e: PointerEvent) => {
