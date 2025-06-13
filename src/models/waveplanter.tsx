@@ -131,12 +131,12 @@ export default function WavePlanterModel() {
       defaultValues={DEFAULT_PROPS}
       camera={[0, -400, 300]}
       orbitDistance={500}
-      steps={{
-        radius: 1,
-        amplitude: 0.1,
-        density: 0.1,
-        depth: 1,
-        twistWaves: 0.1,
+      ranges={{
+        radius: { min: 25, max: 100, step: 25 },
+        amplitude: { min: 0, max: 1, step: 0.05 },
+        density: { min: 0, max: 1, step: 0.1 },
+        depth: { min: 25, max: 600, step: 25 },
+        twistWaves: { min: 0, max: 1, step: 0.01 },
       }}
       mesh={meshElement}
     />

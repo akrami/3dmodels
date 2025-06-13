@@ -17,6 +17,7 @@ export interface ModelLayoutProps<T extends Record<string, number>> {
   name: string
   defaultValues: T
   steps?: Partial<Record<keyof T, number>>
+  ranges?: Partial<Record<keyof T, { min: number; max: number; step?: number }>>
   camera?: [number, number, number]
   orbitDistance?: number
   mesh: React.ReactElement<{
@@ -29,6 +30,7 @@ export default function ModelLayout<T extends Record<string, number>>({
   name,
   defaultValues,
   steps,
+  ranges,
   camera = [4, 4, 4],
   orbitDistance = 7,
   mesh,
@@ -54,7 +56,12 @@ export default function ModelLayout<T extends Record<string, number>>({
               <h2 className="text-lg font-semibold">Properties</h2>
             </SidebarHeader>
             <SidebarContent className="p-4">
-              <ModelControls values={values} onChange={handlePropUpdate} steps={steps} />
+              <ModelControls
+                values={values}
+                onChange={handlePropUpdate}
+                steps={steps}
+                ranges={ranges}
+              />
               <Button onClick={exportModel} className="mt-4 w-full">
                 Export as .stl file
               </Button>
