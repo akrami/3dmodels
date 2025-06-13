@@ -1,32 +1,41 @@
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { XZOrbitControls } from "@/components/xz-orbit-controls";
 import { ModelControls } from "@/components/model-controls";
 import { SceneHelpers } from "@/components/scene-helpers";
 import { useStlExport } from "@/hooks/use-stl-export";
 
-const OBJECT_TEMPLATE = {
-    name: 'cylinder',
-    defaults: {
-        radiusTop: 1,
-        radiusBottom: 1,
-        height: 2,
-        radialSegments: 32,
-    }
+interface CylinderProps {
+    radiusTop: number;
+    radiusBottom: number;
+    height: number;
+    radialSegments: number;
+}
+
+const MODEL_NAME = "cylinder";
+const DEFAULT_PROPS: CylinderProps = {
+    radiusTop: 1,
+    radiusBottom: 1,
+    height: 2,
+    radialSegments: 32,
 };
 
 export default function CylinderModel() {
-    const [properties, setProperties] = useState(OBJECT_TEMPLATE.defaults);
+    const [properties, setProperties] = useState<CylinderProps>(DEFAULT_PROPS);
     const meshRef = useRef<THREE.Mesh>(null);
-    const exportModel = useStlExport(OBJECT_TEMPLATE.name, meshRef);
-    const geometryArgs = [
-        properties.radiusTop,
-        properties.radiusBottom,
-        properties.height,
-        properties.radialSegments
-    ];
+    const exportModel = useStlExport(MODEL_NAME, meshRef);
 
-    const handlePropUpdate = (key: string, value: number) => {
+    const geometryArgs = useMemo(
+        () => [
+            properties.radiusTop,
+            properties.radiusBottom,
+            properties.height,
+            properties.radialSegments,
+        ],
+        [properties],
+    );
+
+    const handlePropUpdate = (key: keyof CylinderProps, value: number) => {
         setProperties((prev) => ({ ...prev, [key]: value }));
     };
 
@@ -63,3 +72,4 @@ export default function CylinderModel() {
         </div>
     );
 }
+
