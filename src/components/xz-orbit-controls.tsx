@@ -41,7 +41,7 @@ export function XZOrbitControls({
       pointer.current.x = e.clientX
       pointer.current.y = e.clientY
       angles.current.theta -= dx * rotateSpeed
-      angles.current.phi -= dy * rotateSpeed
+      angles.current.phi += dy * rotateSpeed
       const piHalf = Math.PI / 2 - 0.001
       angles.current.phi = Math.max(-piHalf, Math.min(piHalf, angles.current.phi))
     }
