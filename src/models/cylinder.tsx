@@ -1,4 +1,5 @@
 import * as React from "react"
+import ModelLayout from "@/layouts/modelLayout"
 
 export interface CylinderProps {
   radiusTop: number
@@ -37,5 +38,16 @@ export function CylinderMesh({
       <cylinderGeometry args={geometryArgs} />
       <meshStandardMaterial color="#AAAAAA" />
     </mesh>
+  )
+}
+
+export default function CylinderModel() {
+  const meshElement = React.createElement(CylinderMesh)
+  return (
+    <ModelLayout
+      name={MODEL_NAME}
+      defaultValues={DEFAULT_PROPS}
+      mesh={meshElement}
+    />
   )
 }

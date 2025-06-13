@@ -1,6 +1,7 @@
 import * as React from "react"
 import * as THREE from "three"
 import { type ThreeElements } from "@react-three/fiber"
+import ModelLayout from "@/layouts/modelLayout"
 
 export interface WavePlanterProps {
   radius: number
@@ -109,5 +110,19 @@ export function WavePlanterMesh({
       />
       <meshStandardMaterial color="#AAAAAA" />
     </mesh>
+  )
+}
+
+export default function WavePlanterModel() {
+  const meshElement = React.createElement(WavePlanterMesh)
+  return (
+    <ModelLayout
+      name={MODEL_NAME}
+      defaultValues={DEFAULT_PROPS}
+      camera={[0, -400, 300]}
+      orbitDistance={500}
+      steps={{ amplitude: 0.1, density: 0.1, rotation: 0.1 }}
+      mesh={meshElement}
+    />
   )
 }
