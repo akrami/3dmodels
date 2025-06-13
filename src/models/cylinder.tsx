@@ -1,7 +1,8 @@
 import { useRef, useState } from "react";
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
+import { XZOrbitControls } from "@/components/xz-orbit-controls";
 import { ModelControls } from "@/components/model-controls";
+import { SceneHelpers } from "@/components/scene-helpers";
 import { useStlExport } from "@/hooks/use-stl-export";
 
 const OBJECT_TEMPLATE = {
@@ -44,17 +45,18 @@ export default function CylinderModel() {
                 </aside>
                 <main className="flex-1 relative">
                     <Canvas
-                        camera={{ position: [4, 4, 4], fov: 60 }}
+                        camera={{ position: [4, 4, 4], fov: 60, up: [0, 0, 1] }}
                         className="bg-gray-900"
                         shadows
                     >
                         <ambientLight intensity={0.6} />
                         <directionalLight position={[5, 10, 7]} intensity={1} castShadow />
+                        <SceneHelpers />
                         <mesh ref={meshRef} castShadow receiveShadow>
                             <cylinderGeometry args={geometryArgs} />
                             <meshStandardMaterial color="#AAAAAA" />
                         </mesh>
-                        <OrbitControls enablePan={false} />
+                        <XZOrbitControls distance={7} />
                     </Canvas>
                 </main>
             </div>

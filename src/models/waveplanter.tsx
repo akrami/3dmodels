@@ -1,8 +1,9 @@
-import { useRef, useState, useMemo, useLayoutEffect } from "react";
+import { useRef, useState, useLayoutEffect, useMemo } from "react";
 import * as THREE from "three";
 import { Canvas, type ThreeElements } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
+import { XZOrbitControls } from "@/components/xz-orbit-controls";
 import { ModelControls } from "@/components/model-controls";
+import { SceneHelpers } from "@/components/scene-helpers";
 import { useStlExport } from "@/hooks/use-stl-export";
 
 const OBJECT_TEMPLATE = {
@@ -135,12 +136,13 @@ export default function WavePlanterModel() {
                 {/* Viewer */}
                 <main className="flex-1 relative">
                     <Canvas
-                        camera={{ position: [0, -400, 300], fov: 60 }}
+                        camera={{ position: [0, -400, 300], fov: 60, up: [0, 0, 1] }}
                         className="bg-gray-900"
                         shadows
                     >
                         <ambientLight intensity={0.6} />
                         <directionalLight position={[800, 1000, 700]} intensity={1} castShadow />
+                        <SceneHelpers />
                         <mesh ref={meshRef} castShadow receiveShadow>
                             <RingGear
                                 R={properties.radius}
@@ -154,7 +156,7 @@ export default function WavePlanterModel() {
                             />
                             <meshStandardMaterial color="#AAAAAA" />
                         </mesh>
-                        <OrbitControls />
+                        <XZOrbitControls distance={500} />
                     </Canvas>
                 </main>
             </div>
