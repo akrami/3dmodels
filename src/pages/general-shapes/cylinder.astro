@@ -2,10 +2,6 @@
 import "../../styles/globals.css";
 import ModelLayout from "@/layouts/modelLayout";
 import { CylinderMesh, DEFAULT_PROPS, MODEL_NAME } from "@/models/cylinder";
-import * as React from "react";
-
-const renderCylinder = (values: any, ref: any) =>
-  React.createElement(CylinderMesh, { props: values, meshRef: ref });
 ---
 <!DOCTYPE html>
 <html lang="en">
@@ -19,7 +15,7 @@ const renderCylinder = (values: any, ref: any) =>
       client:load
       name={MODEL_NAME}
       defaultValues={DEFAULT_PROPS}
-      render={renderCylinder}
+      MeshComponent={CylinderMesh}
     />
   </body>
 </html>

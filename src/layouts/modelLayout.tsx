@@ -17,7 +17,10 @@ export interface ModelLayoutProps<T extends Record<string, number>> {
   name: string
   defaultValues: T
   steps?: Partial<Record<keyof T, number>>
-  render: (values: T, ref: React.RefObject<THREE.Mesh>) => React.ReactNode
+  MeshComponent: React.ComponentType<{
+    props: T
+    meshRef: React.RefObject<THREE.Mesh>
+  }>
   camera?: [number, number, number]
   orbitDistance?: number
 }
@@ -26,7 +29,7 @@ export default function ModelLayout<T extends Record<string, number>>({
   name,
   defaultValues,
   steps,
-  render,
+  MeshComponent,
   camera = [4, 4, 4],
   orbitDistance = 7,
 }: ModelLayoutProps<T>) {
@@ -62,7 +65,7 @@ export default function ModelLayout<T extends Record<string, number>>({
               <ambientLight intensity={0.6} />
               <directionalLight position={[5, 10, 7]} intensity={1} castShadow />
               <SceneHelpers />
-              {render(values, meshRef)}
+              <MeshComponent props={values} meshRef={meshRef} />
               <XZOrbitControls distance={orbitDistance} />
             </Canvas>
           </div>
