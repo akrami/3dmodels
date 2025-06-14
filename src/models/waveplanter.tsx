@@ -120,6 +120,14 @@ export function WavePlanterMesh({
         castShadow
         receiveShadow
       />
+      <mesh
+        rotation={[Math.PI / 2, 0, 0]}
+        castShadow
+        receiveShadow
+      >
+        <cylinderGeometry args={[props.radius, props.radius, 8, 64]} />
+        <meshStandardMaterial color={color} />
+      </mesh>
       <meshStandardMaterial color={color} />
     </mesh>
   );
