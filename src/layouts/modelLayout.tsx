@@ -1,4 +1,5 @@
 import * as React from "react"
+import * as THREE from "three"
 import { Canvas } from "@react-three/fiber"
 import { XZOrbitControls } from "@/components/xz-orbit-controls"
 import { SceneHelpers } from "@/components/scene-helpers"
@@ -22,7 +23,7 @@ export interface ModelLayoutProps<T extends Record<string, number>> {
   orbitDistance?: number
   mesh: React.ReactElement<{
     props?: T
-    meshRef: React.RefObject<THREE.Mesh>
+    meshRef?: React.RefObject<THREE.Mesh>
   }>
 }
 
@@ -36,7 +37,7 @@ export default function ModelLayout<T extends Record<string, number>>({
   mesh,
 }: ModelLayoutProps<T>) {
   const [values, setValues] = React.useState<T>(defaultValues)
-  const meshRef = React.useRef<THREE.Mesh>(null)
+  const meshRef = React.useRef<THREE.Mesh>(null!)
   const exportModel = useStlExport(name, meshRef)
 
   const handlePropUpdate = (key: keyof T, value: number) => {

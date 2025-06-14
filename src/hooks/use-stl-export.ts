@@ -1,7 +1,11 @@
 import { useCallback } from "react";
 import { STLExporter } from "three-stdlib";
+import * as THREE from "three";
 
-export function useStlExport(name: string, ref: React.RefObject<THREE.Object3D>) {
+export function useStlExport<T extends THREE.Object3D>(
+  name: string,
+  ref: React.RefObject<T | null>
+) {
   return useCallback(() => {
     if (!ref.current) return;
     const exporter = new STLExporter();

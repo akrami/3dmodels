@@ -3,7 +3,7 @@ import * as THREE from "three";
 import { type ThreeElements } from "@react-three/fiber";
 import ModelLayout from "@/layouts/modelLayout";
 
-export interface WavePlanterProps {
+export interface WavePlanterProps extends Record<string, number> {
   radius: number;
   amplitude: number;
   density: number;
@@ -26,7 +26,7 @@ export function WavePlanterMesh({
   meshRef,
 }: {
   props?: WavePlanterProps;
-  meshRef: React.RefObject<THREE.Mesh>;
+  meshRef?: React.RefObject<THREE.Mesh>;
 }) {
   const RingGear = ({
     R,
@@ -93,8 +93,8 @@ export function WavePlanterMesh({
     React.useLayoutEffect(() => () => geometry.dispose(), [geometry]);
 
     return (
-      <mesh geometry={geometry} {...meshProps}>
-        {material ?? (
+      <mesh geometry={geometry} material={material} {...meshProps}>
+        {!material && (
           <meshStandardMaterial
             attach="material"
             color="#4477ff"
@@ -124,7 +124,7 @@ export function WavePlanterMesh({
 }
 
 export default function WavePlanterModel() {
-  const meshElement = React.createElement(WavePlanterMesh);
+  const meshElement = <WavePlanterMesh />;
   return (
     <ModelLayout
       name={MODEL_NAME}
