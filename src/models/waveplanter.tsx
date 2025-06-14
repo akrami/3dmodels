@@ -111,58 +111,76 @@ export function WavePlanterMesh({
     );
   };
 
-  const bottomGeometry = React.useMemo(() => {
-    const outer = props.radius - 4;
-    const diameter = outer * 2;
-    const holeCount = diameter <= 50 ? 1 : 3;
+  const createBottomGeometry = React.useCallback(
+    (withHoles: boolean) => {
+      const outer = props.radius - 4;
+      const diameter = outer * 2;
+      const holeCount = withHoles ? (diameter <= 50 ? 1 : 3) : 0;
 
-    const createShape = (holeRadius: number) => {
-      const shape = new THREE.Shape();
-      shape.absarc(0, 0, outer, 0, Math.PI * 2, false);
+      const createShape = (holeRadius: number) => {
+        const shape = new THREE.Shape();
+        shape.absarc(0, 0, outer, 0, Math.PI * 2, false);
 
-      const positions: [number, number][] = [];
-      if (holeCount === 1) {
-        positions.push([0, 0]);
-      } else {
-        const dist = outer / 2;
-        for (let i = 0; i < holeCount; i++) {
-          const ang = (i / holeCount) * Math.PI * 2;
-          positions.push([Math.cos(ang) * dist, Math.sin(ang) * dist]);
+        if (holeCount > 0) {
+          const positions: [number, number][] = [];
+          if (holeCount === 1) {
+            positions.push([0, 0]);
+          } else {
+            const dist = outer / 2;
+            for (let i = 0; i < holeCount; i++) {
+              const ang = (i / holeCount) * Math.PI * 2;
+              positions.push([Math.cos(ang) * dist, Math.sin(ang) * dist]);
+            }
+          }
+
+          positions.forEach(([x, y]) => {
+            const hole = new THREE.Path();
+            hole.absarc(x, y, holeRadius, 0, Math.PI * 2, true);
+            shape.holes.push(hole);
+          });
         }
-      }
 
-      positions.forEach(([x, y]) => {
-        const hole = new THREE.Path();
-        hole.absarc(x, y, holeRadius, 0, Math.PI * 2, true);
-        shape.holes.push(hole);
+        return shape;
+      };
+
+      const topShape = createShape(10);
+      const bottomShape = createShape(9);
+
+      const top = new THREE.ExtrudeGeometry(topShape, {
+        depth: 2,
+        bevelEnabled: false,
+        curveSegments: 64,
       });
 
-      return shape;
-    };
+      const bottom = new THREE.ExtrudeGeometry(bottomShape, {
+        depth: 2,
+        bevelEnabled: false,
+        curveSegments: 64,
+      });
+      bottom.translate(0, 0, -2);
 
-    const topShape = createShape(10);
-    const bottomShape = createShape(9);
+      const geom = mergeGeometries([bottom, top], false);
+      return geom!;
+    },
+    [props.radius]
+  );
 
-    const top = new THREE.ExtrudeGeometry(topShape, {
-      depth: 2,
-      bevelEnabled: false,
-      curveSegments: 64,
-    });
-
-    const bottom = new THREE.ExtrudeGeometry(bottomShape, {
-      depth: 2,
-      bevelEnabled: false,
-      curveSegments: 64,
-    });
-    bottom.translate(0, 0, -2);
-
-    const geom = mergeGeometries([bottom, top], false);
-    return geom!;
-  }, [props.radius]);
+  const bottomGeometry = React.useMemo(
+    () => createBottomGeometry(true),
+    [createBottomGeometry]
+  );
+  const solidBottomGeometry = React.useMemo(
+    () => createBottomGeometry(false),
+    [createBottomGeometry]
+  );
 
   const distance = props.radius * 2.5;
 
-  const Planter = ({ depth, position = [0, 0, 0] as [number, number, number] }) => (
+  const Planter = ({
+    depth,
+    holes = true,
+    position = [0, 0, 0] as [number, number, number],
+  }) => (
     <group position={position} castShadow receiveShadow>
       <RingGear
         R={props.radius}
@@ -175,7 +193,7 @@ export function WavePlanterMesh({
         castShadow
         receiveShadow
       />
-      <mesh geometry={bottomGeometry} castShadow receiveShadow>
+      <mesh geometry={holes ? bottomGeometry : solidBottomGeometry} castShadow receiveShadow>
         <meshStandardMaterial color={color} />
       </mesh>
     </group>
@@ -184,7 +202,7 @@ export function WavePlanterMesh({
   return (
     <group ref={meshRef}>
       <Planter depth={props.depth} />
-      <Planter depth={props.baseDepth} position={[distance, 0, 0]} />
+      <Planter depth={props.baseDepth} holes={false} position={[distance, 0, 0]} />
     </group>
   );
 }
