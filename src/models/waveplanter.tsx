@@ -3,7 +3,7 @@ import * as THREE from "three";
 import { type ThreeElements } from "@react-three/fiber";
 import ModelLayout from "@/layouts/modelLayout";
 
-export interface WavePlanterProps {
+export interface WavePlanterProps extends Record<string, number> {
   radius: number;
   amplitude: number;
   density: number;
@@ -14,11 +14,11 @@ export interface WavePlanterProps {
 export const MODEL_NAME = "wave";
 const TWIST_SEGMENTS = 128;
 export const DEFAULT_PROPS: WavePlanterProps = {
-  radius: 100,
+  radius: 75,
   amplitude: 0.2,
-  density: 0.6,
-  depth: 123,
-  twistWaves: 1,
+  density: 0.3,
+  depth: 100,
+  twistWaves: 0.5,
 };
 
 export function WavePlanterMesh({
@@ -26,7 +26,7 @@ export function WavePlanterMesh({
   meshRef,
 }: {
   props?: WavePlanterProps;
-  meshRef: React.RefObject<THREE.Mesh>;
+  meshRef?: React.RefObject<THREE.Mesh>;
 }) {
   const RingGear = ({
     R,
@@ -93,11 +93,11 @@ export function WavePlanterMesh({
     React.useLayoutEffect(() => () => geometry.dispose(), [geometry]);
 
     return (
-      <mesh geometry={geometry} {...meshProps}>
-        {material ?? (
+      <mesh geometry={geometry} material={material} {...meshProps}>
+        {!material && (
           <meshStandardMaterial
             attach="material"
-            color="#4477ff"
+            color="#7F8CAA"
             side={THREE.DoubleSide}
           />
         )}
@@ -124,19 +124,19 @@ export function WavePlanterMesh({
 }
 
 export default function WavePlanterModel() {
-  const meshElement = React.createElement(WavePlanterMesh);
+  const meshElement = <WavePlanterMesh />;
   return (
     <ModelLayout
       name={MODEL_NAME}
       defaultValues={DEFAULT_PROPS}
       camera={[0, -400, 300]}
       orbitDistance={500}
-      steps={{
-        radius: 1,
-        amplitude: 0.1,
-        density: 0.1,
-        depth: 1,
-        twistWaves: 0.1,
+      ranges={{
+        radius: { min: 25, max: 100, step: 25 },
+        amplitude: { min: 0, max: 1, step: 0.05 },
+        density: { min: 0, max: 1, step: 0.1 },
+        depth: { min: 25, max: 600, step: 25 },
+        twistWaves: { min: 0, max: 1, step: 0.01 },
       }}
       mesh={meshElement}
     />
