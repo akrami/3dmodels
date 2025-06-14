@@ -42,6 +42,7 @@ export function WavePlanterMesh({
     rot = 0,
     twistWaves = 1,
     segments = 1024,
+    reverseTwist = false,
     material,
     ...meshProps
   }: {
@@ -52,6 +53,8 @@ export function WavePlanterMesh({
     rot?: number;
     twistWaves?: number;
     segments?: number;
+    /** Reverse the twist direction */
+    reverseTwist?: boolean;
     material?: THREE.Material | THREE.Material[];
   } & ThreeElements["mesh"]) => {
     const geometry = React.useMemo(() => {
@@ -85,7 +88,8 @@ export function WavePlanterMesh({
         for (let i = 0; i < pos.count; i++) {
           v.fromBufferAttribute(pos, i);
           const t = v.z / depth;
-          const angle = Math.sin(t * twistWaves * Math.PI * 2) * rot;
+          const phase = reverseTwist ? Math.PI : 0;
+          const angle = Math.sin(t * twistWaves * Math.PI * 2 + phase) * rot;
           const e = new THREE.Euler(0, 0, angle);
           v.applyEuler(e);
           pos.setXYZ(i, v.x, v.y, v.z);
@@ -94,7 +98,7 @@ export function WavePlanterMesh({
         geom.computeVertexNormals();
       }
       return geom;
-    }, [R, A, n, depth, segments, rot, twistWaves]);
+    }, [R, A, n, depth, segments, rot, twistWaves, reverseTwist]);
 
     React.useLayoutEffect(() => () => geometry.dispose(), [geometry]);
 
@@ -177,11 +181,19 @@ export function WavePlanterMesh({
   const distance = props.radius * 2.5;
 
   const Planter = ({
+    name,
     depth,
     holes = true,
     position = [0, 0, 0] as [number, number, number],
+    reverseTwist = false,
+  }: {
+    name: string;
+    depth: number;
+    holes?: boolean;
+    position?: [number, number, number];
+    reverseTwist?: boolean;
   }) => (
-    <group position={position} castShadow receiveShadow>
+    <group name={name} position={position} castShadow receiveShadow>
       <RingGear
         R={props.radius}
         A={props.amplitude}
@@ -189,6 +201,7 @@ export function WavePlanterMesh({
         depth={depth}
         rot={Math.PI / 12}
         twistWaves={props.twistWaves}
+        reverseTwist={reverseTwist}
         position={[0, 0, 0]}
         castShadow
         receiveShadow
@@ -201,8 +214,14 @@ export function WavePlanterMesh({
 
   return (
     <group ref={meshRef}>
-      <Planter depth={props.depth} />
-      <Planter depth={props.baseDepth} holes={false} position={[distance, 0, 0]} />
+      <Planter name="waveplanter" depth={props.depth} />
+      <Planter
+        name="baseplanter"
+        depth={props.baseDepth}
+        holes={false}
+        position={[distance, 0, 0]}
+        reverseTwist
+      />
     </group>
   );
 }
