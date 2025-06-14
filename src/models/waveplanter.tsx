@@ -88,8 +88,8 @@ export function WavePlanterMesh({
         for (let i = 0; i < pos.count; i++) {
           v.fromBufferAttribute(pos, i);
           const t = v.z / depth;
-          const phase = reverseTwist ? Math.PI : 0;
-          const angle = Math.sin(t * twistWaves * Math.PI * 2 + phase) * rot;
+          const tt = reverseTwist ? 1 - t : t;
+          const angle = Math.sin(tt * twistWaves * Math.PI * 2) * rot;
           const e = new THREE.Euler(0, 0, angle);
           v.applyEuler(e);
           pos.setXYZ(i, v.x, v.y, v.z);
