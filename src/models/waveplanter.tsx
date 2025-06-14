@@ -125,7 +125,7 @@ export function WavePlanterMesh({
         castShadow
         receiveShadow
       >
-        <cylinderGeometry args={[props.radius, props.radius, 8, 64]} />
+        <cylinderGeometry args={[props.radius - 4, props.radius - 4, 4, 128]} />
         <meshStandardMaterial color={color} />
       </mesh>
       <meshStandardMaterial color={color} />
