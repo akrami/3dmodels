@@ -14,11 +14,11 @@ export interface WavePlanterProps extends Record<string, number> {
 export const MODEL_NAME = "wave";
 const TWIST_SEGMENTS = 128;
 export const DEFAULT_PROPS: WavePlanterProps = {
-  radius: 100,
+  radius: 75,
   amplitude: 0.2,
-  density: 0.6,
-  depth: 123,
-  twistWaves: 1,
+  density: 0.3,
+  depth: 100,
+  twistWaves: 0.5,
 };
 
 export function WavePlanterMesh({
@@ -97,7 +97,7 @@ export function WavePlanterMesh({
         {!material && (
           <meshStandardMaterial
             attach="material"
-            color="#4477ff"
+            color="#7F8CAA"
             side={THREE.DoubleSide}
           />
         )}
