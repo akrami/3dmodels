@@ -188,6 +188,7 @@ export function WavePlanterMesh({
     position = [0, 0, 0] as [number, number, number],
     reverseTwist = false,
     twistWaves = props.twistWaves,
+    bottomOffset = 0,
   }: {
     name: string;
     depth: number;
@@ -195,6 +196,8 @@ export function WavePlanterMesh({
     position?: [number, number, number];
     reverseTwist?: boolean;
     twistWaves?: number;
+    /** Offset the bottom plate along Z */
+    bottomOffset?: number;
   }) => (
     <group name={name} position={position} castShadow receiveShadow>
       <RingGear
@@ -209,7 +212,12 @@ export function WavePlanterMesh({
         castShadow
         receiveShadow
       />
-      <mesh geometry={holes ? bottomGeometry : solidBottomGeometry} castShadow receiveShadow>
+      <mesh
+        geometry={holes ? bottomGeometry : solidBottomGeometry}
+        position={[0, 0, bottomOffset]}
+        castShadow
+        receiveShadow
+      >
         <meshStandardMaterial color={color} />
       </mesh>
     </group>
@@ -225,6 +233,7 @@ export function WavePlanterMesh({
         position={[distance, 0, 0]}
         twistWaves={(props.baseDepth / props.depth) * props.twistWaves}
         reverseTwist
+        bottomOffset={2}
       />
     </group>
   );
