@@ -1,5 +1,6 @@
 import * as React from "react";
 import * as THREE from "three";
+import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { type ThreeElements } from "@react-three/fiber";
 import ModelLayout from "@/layouts/modelLayout";
 
@@ -107,6 +108,55 @@ export function WavePlanterMesh({
     );
   };
 
+  const bottomGeometry = React.useMemo(() => {
+    const outer = props.radius - 4;
+    const diameter = outer * 2;
+    const holeCount = diameter <= 50 ? 1 : 3;
+
+    const createShape = (holeRadius: number) => {
+      const shape = new THREE.Shape();
+      shape.absarc(0, 0, outer, 0, Math.PI * 2, false);
+
+      const positions: [number, number][] = [];
+      if (holeCount === 1) {
+        positions.push([0, 0]);
+      } else {
+        const dist = outer / 2;
+        for (let i = 0; i < holeCount; i++) {
+          const ang = (i / holeCount) * Math.PI * 2;
+          positions.push([Math.cos(ang) * dist, Math.sin(ang) * dist]);
+        }
+      }
+
+      positions.forEach(([x, y]) => {
+        const hole = new THREE.Path();
+        hole.absarc(x, y, holeRadius, 0, Math.PI * 2, true);
+        shape.holes.push(hole);
+      });
+
+      return shape;
+    };
+
+    const topShape = createShape(10);
+    const bottomShape = createShape(9);
+
+    const top = new THREE.ExtrudeGeometry(topShape, {
+      depth: 2,
+      bevelEnabled: false,
+      curveSegments: 64,
+    });
+
+    const bottom = new THREE.ExtrudeGeometry(bottomShape, {
+      depth: 2,
+      bevelEnabled: false,
+      curveSegments: 64,
+    });
+    bottom.translate(0, 0, -2);
+
+    const geom = mergeGeometries([bottom, top], false);
+    return geom!;
+  }, [props.radius]);
+
   return (
     <mesh ref={meshRef} castShadow receiveShadow>
       <RingGear
@@ -120,12 +170,7 @@ export function WavePlanterMesh({
         castShadow
         receiveShadow
       />
-      <mesh
-        rotation={[Math.PI / 2, 0, 0]}
-        castShadow
-        receiveShadow
-      >
-        <cylinderGeometry args={[props.radius - 4, props.radius - 4, 4, 128]} />
+      <mesh geometry={bottomGeometry} castShadow receiveShadow>
         <meshStandardMaterial color={color} />
       </mesh>
       <meshStandardMaterial color={color} />
