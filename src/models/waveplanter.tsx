@@ -186,12 +186,14 @@ export function WavePlanterMesh({
     holes = true,
     position = [0, 0, 0] as [number, number, number],
     reverseTwist = false,
+    twistWaves = props.twistWaves,
   }: {
     name: string;
     depth: number;
     holes?: boolean;
     position?: [number, number, number];
     reverseTwist?: boolean;
+    twistWaves?: number;
   }) => (
     <group name={name} position={position} castShadow receiveShadow>
       <RingGear
@@ -200,7 +202,7 @@ export function WavePlanterMesh({
         n={props.density}
         depth={depth}
         rot={Math.PI / 12}
-        twistWaves={props.twistWaves}
+        twistWaves={twistWaves}
         reverseTwist={reverseTwist}
         position={[0, 0, 0]}
         castShadow
@@ -220,6 +222,7 @@ export function WavePlanterMesh({
         depth={props.baseDepth}
         holes={false}
         position={[distance, 0, 0]}
+        twistWaves={(props.baseDepth / props.depth) * props.twistWaves}
         reverseTwist
       />
     </group>
