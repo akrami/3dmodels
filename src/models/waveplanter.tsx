@@ -24,9 +24,11 @@ export const DEFAULT_PROPS: WavePlanterProps = {
 export function WavePlanterMesh({
   props = DEFAULT_PROPS,
   meshRef,
+  color = "#AAAAAA",
 }: {
   props?: WavePlanterProps;
   meshRef?: React.RefObject<THREE.Mesh>;
+  color?: string;
 }) {
   const RingGear = ({
     R,
@@ -97,7 +99,7 @@ export function WavePlanterMesh({
         {!material && (
           <meshStandardMaterial
             attach="material"
-            color="#7F8CAA"
+            color={color}
             side={THREE.DoubleSide}
           />
         )}
@@ -118,13 +120,14 @@ export function WavePlanterMesh({
         castShadow
         receiveShadow
       />
-      <meshStandardMaterial color="#AAAAAA" />
+      <meshStandardMaterial color={color} />
     </mesh>
   );
 }
 
 export default function WavePlanterModel() {
-  const meshElement = <WavePlanterMesh />;
+  const [color, setColor] = React.useState("#AAAAAA");
+  const meshElement = <WavePlanterMesh color={color} />;
   return (
     <ModelLayout
       name={MODEL_NAME}
@@ -139,6 +142,16 @@ export default function WavePlanterModel() {
         twistWaves: { min: 0, max: 1, step: 0.01 },
       }}
       mesh={meshElement}
-    />
+    >
+      <label className="flex flex-col gap-1 mb-4 text-sm">
+        <span className="capitalize mb-1 flex justify-between">Color</span>
+        <input
+          type="color"
+          value={color}
+          onChange={(e) => setColor(e.target.value)}
+          className="h-8 w-full p-0 border-none bg-transparent"
+        />
+      </label>
+    </ModelLayout>
   );
 }

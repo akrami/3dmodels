@@ -24,6 +24,7 @@ export interface ModelLayoutProps<T extends Record<string, number>> {
     props?: T
     meshRef?: React.RefObject<THREE.Mesh>
   }>
+  children?: React.ReactNode
 }
 
 export default function ModelLayout<T extends Record<string, number>>({
@@ -33,6 +34,7 @@ export default function ModelLayout<T extends Record<string, number>>({
   camera = [4, 4, 4],
   orbitDistance = 7,
   mesh,
+  children,
 }: ModelLayoutProps<T>) {
   const [values, setValues] = React.useState<T>(defaultValues)
   const meshRef = React.useRef<THREE.Mesh>(null!)
@@ -60,6 +62,7 @@ export default function ModelLayout<T extends Record<string, number>>({
                 onChange={handlePropUpdate}
                 ranges={ranges}
               />
+              {children}
               <Button onClick={exportModel} className="mt-4 w-full">
                 Export as .stl file
               </Button>
