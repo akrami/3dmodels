@@ -22,7 +22,7 @@ export interface ModelLayoutProps<T extends Record<string, number>> {
   orbitDistance?: number
   mesh: React.ReactElement<{
     props?: T
-    meshRef?: React.RefObject<THREE.Mesh>
+    meshRef?: React.RefObject<THREE.Group>
   }>
   children?: React.ReactNode
 }
@@ -37,7 +37,7 @@ export default function ModelLayout<T extends Record<string, number>>({
   children,
 }: ModelLayoutProps<T>) {
   const [values, setValues] = React.useState<T>(defaultValues)
-  const meshRef = React.useRef<THREE.Mesh>(null!)
+  const meshRef = React.useRef<THREE.Group>(null!)
   const exportModel = useStlExport(name, meshRef)
 
   const handlePropUpdate = (key: keyof T, value: number) => {

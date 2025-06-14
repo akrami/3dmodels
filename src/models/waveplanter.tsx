@@ -9,6 +9,8 @@ export interface WavePlanterProps extends Record<string, number> {
   amplitude: number;
   density: number;
   depth: number;
+  /** Depth of the secondary base planter */
+  baseDepth: number;
   twistWaves: number;
 }
 
@@ -19,6 +21,7 @@ export const DEFAULT_PROPS: WavePlanterProps = {
   amplitude: 0.2,
   density: 0.3,
   depth: 100,
+  baseDepth: 50,
   twistWaves: 0.5,
 };
 
@@ -28,7 +31,7 @@ export function WavePlanterMesh({
   color = "#AAAAAA",
 }: {
   props?: WavePlanterProps;
-  meshRef?: React.RefObject<THREE.Mesh>;
+  meshRef?: React.RefObject<THREE.Group>;
   color?: string;
 }) {
   const RingGear = ({
@@ -157,13 +160,15 @@ export function WavePlanterMesh({
     return geom!;
   }, [props.radius]);
 
-  return (
-    <mesh ref={meshRef} castShadow receiveShadow>
+  const distance = props.radius * 2.5;
+
+  const Planter = ({ depth, position = [0, 0, 0] as [number, number, number] }) => (
+    <group position={position} castShadow receiveShadow>
       <RingGear
         R={props.radius}
         A={props.amplitude}
         n={props.density}
-        depth={props.depth}
+        depth={depth}
         rot={Math.PI / 12}
         twistWaves={props.twistWaves}
         position={[0, 0, 0]}
@@ -173,8 +178,14 @@ export function WavePlanterMesh({
       <mesh geometry={bottomGeometry} castShadow receiveShadow>
         <meshStandardMaterial color={color} />
       </mesh>
-      <meshStandardMaterial color={color} />
-    </mesh>
+    </group>
+  );
+
+  return (
+    <group ref={meshRef}>
+      <Planter depth={props.depth} />
+      <Planter depth={props.baseDepth} position={[distance, 0, 0]} />
+    </group>
   );
 }
 
@@ -192,6 +203,7 @@ export default function WavePlanterModel() {
         amplitude: { min: 0, max: 1, step: 0.05 },
         density: { min: 0, max: 1, step: 0.1 },
         depth: { min: 25, max: 600, step: 25 },
+        baseDepth: { min: 25, max: 600, step: 25 },
         twistWaves: { min: 0, max: 1, step: 0.01 },
       }}
       mesh={meshElement}
