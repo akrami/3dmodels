@@ -43,6 +43,8 @@ export function WavePlanterMesh({
     twistWaves = 1,
     segments = 1024,
     reverseTwist = false,
+    /** Depth of an additional inner cut at the top */
+    topCutDepth = 0,
     material,
     ...meshProps
   }: {
@@ -55,32 +57,61 @@ export function WavePlanterMesh({
     segments?: number;
     /** Reverse the twist direction */
     reverseTwist?: boolean;
+    /** Depth of a cylindrical cut at the top */
+    topCutDepth?: number;
     material?: THREE.Material | THREE.Material[];
   } & ThreeElements["mesh"]) => {
     const geometry = React.useMemo(() => {
       const k = Math.round(R * n);
       const rOuter = (t: number) => R + A - Math.abs(Math.sin(k * t));
       const rInner = R - (A + 4);
+      const rInnerCut = R - 4;
 
-      const shape = new THREE.Shape();
-      for (let i = 0; i <= segments; i++) {
-        const t = (i / segments) * Math.PI * 2;
-        const r = rOuter(t);
-        const x = r * Math.cos(t);
-        const y = r * Math.sin(t);
-        i === 0 ? shape.moveTo(x, y) : shape.lineTo(x, y);
-      }
-      shape.closePath();
+      const makeOuterShape = () => {
+        const shape = new THREE.Shape();
+        for (let i = 0; i <= segments; i++) {
+          const t = (i / segments) * Math.PI * 2;
+          const r = rOuter(t);
+          const x = r * Math.cos(t);
+          const y = r * Math.sin(t);
+          i === 0 ? shape.moveTo(x, y) : shape.lineTo(x, y);
+        }
+        shape.closePath();
+        return shape;
+      };
 
-      const hole = new THREE.Path().absarc(0, 0, rInner, 0, Math.PI * 2, true);
-      shape.holes.push(hole);
+      const bottomDepth = Math.max(depth - topCutDepth, 0);
+      const bottomSteps = Math.max(1, Math.round((bottomDepth / depth) * TWIST_SEGMENTS));
+      const topSteps = Math.max(1, TWIST_SEGMENTS - bottomSteps);
 
-      const geom = new THREE.ExtrudeGeometry(shape, {
-        steps: TWIST_SEGMENTS,
-        depth,
+      const outerShape = makeOuterShape();
+      const holeBottom = new THREE.Path().absarc(0, 0, rInner, 0, Math.PI * 2, true);
+      const bottomShape = outerShape.clone();
+      bottomShape.holes.push(holeBottom);
+      const bottomGeom = new THREE.ExtrudeGeometry(bottomShape, {
+        steps: bottomSteps,
+        depth: bottomDepth,
         bevelEnabled: false,
         curveSegments: 128,
       });
+
+      let geoms: THREE.BufferGeometry[] = [bottomGeom];
+
+      if (topCutDepth > 0) {
+        const outerShapeTop = makeOuterShape();
+        const holeTop = new THREE.Path().absarc(0, 0, rInnerCut, 0, Math.PI * 2, true);
+        outerShapeTop.holes.push(holeTop);
+        const topGeom = new THREE.ExtrudeGeometry(outerShapeTop, {
+          steps: topSteps,
+          depth: topCutDepth,
+          bevelEnabled: false,
+          curveSegments: 128,
+        });
+        topGeom.translate(0, 0, bottomDepth);
+        geoms.push(topGeom);
+      }
+
+      const geom = mergeGeometries(geoms, false)!;
 
       if (rot !== 0) {
         const pos = geom.attributes.position as THREE.BufferAttribute;
@@ -99,7 +130,7 @@ export function WavePlanterMesh({
         geom.computeVertexNormals();
       }
       return geom;
-    }, [R, A, n, depth, segments, rot, twistWaves, reverseTwist]);
+    }, [R, A, n, depth, segments, rot, twistWaves, reverseTwist, topCutDepth]);
 
     React.useLayoutEffect(() => () => geometry.dispose(), [geometry]);
 
@@ -189,6 +220,7 @@ export function WavePlanterMesh({
     reverseTwist = false,
     twistWaves = props.twistWaves,
     bottomOffset = 0,
+    topCutDepth = 0,
   }: {
     name: string;
     depth: number;
@@ -198,6 +230,8 @@ export function WavePlanterMesh({
     twistWaves?: number;
     /** Offset the bottom plate along Z */
     bottomOffset?: number;
+    /** Depth of cylindrical cut at top */
+    topCutDepth?: number;
   }) => (
     <group name={name} position={position} castShadow receiveShadow>
       <RingGear
@@ -208,6 +242,7 @@ export function WavePlanterMesh({
         rot={Math.PI / 12}
         twistWaves={twistWaves}
         reverseTwist={reverseTwist}
+        topCutDepth={topCutDepth}
         position={[0, 0, 0]}
         castShadow
         receiveShadow
@@ -234,6 +269,7 @@ export function WavePlanterMesh({
         twistWaves={(props.baseDepth / props.depth) * props.twistWaves}
         reverseTwist
         bottomOffset={2}
+        topCutDepth={2}
       />
     </group>
   );
