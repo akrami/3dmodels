@@ -29,11 +29,16 @@ export function useStlExport<T extends THREE.Object3D>(
     const root = ref.current;
     root.updateMatrixWorld(true);
 
-    const groups = root.children.filter(
+    const explicit = [
+      root.getObjectByName("waveplanter"),
+      root.getObjectByName("baseplanter"),
+    ].filter((o): o is THREE.Object3D => o !== null);
+
+    const children = root.children.filter(
       (c): c is THREE.Object3D & { name: string } => c.name !== ""
     );
 
-    const targets = groups.length > 0 ? groups : [root];
+    const targets = explicit.length > 0 ? explicit : children.length > 0 ? children : [root];
 
     targets.forEach((obj) => {
       const geom = mergeGroup(obj);
