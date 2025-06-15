@@ -11,33 +11,6 @@ importers:
       '@astrojs/react':
         specifier: ^4.3.0
         version: 4.3.0(@types/node@22.15.29)(@types/react-dom@19.1.6(@types/react@19.1.6))(@types/react@19.1.6)(jiti@2.4.2)(lightningcss@1.30.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      '@icons-pack/react-simple-icons':
-        specifier: ^12.9.0
-        version: 12.9.0(react@19.1.0)
-      '@jscad/array-utils':
-        specifier: 2.1.4
-        version: 2.1.4
-      '@jscad/core':
-        specifier: 2.6.12
-        version: 2.6.12
-      '@jscad/examples':
-        specifier: 2.4.2
-        version: 2.4.2
-      '@jscad/io':
-        specifier: 2.4.11
-        version: 2.4.11
-      '@jscad/modeling':
-        specifier: 2.12.5
-        version: 2.12.5
-      '@jscad/regl-renderer':
-        specifier: 2.6.12
-        version: 2.6.12
-      '@radix-ui/react-avatar':
-        specifier: ^1.1.10
-        version: 1.1.10(@types/react-dom@19.1.6(@types/react@19.1.6))(@types/react@19.1.6)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      '@radix-ui/react-collapsible':
-        specifier: ^1.1.11
-        version: 1.1.11(@types/react-dom@19.1.6(@types/react@19.1.6))(@types/react@19.1.6)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@radix-ui/react-dialog':
         specifier: ^1.1.14
         version: 1.1.14(@types/react-dom@19.1.6(@types/react@19.1.6))(@types/react@19.1.6)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -398,11 +371,6 @@ packages:
   '@floating-ui/utils@0.2.9':
     resolution: {integrity: sha512-MDWhGtE+eHw5JW7lq4qhc5yRLS11ERl1c7Z6Xd0a58DozHES6EnNNwUWbMiG4J9Cgj053Bhk8zvlhFYKVhULwg==}
 
-  '@icons-pack/react-simple-icons@12.9.0':
-    resolution: {integrity: sha512-GLb2ayO78ZjjmI7GMpCDlXcELEr3DPO89nordI/JC8dMiJDMzuPb3qeOTt+SWcFOyJ+SAh9C/feUCpiBSM8ZLQ==}
-    peerDependencies:
-      react: ^16.13 || ^17 || ^18 || ^19
-
   '@img/sharp-darwin-arm64@0.33.5':
     resolution: {integrity: sha512-UT4p+iz/2H4twwAoLCqfA9UH5pI6DggwKEGuaPy7nCVQ8ZsiY5PIcrRvD1DzuY3qYL07NtIQcWnBSY/heikIFQ==}
     engines: {node: ^18.17.0 || ^20.3.0 || >=21.0.0}
@@ -530,72 +498,6 @@ packages:
   '@jridgewell/trace-mapping@0.3.25':
     resolution: {integrity: sha512-vNk6aEwybGtawWmy/PzwnGDOjCkLWSD2wqvjGGAgOAwCGWySYXfYoxt00IJkTF+8Lb57DwOb3Aa0o9CApepiYQ==}
 
-  '@jscad/3mf-serializer@2.1.14':
-    resolution: {integrity: sha512-Jq/32x9gYbKpaL4Y4ny2ReQnGMeE+ygEMjZP/SILcUZg92G5/95mFmoOy9aoiXykF44jolzH4lgvlUF57JEhMQ==}
-
-  '@jscad/amf-deserializer@2.3.10':
-    resolution: {integrity: sha512-jOGsghWefoNloD/4e+Qr4Q0eTcAv7ARfRZNb0hvupFytwnETrsG34TlvD+eLrny7ZupPlFKsyYuNo9gzeZtqrQ==}
-
-  '@jscad/amf-serializer@2.1.20':
-    resolution: {integrity: sha512-eF9zrskgTnIomTb2sjrNU6iqC1ONvBDpet1KZ+1N5UY8GKyyIIrFwFVcwitjtdjHtQ1/6AFxD8Kk4rhhm5GSxA==}
-
-  '@jscad/array-utils@2.1.4':
-    resolution: {integrity: sha512-c31r4zSKsE+4Xfwk2V8monDA0hx5G89QGzaakWVUvuGNowYS9WSsYCwHiTIXodjR+HEnDu4okQ7k/whmP0Ne2g==}
-
-  '@jscad/core@2.6.12':
-    resolution: {integrity: sha512-82M3DToJlaJpjyohvZ6y2q0Fw4MlGctOXWSmkwTg2KjVsL9H8mSfsKTmOzdG4uJ7k7BSOh5xjhfs2ZVXszTdvA==}
-
-  '@jscad/dxf-deserializer@2.3.27':
-    resolution: {integrity: sha512-ltBpuBPmBOdYvy0RNUCyj5PYhHs1S/DhLjR6Cj0U9tybA6rpVxAoQ3NQ9WlQHDcDV+VRZ1EWJcHmPZLFkLB2mA==}
-
-  '@jscad/dxf-serializer@2.1.20':
-    resolution: {integrity: sha512-4GvdaRn8TkelDFiJiSnsbD8lWBE18nowpCBTZ0jifEQYF4rZ3pViMQuq31ti2VTDjpMyJpBzEp9Xd4l2jiYhpQ==}
-
-  '@jscad/examples@2.4.2':
-    resolution: {integrity: sha512-MiqA+yRn8gc/PlFvCysNQdgUxtiQjeeobsQiyWv+Dncibi6KT2QeMTmTRfFDFPAHRtcKBnMOmMuQN9zYFGetJw==}
-
-  '@jscad/io-utils@2.0.30':
-    resolution: {integrity: sha512-VL0eCrjYGp9Xj+/3G9ZzunnRmUQSyHB1+QIBw9ZQU4UJWo7HKlbgQ+kFwCT4EtKb7c+83eHWVBlH4Hvt7Znvug==}
-
-  '@jscad/io@2.4.11':
-    resolution: {integrity: sha512-65x2HxJSb2IH1W2xWlfxOsf4BUSvxGcsZYIUE43CzAIy3053dYkg4dadbH7G6J3JgDdlSj7q+rXOO7j84ovI+w==}
-
-  '@jscad/json-deserializer@2.0.31':
-    resolution: {integrity: sha512-d4C2mKWvc5xFt7KG5qkpUIh7HpZ+J2fpwg/IrCc7I1aKqVtyInf+zD5GxH0xB0dBeLLOsJMIYHvqmOfmSjj0rg==}
-
-  '@jscad/json-serializer@2.0.30':
-    resolution: {integrity: sha512-Um37ml4MYFqw5rfqnItnLz4JNJLOhZONgWiIUkBUvgiD6cqiieEny9Sk3YeJuwkLoqrW9OT05JPv32MnT7u3eQ==}
-
-  '@jscad/modeling@2.12.5':
-    resolution: {integrity: sha512-7deHWmE+CKBx2RyxDxl9Pie0bDOHHtcsh4V0gKViu27abYXKGl8+myoddwIvxLczwnw31ZZXDdUdm0Ef51YwQg==}
-
-  '@jscad/obj-deserializer@2.0.30':
-    resolution: {integrity: sha512-uO5OwJXECLeRZHOxaf280FwCtR0319uzV+X5wgEPIoceuVNmTcus+BCs+ldNe4rmDWummVLreTQv1qkIt5u1Lg==}
-
-  '@jscad/obj-serializer@2.1.20':
-    resolution: {integrity: sha512-k3u5oE56kE37azocjxFEsBBLRZdTcfONX598anfunIcpn6+2IkZVMVE9OJtuoMd51mVDrjYc4+FLjZvtd6281Q==}
-
-  '@jscad/regl-renderer@2.6.12':
-    resolution: {integrity: sha512-feI9Oi9gYyTmZHa68NtalHwulNyQ9F+xNoNdCEVhJ07kEVWtp8WU2tSRty1Je8KJt1pZBxAWdXHMST+U4PtUWQ==}
-
-  '@jscad/stl-deserializer@2.1.27':
-    resolution: {integrity: sha512-rIRcSWkDIbFyo1iCOySimroaWNJdn1KR0B2rxBXI1XXoBTZ2jfENFgqDh/FamdxmyDavL7MNI/guJRbC/471Pg==}
-
-  '@jscad/stl-serializer@2.1.20':
-    resolution: {integrity: sha512-/hLO+eLsWDNLkAheZ8SoOCzj8wYWiHABbT/O5dhy+pyXT0mLKOv0dHV1Z8rYPySjhdxHcZ1Pzi3IF5bi+P/9bg==}
-
-  '@jscad/svg-deserializer@2.5.11':
-    resolution: {integrity: sha512-D1heO5XbYg99rwnWS2MFv+GgORIslOStHLXqa0m/UqFaU4X6rY1SdOYBhWVL1abFvT3/pKfB0oCt6QIw8FdZCA==}
-
-  '@jscad/svg-serializer@2.3.18':
-    resolution: {integrity: sha512-hWRGSMayD0m8otRU+PXJ0NbBlduS11CuSCj7xrmrzLclm9ICZANBR48Ea9H4yxtE4GTX1Wbs+wrnAikF4iw7NA==}
-
-  '@jscad/x3d-deserializer@2.2.10':
-    resolution: {integrity: sha512-eh9Tl4B2pVnEAsj3jbg5KM61u1IhHhaQ2mUZI82jdCV8re2q0yZjOYPJ1WmMBGEclur00DevA+aV6dz2Vx5zLQ==}
-
-  '@jscad/x3d-serializer@2.4.10':
-    resolution: {integrity: sha512-I6T4HR1pZsLL4C2m03fuZIQNynR2how1+tESekvMHkop2O8i51eYwH/+349KQvdMc5RlDYB0G0pjHQowdrh1bQ==}
-
   '@mediapipe/tasks-vision@0.10.17':
     resolution: {integrity: sha512-CZWV/q6TTe8ta61cZXjfnnHsfWIdFhms03M9T7Cnd5y2mdpylJM0rF1qRq+wsQVRMLz1OYPVEBU9ph2Bx8cxrg==}
 
@@ -615,32 +517,6 @@ packages:
 
   '@radix-ui/react-arrow@1.1.7':
     resolution: {integrity: sha512-F+M1tLhO+mlQaOWspE8Wstg+z6PwxwRd8oQ8IXceWz92kfAmalTRf0EjrouQeo7QssEPfCn05B4Ihs1K9WQ/7w==}
-    peerDependencies:
-      '@types/react': '*'
-      '@types/react-dom': '*'
-      react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
-      react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
-    peerDependenciesMeta:
-      '@types/react':
-        optional: true
-      '@types/react-dom':
-        optional: true
-
-  '@radix-ui/react-avatar@1.1.10':
-    resolution: {integrity: sha512-V8piFfWapM5OmNCXTzVQY+E1rDa53zY+MQ4Y7356v4fFz6vqCyUtIz2rUD44ZEdwg78/jKmMJHj07+C/Z/rcog==}
-    peerDependencies:
-      '@types/react': '*'
-      '@types/react-dom': '*'
-      react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
-      react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
-    peerDependenciesMeta:
-      '@types/react':
-        optional: true
-      '@types/react-dom':
-        optional: true
-
-  '@radix-ui/react-collapsible@1.1.11':
-    resolution: {integrity: sha512-2qrRsVGSCYasSz1RFOorXwl0H7g7J1frQtgpQgYrt+MOidtPAINHn9CPovQXb83r8ahapdx3Tu0fa/pdFFSdPg==}
     peerDependencies:
       '@types/react': '*'
       '@types/react-dom': '*'
@@ -917,15 +793,6 @@ packages:
 
   '@radix-ui/react-use-escape-keydown@1.1.1':
     resolution: {integrity: sha512-Il0+boE7w/XebUHyBjroE+DbByORGR9KKmITzbR7MyQ4akpORYP/ZmbhAr0DG7RmmBqoOnZdy2QlvajJ2QA59g==}
-    peerDependencies:
-      '@types/react': '*'
-      react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
-    peerDependenciesMeta:
-      '@types/react':
-        optional: true
-
-  '@radix-ui/react-use-is-hydrated@0.1.0':
-    resolution: {integrity: sha512-U+UORVEq+cTnRIaostJv9AGdV3G6Y+zbVd+12e18jQ5A3c0xL03IhnHuiU4UV69wolOQp5GfR58NW/EgdQhwOA==}
     peerDependencies:
       '@types/react': '*'
       react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
@@ -1423,9 +1290,6 @@ packages:
     peerDependencies:
       three: '>=0.126.1'
 
-  camera-unproject@1.0.1:
-    resolution: {integrity: sha512-IAta9EeGGa9rLJsw9Fk0lrZycDg2fF6nl6AvJ+QrkROxc4IaawosU9PQjoqgFYrOe1+kqJlod/W2TAZkTpxZQg==}
-
   caniuse-lite@1.0.30001721:
     resolution: {integrity: sha512-cOuvmUVtKrtEaoKiO0rSc29jcjwMwX5tOHDy4MgVFEWiUXj4uBMJkwI8MDySkgXidpMiHUcviogAvFi4pA2hDQ==}
 
@@ -1647,9 +1511,6 @@ packages:
   fflate@0.6.10:
     resolution: {integrity: sha512-IQrh3lEPM93wVCEczc9SaAOvkmcoQn/G8Bo1e8ZPlY3X3bnAxWaBdvTdvM1hP62iZp0BXWDy4vTAy4fF0+Dlpg==}
 
-  fflate@0.7.3:
-    resolution: {integrity: sha512-0Zz1jOzJWERhyhsimS54VTqOteCNwRtIlh8isdL0AXLo0g7xNTfTL7oWrkmCnPhZGocKIkWHBistBrrpoNH3aw==}
-
   fflate@0.8.2:
     resolution: {integrity: sha512-cPJU47OaAoCbg0pBvzsgpTPhmhqI5eJjh/JIu8tPj5q+T7iLvW/JAYUqmE7KOB4R1ZyEhzBaIQpQpardBF5z8A==}
 
@@ -1682,12 +1543,6 @@ packages:
 
   github-slugger@2.0.0:
     resolution: {integrity: sha512-IaOQ9puYtjrkq7Y0Ygl9KDZnrf/aiUJYUpVf89y8kyaxbRG7Y1SrX/jaumrv81vc61+kiMempujsM3Yw7w5qcw==}
-
-  gl-mat4@1.2.0:
-    resolution: {integrity: sha512-sT5C0pwB1/e9G9AvAoLsoaJtbMGjfd/jfxo8jMCKqYYEnjZuFvqV5rehqar0538EmssjdDeiEWnKyBSTw7quoA==}
-
-  gl-vec3@1.1.3:
-    resolution: {integrity: sha512-jduKUqT0SGH02l8Yl+mV1yVsDfYgQAJyXGxkJQGyxPLHRiW25DwVIRPt6uvhrEMHftJfqhqKthRcyZqNEl9Xdw==}
 
   globals@11.12.0:
     resolution: {integrity: sha512-WOBp/EEGUiIsJSp7wcv/y6MO+lV9UoncWqxuFfm8eBwzWNgyfBd6Gz+IeKQ9jCmyhoH99g15M3T+QaVHFjizVA==}
@@ -2117,12 +1972,6 @@ packages:
   oniguruma-to-es@4.3.3:
     resolution: {integrity: sha512-rPiZhzC3wXwE59YQMRDodUwwT9FZ9nNBwQQfsd1wfdtlKEyCdRV0avrTcSZ5xlIvGRVPd/cx6ZN45ECmS39xvg==}
 
-  onml@1.2.0:
-    resolution: {integrity: sha512-olqYAg18XoHAhm7tK9DdBCOVdts70DGmMgCNLOWyqZokht2utgGSKBB4JHi6pBZpmioAhcYlxK+91L3tsrz+GA==}
-
-  onml@1.3.0:
-    resolution: {integrity: sha512-RhGUsC6Im2A5vAdIvxE3auRKTqrqUZQl/AYLn8+9lM3SO4da5bwhcI5TcM+hfQxNCSLLOVErsl9p0ZPjKKmz+g==}
-
   p-limit@6.2.0:
     resolution: {integrity: sha512-kuUqqHNUqoIWp/c467RI4X6mmyuojY5jGutNU0wVTmEOOfcuwLqyMVoAi9MKi2Ak+5i9+nhmrK4ufZE8069kHA==}
     engines: {node: '>=18'}
@@ -2260,9 +2109,6 @@ packages:
   regex@6.0.1:
     resolution: {integrity: sha512-uorlqlzAKjKQZ5P+kTJr3eeJGSVroLKoHmquUj4zHWuR+hEyNqlXsSKlYYF5F4NI6nl7tWCs0apKJ0lmfsXAPA==}
 
-  regl@2.1.0:
-    resolution: {integrity: sha512-oWUce/aVoEvW5l2V0LK7O5KJMzUSKeiOwFuJehzpSFd43dO5spP9r+sSUfhKtsky4u6MCqWJaRL+abzExynfTg==}
-
   rehype-parse@9.0.1:
     resolution: {integrity: sha512-ksCzCD0Fgfh7trPDxr2rSylbwq9iYDkSn8TCDmEJ49ljEUBxDVCzCHv7QNzZOfODanX4+bWQ4WZqLCRWYLfhag==}
 
@@ -2314,13 +2160,6 @@ packages:
     resolution: {integrity: sha512-cPmwD3FnFv8rKMBc1MxWCwVQFxwf1JEmSX3iQXrRVVG15zerAIXRjMFVWnd5Q5QvgKF7Aj+5ykXFhUl+QGnyOw==}
     engines: {node: '>=18.0.0', npm: '>=8.0.0'}
     hasBin: true
-
-  sax@1.4.1:
-    resolution: {integrity: sha512-+aWOz7yVScEGoKNd4PA10LZ8sk0A/z5+nXQG5giUO5rprX9jgYsTdov9qCchZiPIZezbZH+jRut8nPodFAX4Jg==}
-
-  saxes@5.0.1:
-    resolution: {integrity: sha512-5LBh1Tls8c9xgGjw3QrMwETmTMVk0oFgvrFSvWx62llR2hcEInrKNZ2GZCCuuy2lvWrdl5jhbpeqc5hRYKFOcw==}
-    engines: {node: '>=10'}
 
   scheduler@0.25.0:
     resolution: {integrity: sha512-xFVuu11jh+xcO7JOAGJNOXld8/TcEHK/4CituBUeUb5hqxJLj9YuemAEuvm9gQ/+pgXYfbQuqAkiYu+u7YEsNA==}
@@ -2396,10 +2235,6 @@ packages:
   strip-ansi@7.1.0:
     resolution: {integrity: sha512-iq6eVVI64nQQTRYq2KtEg2d2uU7LElhTJwsH4YzIHZshxlgZms/wIc4VoDQTlG/IvVIrBKG06CrZnp0qv7hkcQ==}
     engines: {node: '>=12'}
-
-  strip-bom@4.0.0:
-    resolution: {integrity: sha512-3xurFv5tEgii33Zi8Jtp55wEIILR9eh34FAW00PZf+JnSsTmV/ioewSgQl97JHvgjoRGwPShsWm+IdrxB35d0w==}
-    engines: {node: '>=8'}
 
   suspend-react@0.1.3:
     resolution: {integrity: sha512-aqldKgX9aZqpoDp3e8/BZ8Dm7x1pJl+qI3ZKxDN0i/IQTWUwBx/ManmlVJ3wowqbno6c2bmiIfs+Um6LbsjJyQ==}
@@ -2726,9 +2561,6 @@ packages:
   wrap-ansi@9.0.0:
     resolution: {integrity: sha512-G8ura3S+3Z2G+mkgNRq8dqaFZAuxfsxpBB8OCTGRTCtp+l/v9nbFNmCUP1BZMts3G1142MsZfn6eeUKrr4PD1Q==}
     engines: {node: '>=18'}
-
-  xmlchars@2.2.0:
-    resolution: {integrity: sha512-JZnDKK8B0RCDw84FNdDAIpZK+JuJw+s7Lz8nksI7SIuU3UXJJslUthsi+uWBUYOwPFwW7W7PRLRfUKpxjtjFCw==}
 
   xxhash-wasm@1.1.0:
     resolution: {integrity: sha512-147y/6YNh+tlp6nd/2pWq38i9h6mz/EuQ6njIrmW8D1BS5nCqs0P6DG+m6zTGnNz5I+uhZ0SHxBs9BsPrwcKDA==}
@@ -3101,10 +2933,6 @@ snapshots:
 
   '@floating-ui/utils@0.2.9': {}
 
-  '@icons-pack/react-simple-icons@12.9.0(react@19.1.0)':
-    dependencies:
-      react: 19.1.0
-
   '@img/sharp-darwin-arm64@0.33.5':
     optionalDependencies:
       '@img/sharp-libvips-darwin-arm64': 1.0.4
@@ -3201,135 +3029,6 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.0
 
-  '@jscad/3mf-serializer@2.1.14':
-    dependencies:
-      '@jscad/array-utils': 2.1.4
-      '@jscad/modeling': 2.12.5
-      fflate: 0.7.3
-      onml: 1.2.0
-
-  '@jscad/amf-deserializer@2.3.10':
-    dependencies:
-      '@jscad/io-utils': 2.0.30
-      '@jscad/modeling': 2.12.5
-      saxes: 5.0.1
-
-  '@jscad/amf-serializer@2.1.20':
-    dependencies:
-      '@jscad/array-utils': 2.1.4
-      '@jscad/modeling': 2.12.5
-      onml: 1.3.0
-
-  '@jscad/array-utils@2.1.4': {}
-
-  '@jscad/core@2.6.12':
-    dependencies:
-      '@jscad/array-utils': 2.1.4
-      '@jscad/io': 2.4.11
-      '@jscad/io-utils': 2.0.30
-      '@jscad/modeling': 2.12.5
-      json5: 2.2.3
-      strip-bom: 4.0.0
-
-  '@jscad/dxf-deserializer@2.3.27':
-    dependencies:
-      '@jscad/io-utils': 2.0.30
-      '@jscad/modeling': 2.12.5
-
-  '@jscad/dxf-serializer@2.1.20':
-    dependencies:
-      '@jscad/array-utils': 2.1.4
-      '@jscad/modeling': 2.12.5
-
-  '@jscad/examples@2.4.2': {}
-
-  '@jscad/io-utils@2.0.30': {}
-
-  '@jscad/io@2.4.11':
-    dependencies:
-      '@jscad/3mf-serializer': 2.1.14
-      '@jscad/amf-deserializer': 2.3.10
-      '@jscad/amf-serializer': 2.1.20
-      '@jscad/array-utils': 2.1.4
-      '@jscad/dxf-deserializer': 2.3.27
-      '@jscad/dxf-serializer': 2.1.20
-      '@jscad/io-utils': 2.0.30
-      '@jscad/json-deserializer': 2.0.31
-      '@jscad/json-serializer': 2.0.30
-      '@jscad/modeling': 2.12.5
-      '@jscad/obj-deserializer': 2.0.30
-      '@jscad/obj-serializer': 2.1.20
-      '@jscad/stl-deserializer': 2.1.27
-      '@jscad/stl-serializer': 2.1.20
-      '@jscad/svg-deserializer': 2.5.11
-      '@jscad/svg-serializer': 2.3.18
-      '@jscad/x3d-deserializer': 2.2.10
-      '@jscad/x3d-serializer': 2.4.10
-
-  '@jscad/json-deserializer@2.0.31':
-    dependencies:
-      '@jscad/array-utils': 2.1.4
-      '@jscad/io-utils': 2.0.30
-
-  '@jscad/json-serializer@2.0.30':
-    dependencies:
-      '@jscad/modeling': 2.12.5
-
-  '@jscad/modeling@2.12.5': {}
-
-  '@jscad/obj-deserializer@2.0.30':
-    dependencies:
-      '@jscad/io-utils': 2.0.30
-      '@jscad/modeling': 2.12.5
-
-  '@jscad/obj-serializer@2.1.20':
-    dependencies:
-      '@jscad/array-utils': 2.1.4
-      '@jscad/modeling': 2.12.5
-
-  '@jscad/regl-renderer@2.6.12':
-    dependencies:
-      '@jscad/array-utils': 2.1.4
-      camera-unproject: 1.0.1
-      gl-mat4: 1.2.0
-      gl-vec3: 1.1.3
-      regl: 2.1.0
-
-  '@jscad/stl-deserializer@2.1.27':
-    dependencies:
-      '@jscad/io-utils': 2.0.30
-      '@jscad/modeling': 2.12.5
-
-  '@jscad/stl-serializer@2.1.20':
-    dependencies:
-      '@jscad/array-utils': 2.1.4
-      '@jscad/modeling': 2.12.5
-
-  '@jscad/svg-deserializer@2.5.11':
-    dependencies:
-      '@jscad/array-utils': 2.1.4
-      '@jscad/io-utils': 2.0.30
-      '@jscad/modeling': 2.12.5
-      saxes: 5.0.1
-
-  '@jscad/svg-serializer@2.3.18':
-    dependencies:
-      '@jscad/modeling': 2.12.5
-      onml: 1.3.0
-
-  '@jscad/x3d-deserializer@2.2.10':
-    dependencies:
-      '@jscad/array-utils': 2.1.4
-      '@jscad/io-utils': 2.0.30
-      '@jscad/modeling': 2.12.5
-      saxes: 5.0.1
-
-  '@jscad/x3d-serializer@2.4.10':
-    dependencies:
-      '@jscad/array-utils': 2.1.4
-      '@jscad/modeling': 2.12.5
-      onml: 1.3.0
-
   '@mediapipe/tasks-vision@0.10.17': {}
 
   '@monogrid/gainmap-js@3.1.0(three@0.177.0)':
@@ -3346,35 +3045,6 @@ snapshots:
   '@radix-ui/react-arrow@1.1.7(@types/react-dom@19.1.6(@types/react@19.1.6))(@types/react@19.1.6)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
     dependencies:
       '@radix-ui/react-primitive': 2.1.3(@types/react-dom@19.1.6(@types/react@19.1.6))(@types/react@19.1.6)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      react: 19.1.0
-      react-dom: 19.1.0(react@19.1.0)
-    optionalDependencies:
-      '@types/react': 19.1.6
-      '@types/react-dom': 19.1.6(@types/react@19.1.6)
-
-  '@radix-ui/react-avatar@1.1.10(@types/react-dom@19.1.6(@types/react@19.1.6))(@types/react@19.1.6)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
-    dependencies:
-      '@radix-ui/react-context': 1.1.2(@types/react@19.1.6)(react@19.1.0)
-      '@radix-ui/react-primitive': 2.1.3(@types/react-dom@19.1.6(@types/react@19.1.6))(@types/react@19.1.6)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      '@radix-ui/react-use-callback-ref': 1.1.1(@types/react@19.1.6)(react@19.1.0)
-      '@radix-ui/react-use-is-hydrated': 0.1.0(@types/react@19.1.6)(react@19.1.0)
-      '@radix-ui/react-use-layout-effect': 1.1.1(@types/react@19.1.6)(react@19.1.0)
-      react: 19.1.0
-      react-dom: 19.1.0(react@19.1.0)
-    optionalDependencies:
-      '@types/react': 19.1.6
-      '@types/react-dom': 19.1.6(@types/react@19.1.6)
-
-  '@radix-ui/react-collapsible@1.1.11(@types/react-dom@19.1.6(@types/react@19.1.6))(@types/react@19.1.6)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
-    dependencies:
-      '@radix-ui/primitive': 1.1.2
-      '@radix-ui/react-compose-refs': 1.1.2(@types/react@19.1.6)(react@19.1.0)
-      '@radix-ui/react-context': 1.1.2(@types/react@19.1.6)(react@19.1.0)
-      '@radix-ui/react-id': 1.1.1(@types/react@19.1.6)(react@19.1.0)
-      '@radix-ui/react-presence': 1.1.4(@types/react-dom@19.1.6(@types/react@19.1.6))(@types/react@19.1.6)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      '@radix-ui/react-primitive': 2.1.3(@types/react-dom@19.1.6(@types/react@19.1.6))(@types/react@19.1.6)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      '@radix-ui/react-use-controllable-state': 1.2.2(@types/react@19.1.6)(react@19.1.0)
-      '@radix-ui/react-use-layout-effect': 1.1.1(@types/react@19.1.6)(react@19.1.0)
       react: 19.1.0
       react-dom: 19.1.0(react@19.1.0)
     optionalDependencies:
@@ -3655,13 +3325,6 @@ snapshots:
     dependencies:
       '@radix-ui/react-use-callback-ref': 1.1.1(@types/react@19.1.6)(react@19.1.0)
       react: 19.1.0
-    optionalDependencies:
-      '@types/react': 19.1.6
-
-  '@radix-ui/react-use-is-hydrated@0.1.0(@types/react@19.1.6)(react@19.1.0)':
-    dependencies:
-      react: 19.1.0
-      use-sync-external-store: 1.5.0(react@19.1.0)
     optionalDependencies:
       '@types/react': 19.1.6
 
@@ -4215,8 +3878,6 @@ snapshots:
     dependencies:
       three: 0.177.0
 
-  camera-unproject@1.0.1: {}
-
   caniuse-lite@1.0.30001721: {}
 
   ccount@2.0.1: {}
@@ -4413,8 +4074,6 @@ snapshots:
 
   fflate@0.6.10: {}
 
-  fflate@0.7.3: {}
-
   fflate@0.8.2: {}
 
   flattie@1.1.1: {}
@@ -4446,10 +4105,6 @@ snapshots:
   get-nonce@1.0.1: {}
 
   github-slugger@2.0.0: {}
-
-  gl-mat4@1.2.0: {}
-
-  gl-vec3@1.1.3: {}
 
   globals@11.12.0: {}
 
@@ -5061,14 +4716,6 @@ snapshots:
       regex: 6.0.1
       regex-recursion: 6.0.2
 
-  onml@1.2.0:
-    dependencies:
-      sax: 1.4.1
-
-  onml@1.3.0:
-    dependencies:
-      sax: 1.4.1
-
   p-limit@6.2.0:
     dependencies:
       yocto-queue: 1.2.1
@@ -5189,8 +4836,6 @@ snapshots:
   regex@6.0.1:
     dependencies:
       regex-utilities: 2.3.0
-
-  regl@2.1.0: {}
 
   rehype-parse@9.0.1:
     dependencies:
@@ -5313,12 +4958,6 @@ snapshots:
       '@rollup/rollup-win32-x64-msvc': 4.41.1
       fsevents: 2.3.3
 
-  sax@1.4.1: {}
-
-  saxes@5.0.1:
-    dependencies:
-      xmlchars: 2.2.0
-
   scheduler@0.25.0: {}
 
   scheduler@0.26.0: {}
@@ -5415,8 +5054,6 @@ snapshots:
   strip-ansi@7.1.0:
     dependencies:
       ansi-regex: 6.1.0
-
-  strip-bom@4.0.0: {}
 
   suspend-react@0.1.3(react@19.1.0):
     dependencies:
@@ -5676,8 +5313,6 @@ snapshots:
       ansi-styles: 6.2.1
       string-width: 7.2.0
       strip-ansi: 7.1.0
-
-  xmlchars@2.2.0: {}
 
   xxhash-wasm@1.1.0: {}
 
