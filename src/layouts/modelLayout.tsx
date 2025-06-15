@@ -25,6 +25,14 @@ export interface ModelLayoutProps<T extends Record<string, number>> {
     meshRef?: React.RefObject<THREE.Group>
   }>
   children?: React.ReactNode
+  /**
+   * Optional render function to customize export controls.
+   * Receives the default export handler and the mesh reference.
+   */
+  renderExport?: (args: {
+    exportModel: () => void
+    meshRef: React.RefObject<THREE.Group>
+  }) => React.ReactNode
 }
 
 export default function ModelLayout<T extends Record<string, number>>({
@@ -35,6 +43,7 @@ export default function ModelLayout<T extends Record<string, number>>({
   orbitDistance = 7,
   mesh,
   children,
+  renderExport,
 }: ModelLayoutProps<T>) {
   const [values, setValues] = React.useState<T>(defaultValues)
   const meshRef = React.useRef<THREE.Group>(null!)
@@ -63,9 +72,13 @@ export default function ModelLayout<T extends Record<string, number>>({
                 ranges={ranges}
               />
               {children}
-              <Button onClick={exportModel} className="mt-4 w-full">
-                Export as .stl file
-              </Button>
+              {renderExport ? (
+                renderExport({ exportModel, meshRef })
+              ) : (
+                <Button onClick={exportModel} className="mt-4 w-full">
+                  Export as .stl file
+                </Button>
+              )}
             </SidebarContent>
           </Sidebar>
           <div className="flex-1 relative">

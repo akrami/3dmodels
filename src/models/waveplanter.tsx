@@ -3,6 +3,8 @@ import * as THREE from "three";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { type ThreeElements } from "@react-three/fiber";
 import ModelLayout from "@/layouts/modelLayout";
+import { STLExporter } from "three-stdlib";
+import { Button } from "@/components/ui/button";
 
 export interface WavePlanterProps extends Record<string, number> {
   radius: number;
@@ -278,6 +280,35 @@ export function WavePlanterMesh({
 export default function WavePlanterModel() {
   const [color, setColor] = React.useState("#AAAAAA");
   const meshElement = <WavePlanterMesh color={color} />;
+  const renderExport = React.useCallback(
+    ({ meshRef }: { exportModel: () => void; meshRef: React.RefObject<THREE.Group> }) => {
+      const exportByName = (groupName: string, fileName: string) => {
+        const obj = meshRef.current?.getObjectByName(groupName);
+        if (!obj) return;
+        const exporter = new STLExporter();
+        const stl = exporter.parse(obj, { binary: true });
+        const blob = new Blob([stl], { type: "model/stl" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `${fileName}.stl`;
+        link.click();
+        URL.revokeObjectURL(url);
+      };
+
+      return (
+        <div className="flex flex-col gap-2 mt-4">
+          <Button onClick={() => exportByName("waveplanter", "waveplanter")} className="w-full">
+            Export waveplanter
+          </Button>
+          <Button onClick={() => exportByName("baseplanter", "baseplanter")} className="w-full">
+            Export baseplanter
+          </Button>
+        </div>
+      );
+    },
+    []
+  );
   return (
     <ModelLayout
       name={MODEL_NAME}
@@ -293,6 +324,7 @@ export default function WavePlanterModel() {
         twistWaves: { min: 0, max: 1, step: 0.01 },
       }}
       mesh={meshElement}
+      renderExport={renderExport}
     >
       <label className="flex flex-col gap-1 mb-4 text-sm">
         <span className="capitalize mb-1 flex justify-between">Color</span>
