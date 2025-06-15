@@ -201,76 +201,71 @@ export function WavePlanterMesh({
     [props.radius]
   );
 
-  const bottomGeometry = React.useMemo(
-    () => createBottomGeometry(true),
-    [createBottomGeometry]
-  );
-  const solidBottomGeometry = React.useMemo(
-    () => createBottomGeometry(false),
-    [createBottomGeometry]
-  );
-
   const distance = props.radius * 2.5;
 
-  const Planter = ({
-    name,
-    depth,
-    holes = true,
-    position = [0, 0, 0] as [number, number, number],
-    reverseTwist = false,
-    twistWaves = props.twistWaves,
-    bottomOffset = 0,
-    topCutDepth = 0,
-  }: {
-    name: string;
-    depth: number;
-    holes?: boolean;
-    position?: [number, number, number];
-    reverseTwist?: boolean;
-    twistWaves?: number;
-    /** Offset the bottom plate along Z */
-    bottomOffset?: number;
-    /** Depth of cylindrical cut at top */
-    topCutDepth?: number;
-  }) => (
-    <group name={name} position={position} castShadow receiveShadow>
-      <RingGear
-        R={props.radius}
-        A={props.amplitude}
-        n={props.density}
-        depth={depth}
-        rot={Math.PI / 12}
-        twistWaves={twistWaves}
-        reverseTwist={reverseTwist}
-        topCutDepth={topCutDepth}
-        position={[0, 0, 0]}
-        castShadow
-        receiveShadow
-      />
-      <mesh
-        geometry={holes ? bottomGeometry : solidBottomGeometry}
-        position={[0, 0, bottomOffset]}
+  const WavePlanter = () => {
+    const bottomGeometry = React.useMemo(
+      () => createBottomGeometry(true),
+      [createBottomGeometry]
+    );
+
+    return (
+      <group name="waveplanter" castShadow receiveShadow>
+        <RingGear
+          R={props.radius}
+          A={props.amplitude}
+          n={props.density}
+          depth={props.depth}
+          rot={Math.PI / 12}
+          twistWaves={props.twistWaves}
+          position={[0, 0, 0]}
+          castShadow
+          receiveShadow
+        />
+        <mesh geometry={bottomGeometry} castShadow receiveShadow>
+          <meshStandardMaterial color={color} />
+        </mesh>
+      </group>
+    );
+  };
+
+  const BasePlanter = () => {
+    const bottomGeometry = React.useMemo(
+      () => createBottomGeometry(false),
+      [createBottomGeometry]
+    );
+
+    return (
+      <group
+        name="baseplanter"
+        position={[distance, 0, 0]}
         castShadow
         receiveShadow
       >
-        <meshStandardMaterial color={color} />
-      </mesh>
-    </group>
-  );
+        <RingGear
+          R={props.radius}
+          A={props.amplitude}
+          n={props.density}
+          depth={props.baseDepth}
+          rot={Math.PI / 12}
+          twistWaves={(props.baseDepth / props.depth) * props.twistWaves}
+          reverseTwist
+          topCutDepth={2}
+          position={[0, 0, 0]}
+          castShadow
+          receiveShadow
+        />
+        <mesh position={[0, 0, 2]} geometry={bottomGeometry} castShadow receiveShadow>
+          <meshStandardMaterial color={color} />
+        </mesh>
+      </group>
+    );
+  };
 
   return (
     <group ref={meshRef}>
-      <Planter name="waveplanter" depth={props.depth} />
-      <Planter
-        name="baseplanter"
-        depth={props.baseDepth}
-        holes={false}
-        position={[distance, 0, 0]}
-        twistWaves={(props.baseDepth / props.depth) * props.twistWaves}
-        reverseTwist
-        bottomOffset={2}
-        topCutDepth={2}
-      />
+      <WavePlanter />
+      <BasePlanter />
     </group>
   );
 }
