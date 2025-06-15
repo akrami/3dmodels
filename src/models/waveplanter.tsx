@@ -5,13 +5,13 @@ import { type ThreeElements } from "@react-three/fiber";
 import ModelLayout from "@/layouts/modelLayout";
 import { STLExporter } from "three-stdlib";
 import { Button } from "@/components/ui/button";
+import { Download } from "lucide-react";
 
 export interface WavePlanterProps extends Record<string, number> {
   radius: number;
   amplitude: number;
   density: number;
   depth: number;
-  /** Depth of the secondary base planter */
   baseDepth: number;
   twistWaves: number;
 }
@@ -57,9 +57,7 @@ export function WavePlanterMesh({
     rot?: number;
     twistWaves?: number;
     segments?: number;
-    /** Reverse the twist direction */
     reverseTwist?: boolean;
-    /** Depth of a cylindrical cut at the top */
     topCutDepth?: number;
     material?: THREE.Material | THREE.Material[];
   } & ThreeElements["mesh"]) => {
@@ -299,10 +297,10 @@ export default function WavePlanterModel() {
       return (
         <div className="flex flex-col gap-2 mt-4">
           <Button onClick={() => exportByName("waveplanter", "waveplanter")} className="w-full">
-            Export waveplanter
+            <Download /> Download Top
           </Button>
           <Button onClick={() => exportByName("baseplanter", "baseplanter")} className="w-full">
-            Export baseplanter
+            <Download /> Download Base
           </Button>
         </div>
       );
