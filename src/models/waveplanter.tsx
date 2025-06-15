@@ -147,11 +147,10 @@ export function WavePlanterMesh({
     );
   };
 
-  const createBottomGeometry = React.useCallback(
-    (withHoles: boolean) => {
+  const createWaveBottomGeometry = React.useCallback(() => {
       const outer = props.radius - 4;
       const diameter = outer * 2;
-      const holeCount = withHoles ? (diameter <= 50 ? 1 : 3) : 0;
+      const holeCount = diameter <= 50 ? 1 : 3;
 
       const createShape = (holeRadius: number) => {
         const shape = new THREE.Shape();
@@ -201,12 +200,43 @@ export function WavePlanterMesh({
     [props.radius]
   );
 
+  const createBaseBottomGeometry = React.useCallback(() => {
+      const outer = props.radius - 4;
+
+      const createShape = () => {
+        const shape = new THREE.Shape();
+        shape.absarc(0, 0, outer, 0, Math.PI * 2, false);
+        return shape;
+      };
+
+      const topShape = createShape();
+      const bottomShape = createShape();
+
+      const top = new THREE.ExtrudeGeometry(topShape, {
+        depth: 2,
+        bevelEnabled: false,
+        curveSegments: 64,
+      });
+
+      const bottom = new THREE.ExtrudeGeometry(bottomShape, {
+        depth: 2,
+        bevelEnabled: false,
+        curveSegments: 64,
+      });
+      bottom.translate(0, 0, -2);
+
+      const geom = mergeGeometries([bottom, top], false);
+      return geom!;
+    },
+    [props.radius]
+  );
+
   const distance = props.radius * 2.5;
 
   const WavePlanter = () => {
     const bottomGeometry = React.useMemo(
-      () => createBottomGeometry(true),
-      [createBottomGeometry]
+      () => createWaveBottomGeometry(),
+      [createWaveBottomGeometry]
     );
 
     return (
@@ -231,8 +261,8 @@ export function WavePlanterMesh({
 
   const BasePlanter = () => {
     const bottomGeometry = React.useMemo(
-      () => createBottomGeometry(false),
-      [createBottomGeometry]
+      () => createBaseBottomGeometry(),
+      [createBaseBottomGeometry]
     );
 
     return (
