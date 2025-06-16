@@ -320,13 +320,11 @@ export function WavePlanterMesh({
                   receiveShadow
                 />
               </Base>
-              <Subtraction>
-                <mesh
-                  geometry={taghExt}
-                  position={[-5, props.radius - 5, props.baseDepth - 5]}
-                  scale={[0.75, 0.75, 0.75]}
-                />
-              </Subtraction>
+              <Subtraction
+                geometry={taghExt}
+                position={[-5, props.radius - 5, props.baseDepth - 5]}
+                scale={[0.75, 0.75, 0.75]}
+              />
             </Geometry>
             <meshStandardMaterial color={color} />
           </mesh>
