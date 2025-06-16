@@ -1,6 +1,9 @@
 import * as React from "react";
 import * as THREE from "three";
-import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
+import {
+  mergeGeometries,
+  mergeVertices as mergeVerts,
+} from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { type ThreeElements } from "@react-three/fiber";
 import ModelLayout from "@/layouts/modelLayout";
 import { STLExporter } from "three-stdlib";
@@ -273,15 +276,19 @@ export function WavePlanterMesh({
         .lineTo(15, 0)
         .lineTo(15, 10)
         .lineTo(0, 10)
-        .closePath()
+        .closePath();
 
-      return new THREE.ExtrudeGeometry(shape, {
+      const geom = new THREE.ExtrudeGeometry(shape, {
         depth: 16,
         bevelEnabled: true,
         bevelThickness: 3,
         bevelSize: 3,
         bevelSegments: 16,
-      })
+      });
+
+      const indexed = mergeVerts(geom);
+      indexed.computeVertexNormals();
+      return indexed;
     }, []);
 
     return (
@@ -309,9 +316,7 @@ export function WavePlanterMesh({
                   receiveShadow
                 />
               </Base>
-              <Subtraction>
-                <mesh geometry={taghExt} position={[-5, props.radius - 5, props.baseDepth - 5]} scale={[0.75, 0.75, 0.75]} />
-              </Subtraction>
+              <Subtraction geometry={taghExt} position={[-5, props.radius - 5, props.baseDepth - 5]} scale={[0.75, 0.75, 0.75]} />
             </Geometry>
             <meshStandardMaterial color={color} />
           </mesh>
