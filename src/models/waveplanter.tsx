@@ -134,7 +134,11 @@ export function WavePlanterMesh({
         pos.needsUpdate = true;
         geom.computeVertexNormals();
       }
-      return geom;
+
+      const indexed = mergeVerts(geom);
+      indexed.computeVertexNormals();
+      geom.dispose();
+      return indexed;
     }, [R, A, n, depth, segments, rot, twistWaves, reverseTwist, topCutDepth]);
 
     React.useLayoutEffect(() => () => geometry.dispose(), [geometry]);
@@ -316,7 +320,13 @@ export function WavePlanterMesh({
                   receiveShadow
                 />
               </Base>
-              <Subtraction geometry={taghExt} position={[-5, props.radius - 5, props.baseDepth - 5]} scale={[0.75, 0.75, 0.75]} />
+              <Subtraction>
+                <mesh
+                  geometry={taghExt}
+                  position={[-5, props.radius - 5, props.baseDepth - 5]}
+                  scale={[0.75, 0.75, 0.75]}
+                />
+              </Subtraction>
             </Geometry>
             <meshStandardMaterial color={color} />
           </mesh>
