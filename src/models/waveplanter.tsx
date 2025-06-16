@@ -6,7 +6,6 @@ import ModelLayout from "@/layouts/modelLayout";
 import { STLExporter } from "three-stdlib";
 import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
-import { Geometry, Base, Subtraction } from "@react-three/csg";
 import { useMemo } from "react";
 
 export interface WavePlanterProps extends Record<string, number> {
@@ -28,6 +27,97 @@ export const DEFAULT_PROPS: WavePlanterProps = {
   baseDepth: 50,
   twistWaves: 0.5,
 };
+
+function createRingGearGeometry({
+  R,
+  A,
+  n,
+  depth,
+  rot = 0,
+  twistWaves = 1,
+  segments = 1024,
+  reverseTwist = false,
+  topCutDepth = 0,
+  holes = [],
+}: {
+  R: number;
+  A: number;
+  n: number;
+  depth: number;
+  rot?: number;
+  twistWaves?: number;
+  segments?: number;
+  reverseTwist?: boolean;
+  topCutDepth?: number;
+  holes?: THREE.Path[];
+}): THREE.BufferGeometry {
+  const k = Math.round(R * n);
+  const rOuter = (t: number) => R + A - Math.abs(Math.sin(k * t));
+  const rInner = R - (A + 4);
+  const rInnerCut = R - 4;
+
+  const makeOuterShape = (innerRadius: number) => {
+    const shape = new THREE.Shape();
+    for (let i = 0; i <= segments; i++) {
+      const t = (i / segments) * Math.PI * 2;
+      const r = rOuter(t);
+      const x = r * Math.cos(t);
+      const y = r * Math.sin(t);
+      i === 0 ? shape.moveTo(x, y) : shape.lineTo(x, y);
+    }
+    shape.closePath();
+    shape.holes.push(new THREE.Path().absarc(0, 0, innerRadius, 0, Math.PI * 2, true));
+    holes.forEach((h) => shape.holes.push(h));
+    return shape;
+  };
+
+  const bottomDepth = Math.max(depth - topCutDepth, 0);
+  const bottomSteps = Math.max(1, Math.round((bottomDepth / depth) * TWIST_SEGMENTS));
+  const topSteps = Math.max(1, TWIST_SEGMENTS - bottomSteps);
+
+  const bottomShape = makeOuterShape(rInner);
+  const bottomGeom = new THREE.ExtrudeGeometry(bottomShape, {
+    steps: bottomSteps,
+    depth: bottomDepth,
+    bevelEnabled: false,
+    curveSegments: 128,
+  });
+
+  const geoms: THREE.BufferGeometry[] = [bottomGeom];
+
+  if (topCutDepth > 0) {
+    const topShape = makeOuterShape(rInnerCut);
+    const topGeom = new THREE.ExtrudeGeometry(topShape, {
+      steps: topSteps,
+      depth: topCutDepth,
+      bevelEnabled: false,
+      curveSegments: 128,
+    });
+    topGeom.translate(0, 0, bottomDepth);
+    geoms.push(topGeom);
+  }
+
+  const geom = mergeGeometries(geoms, false)!;
+
+  if (rot !== 0) {
+    const pos = geom.attributes.position as THREE.BufferAttribute;
+    const v = new THREE.Vector3();
+    for (let i = 0; i < pos.count; i++) {
+      v.fromBufferAttribute(pos, i);
+      const t = v.z / depth;
+      const tt = reverseTwist ? 1 - t : t;
+      const dir = reverseTwist ? -1 : 1;
+      const angle = Math.sin(tt * twistWaves * Math.PI * 2) * rot * dir;
+      const e = new THREE.Euler(0, 0, angle);
+      v.applyEuler(e);
+      pos.setXYZ(i, v.x, v.y, v.z);
+    }
+    pos.needsUpdate = true;
+    geom.computeVertexNormals();
+  }
+
+  return geom;
+}
 
 export function WavePlanterMesh({
   props = DEFAULT_PROPS,
@@ -63,76 +153,21 @@ export function WavePlanterMesh({
     topCutDepth?: number;
     material?: THREE.Material | THREE.Material[];
   } & ThreeElements["mesh"]) => {
-    const geometry = React.useMemo(() => {
-      const k = Math.round(R * n);
-      const rOuter = (t: number) => R + A - Math.abs(Math.sin(k * t));
-      const rInner = R - (A + 4);
-      const rInnerCut = R - 4;
-
-      const makeOuterShape = () => {
-        const shape = new THREE.Shape();
-        for (let i = 0; i <= segments; i++) {
-          const t = (i / segments) * Math.PI * 2;
-          const r = rOuter(t);
-          const x = r * Math.cos(t);
-          const y = r * Math.sin(t);
-          i === 0 ? shape.moveTo(x, y) : shape.lineTo(x, y);
-        }
-        shape.closePath();
-        return shape;
-      };
-
-      const bottomDepth = Math.max(depth - topCutDepth, 0);
-      const bottomSteps = Math.max(1, Math.round((bottomDepth / depth) * TWIST_SEGMENTS));
-      const topSteps = Math.max(1, TWIST_SEGMENTS - bottomSteps);
-
-      const outerShape = makeOuterShape();
-      const holeBottom = new THREE.Path().absarc(0, 0, rInner, 0, Math.PI * 2, true);
-      const bottomShape = outerShape.clone();
-      bottomShape.holes.push(holeBottom);
-      const bottomGeom = new THREE.ExtrudeGeometry(bottomShape, {
-        steps: bottomSteps,
-        depth: bottomDepth,
-        bevelEnabled: false,
-        curveSegments: 128,
-      });
-
-      let geoms: THREE.BufferGeometry[] = [bottomGeom];
-
-      if (topCutDepth > 0) {
-        const outerShapeTop = makeOuterShape();
-        const holeTop = new THREE.Path().absarc(0, 0, rInnerCut, 0, Math.PI * 2, true);
-        outerShapeTop.holes.push(holeTop);
-        const topGeom = new THREE.ExtrudeGeometry(outerShapeTop, {
-          steps: topSteps,
-          depth: topCutDepth,
-          bevelEnabled: false,
-          curveSegments: 128,
-        });
-        topGeom.translate(0, 0, bottomDepth);
-        geoms.push(topGeom);
-      }
-
-      const geom = mergeGeometries(geoms, false)!;
-
-      if (rot !== 0) {
-        const pos = geom.attributes.position as THREE.BufferAttribute;
-        const v = new THREE.Vector3();
-        for (let i = 0; i < pos.count; i++) {
-          v.fromBufferAttribute(pos, i);
-          const t = v.z / depth;
-          const tt = reverseTwist ? 1 - t : t;
-          const dir = reverseTwist ? -1 : 1;
-          const angle = Math.sin(tt * twistWaves * Math.PI * 2) * rot * dir;
-          const e = new THREE.Euler(0, 0, angle);
-          v.applyEuler(e);
-          pos.setXYZ(i, v.x, v.y, v.z);
-        }
-        pos.needsUpdate = true;
-        geom.computeVertexNormals();
-      }
-      return geom;
-    }, [R, A, n, depth, segments, rot, twistWaves, reverseTwist, topCutDepth]);
+    const geometry = React.useMemo(
+      () =>
+        createRingGearGeometry({
+          R,
+          A,
+          n,
+          depth,
+          rot,
+          twistWaves,
+          segments,
+          reverseTwist,
+          topCutDepth,
+        }),
+      [R, A, n, depth, rot, twistWaves, segments, reverseTwist, topCutDepth]
+    );
 
     React.useLayoutEffect(() => () => geometry.dispose(), [geometry]);
 
@@ -284,6 +319,67 @@ export function WavePlanterMesh({
       })
     }, []);
 
+    const outerGeometry = useMemo(() => {
+      const slotWidth = 15 * 0.75;
+      const slotHeight = 10 * 0.75;
+      const rect = new THREE.Path();
+      rect.moveTo(-5, props.radius - 5);
+      rect.lineTo(-5 + slotWidth, props.radius - 5);
+      rect.lineTo(-5 + slotWidth, props.radius - 5 + slotHeight);
+      rect.lineTo(-5, props.radius - 5 + slotHeight);
+      rect.closePath();
+
+      return createRingGearGeometry({
+        R: props.radius,
+        A: props.amplitude,
+        n: props.density,
+        depth: props.baseDepth,
+        rot: Math.PI / 12,
+        twistWaves: (props.baseDepth / props.depth) * props.twistWaves,
+        reverseTwist: true,
+        topCutDepth: 2,
+        holes: [rect],
+      });
+    }, [props.radius, props.amplitude, props.density, props.baseDepth, props.depth, props.twistWaves]);
+
+    const waterEntryGeometry = useMemo(() => {
+      const shape = new THREE.Shape()
+        .moveTo(0, 0)
+        .lineTo(15, 0)
+        .lineTo(15, 10)
+        .lineTo(0, 10)
+        .closePath();
+
+      const inner = new THREE.Path()
+        .moveTo(0, 0)
+        .lineTo(15, 0)
+        .lineTo(15, 10)
+        .lineTo(0, 10)
+        .closePath();
+      inner.scale(0.75, 0.75);
+      inner.translate(2, 2);
+      shape.holes.push(inner);
+
+      const box = new THREE.Path();
+      box.moveTo(7 - 15, 12 - 5);
+      box.lineTo(7 - 15 + 30, 12 - 5);
+      box.lineTo(7 - 15 + 30, 12 - 5 + 10);
+      box.lineTo(7 - 15, 12 - 5 + 10);
+      box.closePath();
+      shape.holes.push(box);
+
+      const circle = new THREE.Path().absarc(7, 0, props.radius - 2.5, 0, Math.PI * 2, true);
+      shape.holes.push(circle);
+
+      return new THREE.ExtrudeGeometry(shape, {
+        depth: 16,
+        bevelEnabled: true,
+        bevelThickness: 3,
+        bevelSize: 3,
+        bevelSegments: 16,
+      });
+    }, [props.radius]);
+
     return (
       <group
         name="baseplanter"
@@ -291,50 +387,21 @@ export function WavePlanterMesh({
         castShadow
         receiveShadow
       >
-        <group>
-          <mesh castShadow receiveShadow>
-            <Geometry showOperations={false} computeVertexNormals>
-              <Base>
-                <RingGear
-                  R={props.radius}
-                  A={props.amplitude}
-                  n={props.density}
-                  depth={props.baseDepth}
-                  rot={Math.PI / 12}
-                  twistWaves={(props.baseDepth / props.depth) * props.twistWaves}
-                  reverseTwist
-                  topCutDepth={2}
-                  position={[0, 0, 0]}
-                  castShadow
-                  receiveShadow
-                />
-              </Base>
-              <Subtraction>
-                <mesh geometry={taghExt} position={[-5, props.radius - 5, props.baseDepth - 5]} scale={[0.75, 0.75, 0.75]} />
-              </Subtraction>
-            </Geometry>
-            <meshStandardMaterial color={color} />
-          </mesh>
-        </group>
+        <mesh geometry={outerGeometry} castShadow receiveShadow>
+          <meshStandardMaterial color={color} />
+        </mesh>
         <mesh position={[0, 0, 2]} geometry={bottomGeometry} castShadow receiveShadow>
           <meshStandardMaterial color={color} />
         </mesh>
-        <group position={[-7, props.radius + 7.5, props.baseDepth - 7]} rotation={[Math.PI / 2, 0, 0]}>
-
-          <mesh castShadow receiveShadow>
-            <Geometry showOperations={false}>
-              <Base geometry={taghExt} />
-              <Subtraction position={[7, 12, 7]}>
-                <boxGeometry args={[30, 10, 30]} />
-              </Subtraction>
-              <Subtraction geometry={taghExt} position={[2, 2, 2]} scale={[0.75, 0.75, 0.75]} />
-              <Subtraction position={[7, 0, props.radius + 7.5]}>
-                <cylinderGeometry args={[props.radius - 2.5, props.radius - 2.5, 30, 128]} />
-              </Subtraction>
-            </Geometry>
-            <meshStandardMaterial color={color} />
-          </mesh>
-        </group>
+        <mesh
+          geometry={waterEntryGeometry}
+          position={[-7, props.radius + 7.5, props.baseDepth - 7]}
+          rotation={[Math.PI / 2, 0, 0]}
+          castShadow
+          receiveShadow
+        >
+          <meshStandardMaterial color={color} />
+        </mesh>
       </group>
     );
   };
