@@ -9,10 +9,9 @@ import ModelLayout from "@/layouts/modelLayout";
 import { STLExporter } from "three-stdlib";
 import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
-// Removed usage of @react-three/csg. Some geometry still relies on boolean
-// operations implemented with three-bvh-csg directly.
-import { Brush, Evaluator, SUBTRACTION, ADDITION } from "three-bvh-csg";
 import { useMemo } from "react";
+import { geometryToManifold, manifoldToGeometry } from "@lib/manifold";
+import { useAsyncGeometry } from "@/hooks/use-async-geometry";
 
 export interface WavePlanterProps extends Record<string, number> {
   radius: number;
@@ -149,38 +148,41 @@ function useRingGearGeometry(options: RingGearOptions) {
   );
 }
 
-function subtractGeometry(
+async function subtractGeometry(
   base: THREE.BufferGeometry,
   subtracts: THREE.BufferGeometry[]
 ) {
-  const evaluator = new Evaluator();
-  let brush = new Brush(base.clone());
-  brush.updateMatrixWorld();
-  subtracts.forEach((geom) => {
-    const b = new Brush(geom.clone());
-    b.updateMatrixWorld();
-    brush = evaluator.evaluate(brush, b, SUBTRACTION) as Brush;
-  });
-  return (brush.geometry as THREE.BufferGeometry).clone();
+  const { wasm, manifold: baseM } = await geometryToManifold(base)
+  let result = baseM
+  for (const geom of subtracts) {
+    const { manifold } = await geometryToManifold(geom)
+    const diff = wasm.Manifold.difference(result, manifold)
+    result.delete()
+    manifold.delete()
+    result = diff
+  }
+  const geometry = await manifoldToGeometry(result, wasm)
+  geometry.computeVertexNormals()
+  return geometry
 }
 
-function unionGeometry(
+async function unionGeometry(
   base: THREE.BufferGeometry,
   additions: { geometry: THREE.BufferGeometry; matrix?: THREE.Matrix4 }[]
 ) {
-  const evaluator = new Evaluator();
-  let brush = new Brush(base.clone());
-  brush.updateMatrixWorld();
-  additions.forEach(({ geometry, matrix }) => {
-    const g = geometry.clone();
-    if (matrix) {
-      g.applyMatrix4(matrix);
-    }
-    const b = new Brush(g);
-    b.updateMatrixWorld();
-    brush = evaluator.evaluate(brush, b, ADDITION) as Brush;
-  });
-  return (brush.geometry as THREE.BufferGeometry).clone();
+  const { wasm, manifold: baseM } = await geometryToManifold(base)
+  const manifolds = [baseM]
+  for (const { geometry, matrix } of additions) {
+    const g = geometry.clone()
+    if (matrix) g.applyMatrix4(matrix)
+    const { manifold } = await geometryToManifold(g)
+    manifolds.push(manifold)
+  }
+  const union = wasm.Manifold.union(manifolds)
+  manifolds.forEach((m) => m.delete())
+  const geometry = await manifoldToGeometry(union, wasm)
+  geometry.computeVertexNormals()
+  return geometry
 }
 
 export function WavePlanterMesh({
@@ -394,7 +396,7 @@ export function WavePlanterMesh({
       return merged;
     }, []);
 
-    const taghExt = useMemo(() => {
+    const taghExt = useAsyncGeometry(async () => {
       const inner = tagBase.clone();
       inner.scale(0.75, 0.75, 0.75);
       inner.translate(2, 2, 2);
@@ -410,29 +412,30 @@ export function WavePlanterMesh({
       );
       cyl.translate(7, 0, props.radius + 7.5);
 
-      const result = subtractGeometry(tagBase, [box, inner, cyl]);
+      const result = await subtractGeometry(tagBase, [box, inner, cyl]);
       const merged = mergeVerts(result);
       merged.computeVertexNormals();
       return merged;
     }, [props.radius, tagBase]);
 
-    const ringGeom = useMemo(() => {
+    const ringGeom = useAsyncGeometry(async () => {
       const cut = tagBase.clone();
       cut.scale(0.75, 0.75, 0.75);
       cut.translate(-5, props.radius - 5, props.baseDepth - 5);
 
-      const result = subtractGeometry(ringBase, [cut]);
+      const result = await subtractGeometry(ringBase, [cut]);
       result.computeVertexNormals();
       return result;
     }, [ringBase, props.radius, props.baseDepth, tagBase]);
 
-    const baseGeom = useMemo(() => {
+    const baseGeom = useAsyncGeometry(async () => {
+      if (!ringGeom || !taghExt) return new THREE.BufferGeometry();
       const bottomMatrix = new THREE.Matrix4().makeTranslation(0, 0, 2);
       const tagMatrix = new THREE.Matrix4()
         .makeTranslation(-7, props.radius + 7.5, props.baseDepth - 7)
         .multiply(new THREE.Matrix4().makeRotationX(Math.PI / 2));
 
-      const unioned = unionGeometry(ringGeom, [
+      const unioned = await unionGeometry(ringGeom, [
         { geometry: bottomGeometry, matrix: bottomMatrix },
         { geometry: taghExt, matrix: tagMatrix },
       ]);

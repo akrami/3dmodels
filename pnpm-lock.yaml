@@ -56,6 +56,9 @@ importers:
       lucide-react:
         specifier: ^0.511.0
         version: 0.511.0(react@19.1.0)
+      manifold-3d:
+        specifier: ^3.1.1
+        version: 3.1.1
       react:
         specifier: ^19.1.0
         version: 19.1.0
@@ -71,9 +74,6 @@ importers:
       three:
         specifier: ^0.177.0
         version: 0.177.0
-      three-bvh-csg:
-        specifier: ^0.0.17
-        version: 0.0.17(three-mesh-bvh@0.8.3(three@0.177.0))(three@0.177.0)
       three-stdlib:
         specifier: ^2.36.0
         version: 2.36.0(three@0.177.0)
@@ -1772,6 +1772,9 @@ packages:
   magicast@0.3.5:
     resolution: {integrity: sha512-L0WhttDl+2BOsybvEOLK7fW3UA0OQ0IQ2d6Zl2x/a6vVRs3bAY0ECOSHHeL5jD+SbOpOCUEi0y1DgHEn9Qn1AQ==}
 
+  manifold-3d@3.1.1:
+    resolution: {integrity: sha512-1u/9BUYNDWfEZt2BJHjgrmFREdlwbQdrvtCmiazMrspJHF18u7CSDIqNcT/Pe/wa4Gsbfq2WEYwCzGMq+/qqAw==}
+
   markdown-table@3.0.4:
     resolution: {integrity: sha512-wiYz4+JrLyb/DqW2hkFJxP7Vd7JuTDm77fvbM8VfEQdmSMqcImWeeRbHwZjBjIFki/VaMK2BhFi7oUUZeM5bqw==}
 
@@ -2257,12 +2260,6 @@ packages:
   tar@7.4.3:
     resolution: {integrity: sha512-5S7Va8hKfV7W5U6g3aYxXmlPoZVAwUMy9AOKyF2fVuZa2UD3qZjg578OrLRt8PcNN1PleVaL/5/yYATNL0ICUw==}
     engines: {node: '>=18'}
-
-  three-bvh-csg@0.0.17:
-    resolution: {integrity: sha512-iEkHDF8GRfGM6593Cuw8SnF1vfENCp46gIAtRzuL4nGXGWPcR1sbTBwM9ptDONb5twqlZp5WkAKya5aBKe2qcA==}
-    peerDependencies:
-      three: '>=0.151.0'
-      three-mesh-bvh: '>=0.6.6'
 
   three-mesh-bvh@0.8.3:
     resolution: {integrity: sha512-4G5lBaF+g2auKX3P0yqx+MJC6oVt6sB5k+CchS6Ob0qvH0YIhuUk1eYr7ktsIpY+albCqE80/FVQGV190PmiAg==}
@@ -4356,6 +4353,8 @@ snapshots:
       '@babel/types': 7.27.3
       source-map-js: 1.2.1
 
+  manifold-3d@3.1.1: {}
+
   markdown-table@3.0.4: {}
 
   mdast-util-definitions@6.0.0:
@@ -5082,11 +5081,6 @@ snapshots:
       minizlib: 3.0.2
       mkdirp: 3.0.1
       yallist: 5.0.0
-
-  three-bvh-csg@0.0.17(three-mesh-bvh@0.8.3(three@0.177.0))(three@0.177.0):
-    dependencies:
-      three: 0.177.0
-      three-mesh-bvh: 0.8.3(three@0.177.0)
 
   three-mesh-bvh@0.8.3(three@0.177.0):
     dependencies:
