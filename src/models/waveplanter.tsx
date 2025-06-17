@@ -417,8 +417,20 @@ export default function WavePlanterModel() {
       const exportByName = (groupName: string, fileName: string) => {
         const obj = meshRef.current?.getObjectByName(groupName);
         if (!obj) return;
+
+        const exportGroup = new THREE.Group();
+        obj.traverse((child) => {
+          if ((child as any).isMesh && !(child as any).isBrush) {
+            const mesh = child as THREE.Mesh;
+            const clone = new THREE.Mesh(mesh.geometry, mesh.material);
+            mesh.updateWorldMatrix(true, false);
+            clone.applyMatrix4(mesh.matrixWorld);
+            exportGroup.add(clone);
+          }
+        });
+
         const exporter = new STLExporter();
-        const stl = exporter.parse(obj, { binary: true });
+        const stl = exporter.parse(exportGroup, { binary: true });
         const blob = new Blob([stl], { type: "model/stl" });
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
