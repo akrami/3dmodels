@@ -418,16 +418,13 @@ export default function WavePlanterModel() {
         const obj = meshRef.current?.getObjectByName(groupName);
         if (!obj) return;
 
-        const exportGroup = new THREE.Group();
-        obj.traverse((child) => {
-          if ((child as any).isMesh && !(child as any).isBrush) {
-            const mesh = child as THREE.Mesh;
-            const clone = new THREE.Mesh(mesh.geometry, mesh.material);
-            mesh.updateWorldMatrix(true, false);
-            clone.applyMatrix4(mesh.matrixWorld);
-            exportGroup.add(clone);
+        const exportGroup = obj.clone(true);
+        exportGroup.traverse((child) => {
+          if ((child as any).isBrush) {
+            child.parent?.remove(child);
           }
         });
+        exportGroup.updateMatrixWorld(true);
 
         const exporter = new STLExporter();
         const stl = exporter.parse(exportGroup, { binary: true });
