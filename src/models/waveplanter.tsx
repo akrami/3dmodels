@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
 // Removed usage of @react-three/csg. Some geometry still relies on boolean
 // operations implemented with three-bvh-csg directly.
-import { Brush, Evaluator, SUBTRACTION } from "three-bvh-csg";
+import { Brush, Evaluator, SUBTRACTION, ADDITION } from "three-bvh-csg";
 import { useMemo } from "react";
 
 export interface WavePlanterProps extends Record<string, number> {
@@ -160,6 +160,25 @@ function subtractGeometry(
     const b = new Brush(geom.clone());
     b.updateMatrixWorld();
     brush = evaluator.evaluate(brush, b, SUBTRACTION) as Brush;
+  });
+  return (brush.geometry as THREE.BufferGeometry).clone();
+}
+
+function unionGeometry(
+  base: THREE.BufferGeometry,
+  additions: { geometry: THREE.BufferGeometry; matrix?: THREE.Matrix4 }[]
+) {
+  const evaluator = new Evaluator();
+  let brush = new Brush(base.clone());
+  brush.updateMatrixWorld();
+  additions.forEach(({ geometry, matrix }) => {
+    const g = geometry.clone();
+    if (matrix) {
+      g.applyMatrix4(matrix);
+    }
+    const b = new Brush(g);
+    b.updateMatrixWorld();
+    brush = evaluator.evaluate(brush, b, ADDITION) as Brush;
   });
   return (brush.geometry as THREE.BufferGeometry).clone();
 }
@@ -407,6 +426,27 @@ export function WavePlanterMesh({
       return result;
     }, [ringBase, props.radius, props.baseDepth, tagBase]);
 
+    const baseGeom = useMemo(() => {
+      const bottomMatrix = new THREE.Matrix4().makeTranslation(0, 0, 2);
+      const tagMatrix = new THREE.Matrix4()
+        .makeRotationX(Math.PI / 2)
+        .multiply(
+          new THREE.Matrix4().makeTranslation(
+            -7,
+            props.radius + 7.5,
+            props.baseDepth - 7
+          )
+        );
+
+      const unioned = unionGeometry(ringGeom, [
+        { geometry: bottomGeometry, matrix: bottomMatrix },
+        { geometry: taghExt, matrix: tagMatrix },
+      ]);
+      const merged = mergeVerts(unioned);
+      merged.computeVertexNormals();
+      return merged;
+    }, [ringGeom, bottomGeometry, taghExt, props.radius, props.baseDepth]);
+
     return (
       <group
         name="baseplanter"
@@ -414,17 +454,9 @@ export function WavePlanterMesh({
         castShadow
         receiveShadow
       >
-        <mesh geometry={ringGeom} castShadow receiveShadow>
+        <mesh geometry={baseGeom} castShadow receiveShadow>
           <meshStandardMaterial color={color} />
         </mesh>
-        <mesh position={[0, 0, 2]} geometry={bottomGeometry} castShadow receiveShadow>
-          <meshStandardMaterial color={color} />
-        </mesh>
-        <group position={[-7, props.radius + 7.5, props.baseDepth - 7]} rotation={[Math.PI / 2, 0, 0]}>
-          <mesh geometry={taghExt} castShadow receiveShadow>
-            <meshStandardMaterial color={color} />
-          </mesh>
-        </group>
       </group>
     );
   };
