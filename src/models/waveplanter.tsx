@@ -429,14 +429,8 @@ export function WavePlanterMesh({
     const baseGeom = useMemo(() => {
       const bottomMatrix = new THREE.Matrix4().makeTranslation(0, 0, 2);
       const tagMatrix = new THREE.Matrix4()
-        .makeRotationX(Math.PI / 2)
-        .multiply(
-          new THREE.Matrix4().makeTranslation(
-            -7,
-            props.radius + 7.5,
-            props.baseDepth - 7
-          )
-        );
+        .makeTranslation(-7, props.radius + 7.5, props.baseDepth - 7)
+        .multiply(new THREE.Matrix4().makeRotationX(Math.PI / 2));
 
       const unioned = unionGeometry(ringGeom, [
         { geometry: bottomGeometry, matrix: bottomMatrix },
