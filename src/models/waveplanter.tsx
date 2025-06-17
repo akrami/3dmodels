@@ -419,7 +419,10 @@ export default function WavePlanterModel() {
         const obj = meshRef.current?.getObjectByName(groupName);
         if (!obj) return;
 
+        obj.updateMatrixWorld(true);
         const exportGroup = obj.clone(true);
+        exportGroup.applyMatrix4(obj.matrixWorld);
+
         const brushes: THREE.Object3D[] = [];
         exportGroup.traverse((child) => {
           if ((child as any).isBrush) brushes.push(child);
