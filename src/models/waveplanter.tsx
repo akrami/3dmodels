@@ -9,7 +9,8 @@ import ModelLayout from "@/layouts/modelLayout";
 import { STLExporter } from "three-stdlib";
 import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
-import { Geometry, Base, Subtraction } from "@react-three/csg";
+// Removed usage of @react-three/csg. All geometry is now created using
+// standard shapes and holes.
 import { useMemo } from "react";
 
 export interface WavePlanterProps extends Record<string, number> {
@@ -345,6 +346,15 @@ export function WavePlanterMesh({
         .lineTo(0, 10)
         .closePath();
 
+      const innerRect = new THREE.Path()
+        .moveTo(2, 2)
+        .lineTo(13, 2)
+        .lineTo(13, 8)
+        .lineTo(2, 8)
+        .closePath();
+
+      shape.holes.push(innerRect);
+
       const geom = new THREE.ExtrudeGeometry(shape, {
         depth: 16,
         bevelEnabled: true,
@@ -365,35 +375,14 @@ export function WavePlanterMesh({
         castShadow
         receiveShadow
       >
-        <group>
-          <mesh castShadow receiveShadow>
-            <Geometry showOperations={false} computeVertexNormals>
-              <Base geometry={ringGeom} />
-              <Subtraction
-                geometry={taghExt}
-                position={[-5, props.radius - 5, props.baseDepth - 5]}
-                scale={[0.75, 0.75, 0.75]}
-              />
-            </Geometry>
-            <meshStandardMaterial color={color} />
-          </mesh>
-        </group>
+        <mesh geometry={ringGeom} castShadow receiveShadow>
+          <meshStandardMaterial color={color} />
+        </mesh>
         <mesh position={[0, 0, 2]} geometry={bottomGeometry} castShadow receiveShadow>
           <meshStandardMaterial color={color} />
         </mesh>
         <group position={[-7, props.radius + 7.5, props.baseDepth - 7]} rotation={[Math.PI / 2, 0, 0]}>
-
-          <mesh castShadow receiveShadow>
-            <Geometry showOperations={false}>
-              <Base geometry={taghExt} />
-              <Subtraction position={[7, 12, 7]}>
-                <boxGeometry args={[30, 10, 30]} />
-              </Subtraction>
-              <Subtraction geometry={taghExt} position={[2, 2, 2]} scale={[0.75, 0.75, 0.75]} />
-              <Subtraction position={[7, 0, props.radius + 7.5]}>
-                <cylinderGeometry args={[props.radius - 2.5, props.radius - 2.5, 30, 128]} />
-              </Subtraction>
-            </Geometry>
+          <mesh geometry={taghExt} castShadow receiveShadow>
             <meshStandardMaterial color={color} />
           </mesh>
         </group>
