@@ -135,10 +135,9 @@ export function WavePlanterMesh({
         geom.computeVertexNormals();
       }
 
-      const indexed = mergeVerts(geom);
-      indexed.computeVertexNormals();
-      geom.dispose();
-      return indexed;
+      mergeVerts(geom);
+      geom.computeVertexNormals();
+      return geom;
     }, [R, A, n, depth, segments, rot, twistWaves, reverseTwist, topCutDepth]);
 
     React.useLayoutEffect(() => () => geometry.dispose(), [geometry]);
@@ -290,9 +289,9 @@ export function WavePlanterMesh({
         bevelSegments: 16,
       });
 
-      const indexed = mergeVerts(geom);
-      indexed.computeVertexNormals();
-      return indexed;
+      mergeVerts(geom);
+      geom.computeVertexNormals();
+      return geom;
     }, []);
 
     return (
