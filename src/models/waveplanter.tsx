@@ -419,11 +419,13 @@ export default function WavePlanterModel() {
         if (!obj) return;
 
         const exportGroup = obj.clone(true);
+        const brushes: THREE.Object3D[] = [];
         exportGroup.traverse((child) => {
-          if ((child as any).isBrush) {
-            child.parent?.remove(child);
-          }
+          if ((child as any).isBrush) brushes.push(child);
         });
+        for (const brush of brushes) {
+          brush.parent?.remove(brush);
+        }
         exportGroup.updateMatrixWorld(true);
 
         const exporter = new STLExporter();
