@@ -428,8 +428,23 @@ export default function WavePlanterModel() {
         }
         exportGroup.updateMatrixWorld(true);
 
+        const geometries: THREE.BufferGeometry[] = [];
+        exportGroup.traverse((child) => {
+          if ((child as THREE.Mesh).isMesh) {
+            const mesh = child as THREE.Mesh;
+            const geom = (mesh.geometry as THREE.BufferGeometry).clone();
+            mesh.updateWorldMatrix(true, false);
+            geom.applyMatrix4(mesh.matrixWorld);
+            geometries.push(geom);
+          }
+        });
+        const merged = mergeGeometries(geometries, false)!;
+        geometries.forEach((g) => g.dispose());
+        const welded = mergeVerts(merged);
+        welded.computeVertexNormals();
+
         const exporter = new STLExporter();
-        const stl = exporter.parse(exportGroup, { binary: true });
+        const stl = exporter.parse(welded, { binary: true });
         const blob = new Blob([stl], { type: "model/stl" });
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
