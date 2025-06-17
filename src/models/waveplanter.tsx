@@ -9,8 +9,9 @@ import ModelLayout from "@/layouts/modelLayout";
 import { STLExporter } from "three-stdlib";
 import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
-// Removed usage of @react-three/csg. All geometry is now created using
-// standard shapes and holes.
+// Removed usage of @react-three/csg. Some geometry still relies on boolean
+// operations implemented with three-bvh-csg directly.
+import { Brush, Evaluator, SUBTRACTION } from "three-bvh-csg";
 import { useMemo } from "react";
 
 export interface WavePlanterProps extends Record<string, number> {
@@ -146,6 +147,21 @@ function useRingGearGeometry(options: RingGearOptions) {
       }),
     [R, A, n, depth, rot, twistWaves, segments, reverseTwist, topCutDepth]
   );
+}
+
+function subtractGeometry(
+  base: THREE.BufferGeometry,
+  subtracts: THREE.BufferGeometry[]
+) {
+  const evaluator = new Evaluator();
+  let brush = new Brush(base.clone());
+  brush.updateMatrixWorld();
+  subtracts.forEach((geom) => {
+    const b = new Brush(geom.clone());
+    b.updateMatrixWorld();
+    brush = evaluator.evaluate(brush, b, SUBTRACTION) as Brush;
+  });
+  return (brush.geometry as THREE.BufferGeometry).clone();
 }
 
 export function WavePlanterMesh({
@@ -327,7 +343,7 @@ export function WavePlanterMesh({
       [createBaseBottomGeometry]
     );
 
-    const ringGeom = useRingGearGeometry({
+    const ringBase = useRingGearGeometry({
       R: props.radius,
       A: props.amplitude,
       n: props.density,
@@ -338,22 +354,13 @@ export function WavePlanterMesh({
       topCutDepth: 2,
     });
 
-    const taghExt = useMemo(() => {
+    const tagBase = useMemo(() => {
       const shape = new THREE.Shape()
         .moveTo(0, 0)
         .lineTo(15, 0)
         .lineTo(15, 10)
         .lineTo(0, 10)
         .closePath();
-
-      const innerRect = new THREE.Path()
-        .moveTo(2, 2)
-        .lineTo(13, 2)
-        .lineTo(13, 8)
-        .lineTo(2, 8)
-        .closePath();
-
-      shape.holes.push(innerRect);
 
       const geom = new THREE.ExtrudeGeometry(shape, {
         depth: 16,
@@ -367,6 +374,38 @@ export function WavePlanterMesh({
       merged.computeVertexNormals();
       return merged;
     }, []);
+
+    const taghExt = useMemo(() => {
+      const inner = tagBase.clone();
+      inner.scale(0.75, 0.75, 0.75);
+      inner.translate(2, 2, 2);
+
+      const box = new THREE.BoxGeometry(30, 10, 30);
+      box.translate(7, 12, 7);
+
+      const cyl = new THREE.CylinderGeometry(
+        props.radius - 2.5,
+        props.radius - 2.5,
+        30,
+        128
+      );
+      cyl.translate(7, 0, props.radius + 7.5);
+
+      const result = subtractGeometry(tagBase, [box, inner, cyl]);
+      const merged = mergeVerts(result);
+      merged.computeVertexNormals();
+      return merged;
+    }, [props.radius, tagBase]);
+
+    const ringGeom = useMemo(() => {
+      const cut = tagBase.clone();
+      cut.scale(0.75, 0.75, 0.75);
+      cut.translate(-5, props.radius - 5, props.baseDepth - 5);
+
+      const result = subtractGeometry(ringBase, [cut]);
+      result.computeVertexNormals();
+      return result;
+    }, [ringBase, props.radius, props.baseDepth, tagBase]);
 
     return (
       <group

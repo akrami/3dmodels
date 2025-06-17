@@ -71,6 +71,9 @@ importers:
       three:
         specifier: ^0.177.0
         version: 0.177.0
+      three-bvh-csg:
+        specifier: ^0.0.17
+        version: 0.0.17(three-mesh-bvh@0.8.3(three@0.177.0))(three@0.177.0)
       three-stdlib:
         specifier: ^2.36.0
         version: 2.36.0(three@0.177.0)
@@ -851,7 +854,6 @@ packages:
 
   '@radix-ui/rect@1.1.1':
     resolution: {integrity: sha512-HPwpGIzkl28mWyZqG52jiqDJ12waP11Pa1lGoiyUkIEuMLBP0oeK/C89esbXrxsky5we7dfd8U58nm0SgAWpVw==}
-
 
   '@react-three/drei@10.1.2':
     resolution: {integrity: sha512-CCcLAqZEvYiUErOcJgGzovY3RH6KgdrqD4ubeAx1nyGbSPLnKR9a8ynYbPdtZhIyiWqGc07z+RYQzpaOfN4ZIA==}
@@ -2256,16 +2258,11 @@ packages:
     resolution: {integrity: sha512-5S7Va8hKfV7W5U6g3aYxXmlPoZVAwUMy9AOKyF2fVuZa2UD3qZjg578OrLRt8PcNN1PleVaL/5/yYATNL0ICUw==}
     engines: {node: '>=18'}
 
-  three-bvh-csg@0.0.16:
-    resolution: {integrity: sha512-RgC5dY0hAKdfd1bmD3o2CDfmK9GTkvsA1ECzoqTMhSkjSc2zp1z4Wpa5+emLi/EosF5P6+aK2veTxTLZA9+Mhw==}
+  three-bvh-csg@0.0.17:
+    resolution: {integrity: sha512-iEkHDF8GRfGM6593Cuw8SnF1vfENCp46gIAtRzuL4nGXGWPcR1sbTBwM9ptDONb5twqlZp5WkAKya5aBKe2qcA==}
     peerDependencies:
       three: '>=0.151.0'
       three-mesh-bvh: '>=0.6.6'
-
-  three-mesh-bvh@0.6.8:
-    resolution: {integrity: sha512-EGebF9DZx1S8+7OZYNNTT80GXJZVf+UYXD/HyTg/e2kR/ApofIFfUS4ZzIHNnUVIadpnLSzM4n96wX+l7GMbnQ==}
-    peerDependencies:
-      three: '>= 0.151.0'
 
   three-mesh-bvh@0.8.3:
     resolution: {integrity: sha512-4G5lBaF+g2auKX3P0yqx+MJC6oVt6sB5k+CchS6Ob0qvH0YIhuUk1eYr7ktsIpY+albCqE80/FVQGV190PmiAg==}
@@ -3376,7 +3373,6 @@ snapshots:
       '@types/react-dom': 19.1.6(@types/react@19.1.6)
 
   '@radix-ui/rect@1.1.1': {}
-
 
   '@react-three/drei@10.1.2(@react-three/fiber@9.1.2(@types/react@19.1.6)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(three@0.177.0))(@types/react@19.1.6)(@types/three@0.177.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(three@0.177.0)':
     dependencies:
@@ -5087,14 +5083,10 @@ snapshots:
       mkdirp: 3.0.1
       yallist: 5.0.0
 
-  three-bvh-csg@0.0.16(three-mesh-bvh@0.6.8(three@0.177.0))(three@0.177.0):
+  three-bvh-csg@0.0.17(three-mesh-bvh@0.8.3(three@0.177.0))(three@0.177.0):
     dependencies:
       three: 0.177.0
-      three-mesh-bvh: 0.6.8(three@0.177.0)
-
-  three-mesh-bvh@0.6.8(three@0.177.0):
-    dependencies:
-      three: 0.177.0
+      three-mesh-bvh: 0.8.3(three@0.177.0)
 
   three-mesh-bvh@0.8.3(three@0.177.0):
     dependencies:
