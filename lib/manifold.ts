@@ -1,4 +1,5 @@
-import Module, { ManifoldToplevel } from 'manifold-3d'
+import Module from 'manifold-3d'
+import type { ManifoldToplevel } from 'manifold-3d'
 import * as THREE from 'three'
 
 let modPromise: Promise<ManifoldToplevel> | null = null
