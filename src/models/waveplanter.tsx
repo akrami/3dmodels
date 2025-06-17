@@ -443,8 +443,11 @@ export default function WavePlanterModel() {
         const welded = mergeVerts(merged);
         welded.computeVertexNormals();
 
+        const mesh = new THREE.Mesh(welded);
+        mesh.updateMatrixWorld(true);
+
         const exporter = new STLExporter();
-        const stl = exporter.parse(welded, { binary: true });
+        const stl = exporter.parse(mesh, { binary: true });
         const blob = new Blob([stl], { type: "model/stl" });
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
