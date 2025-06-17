@@ -10,6 +10,7 @@ import { STLExporter } from "three-stdlib";
 import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
 import { Geometry, Base, Subtraction } from "@react-three/csg";
+import { Brush, Evaluator, ADDITION } from "three-bvh-csg";
 import { useMemo } from "react";
 
 export interface WavePlanterProps extends Record<string, number> {
@@ -428,19 +429,30 @@ export default function WavePlanterModel() {
         }
         exportGroup.updateMatrixWorld(true);
 
-        const geometries: THREE.BufferGeometry[] = [];
+        const meshes: THREE.Mesh[] = [];
         exportGroup.traverse((child) => {
           if ((child as THREE.Mesh).isMesh) {
-            const mesh = child as THREE.Mesh;
-            const geom = (mesh.geometry as THREE.BufferGeometry).clone();
-            mesh.updateWorldMatrix(true, false);
-            geom.applyMatrix4(mesh.matrixWorld);
-            geometries.push(geom);
+            meshes.push(child as THREE.Mesh);
           }
         });
-        const merged = mergeGeometries(geometries, false)!;
-        geometries.forEach((g) => g.dispose());
-        const welded = mergeVerts(merged);
+
+        if (meshes.length === 0) return;
+
+        const ev = new Evaluator();
+        let root = new Brush((meshes[0].geometry as THREE.BufferGeometry).clone());
+        meshes[0].updateWorldMatrix(true, false);
+        root.applyMatrix4(meshes[0].matrixWorld);
+
+        for (let i = 1; i < meshes.length; i++) {
+          const mesh = meshes[i];
+          const geom = (mesh.geometry as THREE.BufferGeometry).clone();
+          mesh.updateWorldMatrix(true, false);
+          const brush = new Brush(geom);
+          brush.applyMatrix4(mesh.matrixWorld);
+          root = ev.evaluate(root, brush, ADDITION);
+        }
+
+        const welded = mergeVerts(root.geometry.clone());
         welded.computeVertexNormals();
 
         const mesh = new THREE.Mesh(welded);
