@@ -1,11 +1,14 @@
 import Module from 'manifold-3d'
 import type { ManifoldToplevel } from 'manifold-3d'
+import wasmUrl from 'manifold-3d/manifold.wasm?url'
 import * as THREE from 'three'
 
 let modPromise: Promise<ManifoldToplevel> | null = null
 export function getManifold() {
   if (!modPromise) {
-    modPromise = Module().then((m) => {
+    modPromise = Module({
+      locateFile: () => wasmUrl,
+    }).then((m) => {
       m.setup()
       return m
     })
@@ -25,7 +28,7 @@ export async function geometryToManifold(geometry: THREE.BufferGeometry) {
   const mesh = new Mesh({ numProp: 3, vertProperties, triVerts })
   mesh.merge()
   const manifold = new Manifold(mesh)
-  mesh.delete()
+  ;(mesh as any).delete()
   return { wasm, manifold }
 }
 
@@ -34,7 +37,7 @@ export async function manifoldToGeometry(manifold: any, wasm: ManifoldToplevel) 
   const geometry = new THREE.BufferGeometry()
   geometry.setAttribute('position', new THREE.BufferAttribute(mesh.vertProperties, 3))
   geometry.setIndex(new THREE.BufferAttribute(mesh.triVerts, 1))
-  mesh.delete()
+  ;(mesh as any).delete()
   manifold.delete()
   return geometry
 }
