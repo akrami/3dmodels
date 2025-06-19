@@ -175,7 +175,10 @@ function createBasePlanterGeometry({
   };
 
   const bottomDepth = Math.max(depth - 2, 0);
-  const bottomSteps = Math.max(1, Math.round((bottomDepth / depth) * TWIST_SEGMENTS));
+  const bottomSteps = Math.max(
+    1,
+    Math.round((bottomDepth / depth) * TWIST_SEGMENTS)
+  );
   const topSteps = Math.max(1, TWIST_SEGMENTS - bottomSteps);
 
   const outerBottom = makeOuterShape();
@@ -209,7 +212,8 @@ function createBasePlanterGeometry({
     for (let i = 0; i < pos.count; i++) {
       v.fromBufferAttribute(pos, i);
       const t = v.z / depth;
-      const angle = Math.sin(t * twistWaves * Math.PI * 2) * rot * -1;
+      const tt = 1 - t;
+      const angle = Math.sin(tt * twistWaves * Math.PI * 2) * rot * -1;
       v.applyEuler(new THREE.Euler(0, 0, angle));
       pos.setXYZ(i, v.x, v.y, v.z);
     }
@@ -226,14 +230,14 @@ function createHandleGeometry() {
   const outer = new THREE.Shape()
     .moveTo(0, 0)
     .lineTo(15, 0)
-    .absarc(15, 5, 5, -Math.PI / 2, Math.PI / 2, false)
+    .lineTo(15, 10)
     .lineTo(0, 10)
     .closePath();
 
   const inner = new THREE.Path()
     .moveTo(2, 2)
     .lineTo(13, 2)
-    .absarc(13, 5, 3, -Math.PI / 2, Math.PI / 2, false)
+    .lineTo(13, 8)
     .lineTo(2, 8)
     .closePath();
   outer.holes.push(inner);
