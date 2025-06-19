@@ -150,7 +150,7 @@ function useRingGearGeometry(options: RingGearOptions) {
 export function WavePlanterMesh({
   props = DEFAULT_PROPS,
   meshRef,
-  color = "#AAAAAA",
+  color = "#add8e6",
 }: {
   props?: WavePlanterProps;
   meshRef?: React.RefObject<THREE.Group>;
@@ -410,7 +410,7 @@ export function WavePlanterMesh({
 }
 
 export default function WavePlanterModel() {
-  const [color, setColor] = React.useState("#AAAAAA");
+  const [color, setColor] = React.useState("#add8e6");
   const meshElement = <WavePlanterMesh color={color} />;
   const renderExport = React.useCallback(
     ({ meshRef }: { exportModel: () => void; meshRef: React.RefObject<THREE.Group> }) => {
