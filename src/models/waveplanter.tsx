@@ -402,7 +402,7 @@ export function WavePlanterMesh({
   };
 
   return (
-    <group ref={meshRef}>
+    <group ref={meshRef} rotation={[-Math.PI / 2, 0, 0]}>
       <WavePlanter />
       <BasePlanter />
     </group>
