@@ -83,7 +83,7 @@ export default function ModelLayout<T extends Record<string, number>>({
           </Sidebar>
           <div className="flex-1 relative">
             <Canvas
-              camera={{ position: camera, fov: 60, up: [0, 0, 1] }}
+              camera={{ position: camera, fov: 60, up: [0, 1, 0] }}
               className="bg-gradient-to-br from-gray-50 to-gray-200"
               shadows
             >

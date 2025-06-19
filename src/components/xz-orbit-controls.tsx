@@ -11,7 +11,7 @@ export interface XZOrbitControlsProps {
   zoomSpeed?: number
 }
 
-/** Simple orbit controls that yaw around Z and pitch around X. */
+/** Simple orbit controls that yaw around Y and pitch around X. */
 export function XZOrbitControls({
   distance = 10,
   rotateSpeed = 0.005,
@@ -24,12 +24,12 @@ export function XZOrbitControls({
   const pointer = useRef({ x: 0, y: 0 })
 
   useEffect(() => {
-    camera.up.set(0, 0, 1)
+    camera.up.set(0, 1, 0)
     const r = radius.current
     const { theta, phi } = angles.current
-    const x = r * Math.cos(theta) * Math.cos(phi)
-    const y = r * Math.sin(theta) * Math.cos(phi)
-    const z = r * Math.sin(phi)
+    const x = r * Math.sin(theta) * Math.cos(phi)
+    const y = r * Math.sin(phi)
+    const z = r * Math.cos(theta) * Math.cos(phi)
     camera.position.set(x, y, z)
     camera.lookAt(new THREE.Vector3(0, 0, 0))
     const element = gl.domElement
@@ -78,9 +78,9 @@ export function XZOrbitControls({
   useFrame(() => {
     const r = radius.current
     const { theta, phi } = angles.current
-    const x = r * Math.cos(theta) * Math.cos(phi)
-    const y = r * Math.sin(theta) * Math.cos(phi)
-    const z = r * Math.sin(phi)
+    const x = r * Math.sin(theta) * Math.cos(phi)
+    const y = r * Math.sin(phi)
+    const z = r * Math.cos(theta) * Math.cos(phi)
     camera.position.set(x, y, z)
     camera.lookAt(new THREE.Vector3(0, 0, 0))
   })
