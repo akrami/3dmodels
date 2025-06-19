@@ -209,12 +209,23 @@ function createBasePlanterGeometry({
   if (rot !== 0) {
     const pos = geom.attributes.position as THREE.BufferAttribute;
     const v = new THREE.Vector3();
+    const slotMinX = -5;
+    const slotMaxX = slotMinX + 11.25;
+    const slotMinY = R - 5;
+    const slotMaxY = slotMinY + 7.5;
     for (let i = 0; i < pos.count; i++) {
       v.fromBufferAttribute(pos, i);
       const t = v.z / depth;
       const tt = 1 - t;
       const angle = Math.sin(tt * twistWaves * Math.PI * 2) * rot * -1;
-      v.applyEuler(new THREE.Euler(0, 0, angle));
+      if (
+        v.x < slotMinX ||
+        v.x > slotMaxX ||
+        v.y < slotMinY ||
+        v.y > slotMaxY
+      ) {
+        v.applyEuler(new THREE.Euler(0, 0, angle));
+      }
       pos.setXYZ(i, v.x, v.y, v.z);
     }
     pos.needsUpdate = true;
