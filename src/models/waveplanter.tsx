@@ -301,7 +301,7 @@ export function WavePlanterMesh({
     );
 
     return (
-      <group name="waveplanter" castShadow receiveShadow>
+      <group name="waveplanter" castShadow receiveShadow position={[-distance / 2, 0, 0]}>
         <RingGear
           R={props.radius}
           A={props.amplitude}
@@ -361,7 +361,7 @@ export function WavePlanterMesh({
     return (
       <group
         name="baseplanter"
-        position={[distance, 0, 0]}
+        position={[distance / 2, 0, 0]}
         castShadow
         receiveShadow
       >
