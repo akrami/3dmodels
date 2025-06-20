@@ -415,10 +415,16 @@ export default function WavePlanterModel() {
   const renderExport = React.useCallback(
     ({ meshRef }: { exportModel: () => void; meshRef: React.RefObject<THREE.Group> }) => {
       const exportByName = (groupName: string, fileName: string) => {
-        const obj = meshRef.current?.getObjectByName(groupName);
-        if (!obj) return;
-        const exporter = new STLExporter();
-        const stl = exporter.parse(obj, { binary: true });
+        const obj = meshRef.current?.getObjectByName(groupName)
+        if (!obj) return
+        const clone = obj.clone(true)
+        const toRemove: THREE.Object3D[] = []
+        clone.traverse((child) => {
+          if (!child.visible) toRemove.push(child)
+        })
+        toRemove.forEach((child) => child.parent?.remove(child))
+        const exporter = new STLExporter()
+        const stl = exporter.parse(clone, { binary: true })
         const blob = new Blob([stl], { type: "model/stl" });
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
