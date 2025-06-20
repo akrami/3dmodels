@@ -1,15 +1,7 @@
 ---
-import "../../styles/globals.css";
+import PageLayout from "@/layouts/pageLayout.astro";
 import WavePlanterModel from "@/models/waveplanter";
 ---
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Wave Planter</title>
-  </head>
-  <body>
-    <WavePlanterModel client:visible />
-  </body>
-</html>
+<PageLayout title="Wave Planter">
+  <WavePlanterModel client:visible />
+</PageLayout>
