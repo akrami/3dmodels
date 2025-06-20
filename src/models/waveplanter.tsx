@@ -27,7 +27,6 @@ function extrude(shape: THREE.Shape, depth: number, steps = 1) {
 function twistGeometry(
   geom: THREE.BufferGeometry,
   depth: number,
-  rot: number,
   twistWaves: number,
   reverse: boolean
 ) {
@@ -38,7 +37,7 @@ function twistGeometry(
     const t = v.z / depth;
     const tt = reverse ? 1 - t : t;
     const dir = reverse ? -1 : 1;
-    const angle = Math.sin(tt * twistWaves * Math.PI * 2) * rot * dir;
+    const angle = Math.sin(tt * twistWaves * Math.PI * 2) * dir;
     v.applyEuler(new THREE.Euler(0, 0, angle));
     pos.setXYZ(i, v.x, v.y, v.z);
   }
@@ -67,11 +66,10 @@ export const DEFAULT_PROPS: WavePlanterProps = {
 };
 
 export interface RingGearOptions {
-  R: number;
-  A: number;
-  n: number;
+  radius: number;
+  amplitude: number;
+  density: number;
   depth: number;
-  rot?: number;
   twistWaves?: number;
   segments?: number;
   reverseTwist?: boolean;
@@ -80,11 +78,10 @@ export interface RingGearOptions {
 
 function createRingGearGeometry(options: RingGearOptions) {
   const {
-    R: radius,
-    A: amplitude,
-    n: density,
+    radius,
+    amplitude,
+    density,
     depth,
-    rot = 0,
     twistWaves = 1,
     segments = 1024,
     reverseTwist = false,
@@ -132,9 +129,7 @@ function createRingGearGeometry(options: RingGearOptions) {
 
   const geom = mergeGeometries(geoms, false)!;
 
-  if (rot !== 0) {
-    twistGeometry(geom, depth, rot, twistWaves, reverseTwist);
-  }
+  twistGeometry(geom, depth, twistWaves, reverseTwist);
 
   const merged = mergeVerts(geom);
   merged.computeVertexNormals();
@@ -142,21 +137,20 @@ function createRingGearGeometry(options: RingGearOptions) {
 }
 
 function useRingGearGeometry(options: RingGearOptions) {
-  const { R, A, n, depth, rot, twistWaves, segments, reverseTwist, topCutDepth } = options;
+  const { radius, amplitude, density, depth, twistWaves, segments, reverseTwist, topCutDepth } = options;
   return React.useMemo(
     () =>
       createRingGearGeometry({
-        R,
-        A,
-        n,
+        radius,
+        amplitude,
+        density,
         depth,
-        rot,
         twistWaves,
         segments,
         reverseTwist,
         topCutDepth,
       }),
-    [R, A, n, depth, rot, twistWaves, segments, reverseTwist, topCutDepth]
+    [radius, amplitude, density, depth, twistWaves, segments, reverseTwist, topCutDepth]
   );
 }
 
@@ -170,11 +164,10 @@ export function WavePlanterMesh({
   color?: string;
 }) {
   const RingGear = ({
-    R,
-    A,
-    n,
+    radius,
+    amplitude,
+    density,
     depth,
-    rot = 0,
     twistWaves = 1,
     segments = 1024,
     reverseTwist = false,
@@ -183,11 +176,10 @@ export function WavePlanterMesh({
     material,
     ...meshProps
   }: {
-    R: number;
-    A: number;
-    n: number;
+    radius: number;
+    amplitude: number;
+    density: number;
     depth: number;
-    rot?: number;
     twistWaves?: number;
     segments?: number;
     reverseTwist?: boolean;
@@ -195,11 +187,10 @@ export function WavePlanterMesh({
     material?: THREE.Material | THREE.Material[];
   } & ThreeElements["mesh"]) => {
     const geometry = useRingGearGeometry({
-      R,
-      A,
-      n,
+      radius,
+      amplitude,
+      density,
       depth,
-      rot,
       twistWaves,
       segments,
       reverseTwist,
@@ -274,11 +265,10 @@ export function WavePlanterMesh({
     return (
       <group name="waveplanter" castShadow receiveShadow position={[-distance / 2, 0, 0]}>
         <RingGear
-          R={props.radius}
-          A={props.amplitude}
-          n={props.density}
+          radius={props.radius}
+          amplitude={props.amplitude}
+          density={props.density}
           depth={props.depth}
-          rot={Math.PI / 12}
           twistWaves={props.twistWaves}
           position={[0, 0, 0]}
           castShadow
@@ -298,11 +288,10 @@ export function WavePlanterMesh({
     );
 
     const ringGeom = useRingGearGeometry({
-      R: props.radius,
-      A: props.amplitude,
-      n: props.density,
+      radius: props.radius,
+      amplitude: props.amplitude,
+      density: props.density,
       depth: props.baseDepth,
-      rot: Math.PI / 12,
       twistWaves: (props.baseDepth / props.depth) * props.twistWaves,
       reverseTwist: true,
       topCutDepth: 2,
