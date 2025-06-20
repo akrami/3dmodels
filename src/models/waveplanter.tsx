@@ -12,6 +12,43 @@ import { Download } from "lucide-react";
 import { Geometry, Base, Subtraction } from "@react-three/csg";
 import { useMemo } from "react";
 
+const EXTRUDE_SETTINGS = { bevelEnabled: false, curveSegments: 64 } as const;
+
+/** Create a basic circle shape */
+function circle(radius: number) {
+  const shape = new THREE.Shape();
+  shape.absarc(0, 0, radius, 0, Math.PI * 2, false);
+  return shape;
+}
+
+/** Extrude a shape with standard settings */
+function extrude(shape: THREE.Shape, depth: number, steps = 1) {
+  return new THREE.ExtrudeGeometry(shape, { ...EXTRUDE_SETTINGS, depth, steps });
+}
+
+/** Apply a sine based twist to a geometry */
+function twistGeometry(
+  geom: THREE.BufferGeometry,
+  depth: number,
+  rot: number,
+  twistWaves: number,
+  reverse: boolean
+) {
+  const pos = geom.attributes.position as THREE.BufferAttribute;
+  const v = new THREE.Vector3();
+  for (let i = 0; i < pos.count; i++) {
+    v.fromBufferAttribute(pos, i);
+    const t = v.z / depth;
+    const tt = reverse ? 1 - t : t;
+    const dir = reverse ? -1 : 1;
+    const angle = Math.sin(tt * twistWaves * Math.PI * 2) * rot * dir;
+    v.applyEuler(new THREE.Euler(0, 0, angle));
+    pos.setXYZ(i, v.x, v.y, v.z);
+  }
+  pos.needsUpdate = true;
+  geom.computeVertexNormals();
+}
+
 export interface WavePlanterProps extends Record<string, number> {
   radius: number;
   amplitude: number;
@@ -44,21 +81,23 @@ export interface RingGearOptions {
   topCutDepth?: number;
 }
 
-function createRingGearGeometry({
-  R,
-  A,
-  n,
-  depth,
-  rot = 0,
-  twistWaves = 1,
-  segments = 1024,
-  reverseTwist = false,
-  topCutDepth = 0,
-}: RingGearOptions) {
-  const k = Math.round(R * n);
-  const rOuter = (t: number) => R + A - Math.abs(Math.sin(k * t));
-  const rInner = R - (A + 4);
-  const rInnerCut = R - 4;
+function createRingGearGeometry(options: RingGearOptions) {
+  const {
+    R: radius,
+    A: amplitude,
+    n: density,
+    depth,
+    rot = 0,
+    twistWaves = 1,
+    segments = 1024,
+    reverseTwist = false,
+    topCutDepth = 0,
+  } = options;
+
+  const k = Math.round(radius * density);
+  const rOuter = (t: number) => radius + amplitude - Math.abs(Math.sin(k * t));
+  const rInner = radius - (amplitude + 4);
+  const rInnerCut = radius - 4;
 
   const makeOuterShape = () => {
     const shape = new THREE.Shape();
@@ -81,12 +120,7 @@ function createRingGearGeometry({
   const holeBottom = new THREE.Path().absarc(0, 0, rInner, 0, Math.PI * 2, true);
   const bottomShape = outerShape.clone();
   bottomShape.holes.push(holeBottom);
-  const bottomGeom = new THREE.ExtrudeGeometry(bottomShape, {
-    steps: bottomSteps,
-    depth: bottomDepth,
-    bevelEnabled: false,
-    curveSegments: 64,
-  });
+  const bottomGeom = extrude(bottomShape, bottomDepth, bottomSteps);
 
   const geoms: THREE.BufferGeometry[] = [bottomGeom];
 
@@ -94,12 +128,7 @@ function createRingGearGeometry({
     const outerShapeTop = makeOuterShape();
     const holeTop = new THREE.Path().absarc(0, 0, rInnerCut, 0, Math.PI * 2, true);
     outerShapeTop.holes.push(holeTop);
-    const topGeom = new THREE.ExtrudeGeometry(outerShapeTop, {
-      steps: topSteps,
-      depth: topCutDepth,
-      bevelEnabled: false,
-      curveSegments: 64,
-    });
+    const topGeom = extrude(outerShapeTop, topCutDepth, topSteps);
     topGeom.translate(0, 0, bottomDepth);
     geoms.push(topGeom);
   }
@@ -107,20 +136,7 @@ function createRingGearGeometry({
   const geom = mergeGeometries(geoms, false)!;
 
   if (rot !== 0) {
-    const pos = geom.attributes.position as THREE.BufferAttribute;
-    const v = new THREE.Vector3();
-    for (let i = 0; i < pos.count; i++) {
-      v.fromBufferAttribute(pos, i);
-      const t = v.z / depth;
-      const tt = reverseTwist ? 1 - t : t;
-      const dir = reverseTwist ? -1 : 1;
-      const angle = Math.sin(tt * twistWaves * Math.PI * 2) * rot * dir;
-      const e = new THREE.Euler(0, 0, angle);
-      v.applyEuler(e);
-      pos.setXYZ(i, v.x, v.y, v.z);
-    }
-    pos.needsUpdate = true;
-    geom.computeVertexNormals();
+    twistGeometry(geom, depth, rot, twistWaves, reverseTwist);
   }
 
   const merged = mergeVerts(geom);
@@ -210,24 +226,19 @@ export function WavePlanterMesh({
 
   const createWaveBottomGeometry = React.useCallback(() => {
     const outer = props.radius - 4;
-    const diameter = outer * 2;
-    const holeCount = diameter <= 50 ? 1 : 3;
+    const holeCount = outer * 2 <= 50 ? 1 : 3;
 
     const createShape = (holeRadius: number) => {
-      const shape = new THREE.Shape();
-      shape.absarc(0, 0, outer, 0, Math.PI * 2, false);
-
+      const shape = circle(outer);
       if (holeCount > 0) {
-        const positions: [number, number][] = [];
-        if (holeCount === 1) {
-          positions.push([0, 0]);
-        } else {
-          const dist = outer / 2;
-          for (let i = 0; i < holeCount; i++) {
-            const ang = (i / holeCount) * Math.PI * 2;
-            positions.push([Math.cos(ang) * dist, Math.sin(ang) * dist]);
-          }
-        }
+        const positions: [number, number][] =
+          holeCount === 1
+            ? [[0, 0]]
+            : Array.from({ length: holeCount }, (_, i) => {
+                const ang = (i / holeCount) * Math.PI * 2;
+                const dist = outer / 2;
+                return [Math.cos(ang) * dist, Math.sin(ang) * dist] as [number, number];
+              });
 
         positions.forEach(([x, y]) => {
           const hole = new THREE.Path();
@@ -235,62 +246,25 @@ export function WavePlanterMesh({
           shape.holes.push(hole);
         });
       }
-
       return shape;
     };
 
-    const topShape = createShape(10);
-    const bottomShape = createShape(9);
-
-    const top = new THREE.ExtrudeGeometry(topShape, {
-      depth: 2,
-      bevelEnabled: false,
-      curveSegments: 64,
-    });
-
-    const bottom = new THREE.ExtrudeGeometry(bottomShape, {
-      depth: 2,
-      bevelEnabled: false,
-      curveSegments: 64,
-    });
+    const bottom = extrude(createShape(9), 2);
     bottom.translate(0, 0, -2);
-
+    const top = extrude(createShape(10), 2);
     const geom = mergeGeometries([bottom, top], false);
     return geom!;
-  },
-    [props.radius]
-  );
+  }, [props.radius]);
 
   const createBaseBottomGeometry = React.useCallback(() => {
     const outer = props.radius - 4;
-
-    const createShape = () => {
-      const shape = new THREE.Shape();
-      shape.absarc(0, 0, outer, 0, Math.PI * 2, false);
-      return shape;
-    };
-
-    const topShape = createShape();
-    const bottomShape = createShape();
-
-    const top = new THREE.ExtrudeGeometry(topShape, {
-      depth: 2,
-      bevelEnabled: false,
-      curveSegments: 64,
-    });
-
-    const bottom = new THREE.ExtrudeGeometry(bottomShape, {
-      depth: 2,
-      bevelEnabled: false,
-      curveSegments: 64,
-    });
+    const shape = circle(outer);
+    const bottom = extrude(shape.clone(), 2);
     bottom.translate(0, 0, -2);
-
+    const top = extrude(shape, 2);
     const geom = mergeGeometries([bottom, top], false);
     return geom!;
-  },
-    [props.radius]
-  );
+  }, [props.radius]);
 
   const distance = props.radius * 2.5;
 
@@ -414,32 +388,32 @@ export default function WavePlanterModel() {
   const meshElement = <WavePlanterMesh color={color} />;
   const renderExport = React.useCallback(
     ({ meshRef }: { exportModel: () => void; meshRef: React.RefObject<THREE.Group> }) => {
-      const exportByName = (groupName: string, fileName: string) => {
-        const obj = meshRef.current?.getObjectByName(groupName)
-        if (!obj) return
-        const clone = obj.clone(true)
-        const toRemove: THREE.Object3D[] = []
+      const exportGroup = (name: string, file: string) => {
+        const obj = meshRef.current?.getObjectByName(name);
+        if (!obj) return;
+        const clone = obj.clone(true);
+        const invisible: THREE.Object3D[] = [];
         clone.traverse((child) => {
-          if (!child.visible) toRemove.push(child)
-        })
-        toRemove.forEach((child) => child.parent?.remove(child))
-        const exporter = new STLExporter()
-        const stl = exporter.parse(clone, { binary: true })
-        const blob = new Blob([stl], { type: "model/stl" });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = `${fileName}.stl`;
+          if (!child.visible) invisible.push(child);
+        });
+        invisible.forEach((child) => child.parent?.remove(child));
+        const exporter = new STLExporter();
+        const stl = exporter.parse(clone, { binary: true });
+        const url = URL.createObjectURL(new Blob([stl], { type: "model/stl" }));
+        const link = Object.assign(document.createElement("a"), {
+          href: url,
+          download: `${file}.stl`,
+        });
         link.click();
         URL.revokeObjectURL(url);
       };
 
       return (
         <div className="flex flex-col gap-2 mt-4">
-          <Button onClick={() => exportByName("waveplanter", "waveplanter")} className="w-full">
+          <Button onClick={() => exportGroup("waveplanter", "waveplanter")} className="w-full">
             <Download /> Download Top
           </Button>
-          <Button onClick={() => exportByName("baseplanter", "baseplanter")} className="w-full">
+          <Button onClick={() => exportGroup("baseplanter", "baseplanter")} className="w-full">
             <Download /> Download Base
           </Button>
         </div>
