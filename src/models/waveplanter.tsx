@@ -22,7 +22,7 @@ export interface WavePlanterProps extends Record<string, number> {
 }
 
 export const MODEL_NAME = "wave";
-const TWIST_SEGMENTS = 128;
+const TWIST_SEGMENTS = 64;
 export const DEFAULT_PROPS: WavePlanterProps = {
   radius: 75,
   amplitude: 0.2,
@@ -85,7 +85,7 @@ function createRingGearGeometry({
     steps: bottomSteps,
     depth: bottomDepth,
     bevelEnabled: false,
-    curveSegments: 128,
+    curveSegments: 64,
   });
 
   const geoms: THREE.BufferGeometry[] = [bottomGeom];
@@ -98,7 +98,7 @@ function createRingGearGeometry({
       steps: topSteps,
       depth: topCutDepth,
       bevelEnabled: false,
-      curveSegments: 128,
+      curveSegments: 64,
     });
     topGeom.translate(0, 0, bottomDepth);
     geoms.push(topGeom);
@@ -391,7 +391,7 @@ export function WavePlanterMesh({
               </Subtraction>
               <Subtraction geometry={taghExt} position={[2, 2, 2]} scale={[0.75, 0.75, 0.75]} />
               <Subtraction position={[7, 0, props.radius + 7.5]}>
-                <cylinderGeometry args={[props.radius - 2.5, props.radius - 2.5, 30, 128]} />
+                <cylinderGeometry args={[props.radius - 2.5, props.radius - 2.5, 30, 64]} />
               </Subtraction>
             </Geometry>
             <meshStandardMaterial color={color} />
