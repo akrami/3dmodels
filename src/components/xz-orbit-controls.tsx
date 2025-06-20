@@ -3,15 +3,11 @@ import { useThree, useFrame } from "@react-three/fiber"
 import * as THREE from "three"
 
 export interface XZOrbitControlsProps {
-  /** initial camera distance from origin */
   distance?: number
-  /** rotation speed multiplier */
   rotateSpeed?: number
-  /** zoom speed multiplier */
   zoomSpeed?: number
 }
 
-/** Simple orbit controls that yaw around Y and pitch around X. */
 export function XZOrbitControls({
   distance = 10,
   rotateSpeed = 0.005,

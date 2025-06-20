@@ -14,19 +14,16 @@ import { useMemo } from "react";
 
 const EXTRUDE_SETTINGS = { bevelEnabled: false, curveSegments: 64 } as const;
 
-/** Create a basic circle shape */
 function circle(radius: number) {
   const shape = new THREE.Shape();
   shape.absarc(0, 0, radius, 0, Math.PI * 2, false);
   return shape;
 }
 
-/** Extrude a shape with standard settings */
 function extrude(shape: THREE.Shape, depth: number, steps = 1) {
   return new THREE.ExtrudeGeometry(shape, { ...EXTRUDE_SETTINGS, depth, steps });
 }
 
-/** Apply a sine based twist to a geometry */
 function twistGeometry(
   geom: THREE.BufferGeometry,
   depth: number,
