@@ -1,17 +1,9 @@
 ---
-import "../styles/globals.css";
+import PageLayout from "@/layouts/pageLayout.astro";
 import AppLayout from "@/layouts/appLayout";
 ---
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tools</title>
-  </head>
-  <body>
-    <AppLayout client:idle>
-      <p>Home page</p>
-    </AppLayout>
-  </body>
-</html>
+<PageLayout title="Tools">
+  <AppLayout client:idle>
+    <p>Home page</p>
+  </AppLayout>
+</PageLayout>
