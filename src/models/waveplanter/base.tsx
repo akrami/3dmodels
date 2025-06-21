@@ -7,7 +7,7 @@ import {
 import { Geometry, Base, Subtraction } from "@react-three/csg";
 import { useMemo } from "react";
 import { circle, extrude, useRingGearGeometry } from "./ringGear";
-import type { WavePlanterProps } from "./waveprops";
+import type { WavePlanterProps } from "./props";
 
 export default function BasePlanter({
   props,

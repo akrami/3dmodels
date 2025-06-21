@@ -3,7 +3,7 @@ import * as THREE from "three";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { type ThreeElements } from "@react-three/fiber";
 import { circle, extrude, useRingGearGeometry } from "./ringGear";
-import type { WavePlanterProps } from "./waveprops";
+import type { WavePlanterProps } from "./props";
 
 export default function WavePlanter({
   props,
