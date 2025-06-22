@@ -11,55 +11,63 @@ export default function InsertObject({ props, color }: { props: WavePlanterProps
   const geometry = React.useMemo(() => {
     const height = Math.max(props.baseDepth - 12, 0);
 
-    const ringGeom = new THREE.CylinderGeometry(10, 10, 2, 8, 1, true);
+    // --- basic outer shell ---
+    const ringGeom = new THREE.CylinderGeometry(10, 10, 2, 16);
     ringGeom.translate(0, 0, height + 3);
 
-    const cylGeom = new THREE.CylinderGeometry(10, 10, height, 8, 1, true);
+    const cylGeom = new THREE.CylinderGeometry(10, 10, height, 16, 1, true);
     cylGeom.translate(0, 0, 2 + height / 2);
 
-    const diskGeom = new THREE.CylinderGeometry(8, 8, 2, 8);
-    diskGeom.translate(0, 0, 1);
-
-    const outer = mergeGeometries([diskGeom, cylGeom, ringGeom], false)!;
+    const shell = mergeGeometries([ringGeom, cylGeom], false)!;
 
     const evaluator = new Evaluator();
     evaluator.useGroups = false;
 
-    const innerGeom = new THREE.CylinderGeometry(8, 8, height + 2, 8, 1, true);
+    // subtract inner space while keeping the bottom disk
+    const innerGeom = new THREE.CylinderGeometry(8, 8, height + 2, 16);
     innerGeom.translate(0, 0, 3 + height / 2);
     let result = evaluator.evaluate(
-      new Brush(outer),
+      new Brush(shell),
       new Brush(innerGeom),
       SUBTRACTION
     ) as THREE.Mesh;
 
-    const holeRadius = 2;
-    const holeSpacing = 8;
-    const radial = 9;
-    const circumference = 2 * Math.PI * radial;
-    const aroundCount = Math.min(20, Math.max(3, Math.floor(circumference / holeSpacing)));
-    const angleStep = (2 * Math.PI) / aroundCount;
-    const verticalCount = Math.min(10, Math.max(1, Math.floor(height / holeSpacing)));
+    // add the bottom disk as a separate geometry
+    const diskGeom = new THREE.CylinderGeometry(8, 8, 2, 16);
+    diskGeom.translate(0, 0, 1);
+    let geom = mergeGeometries([
+      (result.geometry as THREE.BufferGeometry).clone(),
+      diskGeom,
+    ], false)!;
 
-    const holeGeoms: THREE.BufferGeometry[] = [];
-    for (let i = 0; i < verticalCount; i++) {
-      const z = 2 + holeSpacing / 2 + i * holeSpacing;
-      const offset = (i % 2) * angleStep * 0.5;
-      for (let j = 0; j < aroundCount; j++) {
-        const angle = j * angleStep + offset;
-        const x = Math.cos(angle) * radial;
-        const y = Math.sin(angle) * radial;
-        const g = new THREE.CylinderGeometry(holeRadius, holeRadius, 4, 6);
-        g.rotateX(Math.PI / 2);
-        g.translate(x, y, z);
-        holeGeoms.push(g);
+    // --- light cylindrical holes ---
+    if (height > 2) {
+      const holeGeoms: THREE.BufferGeometry[] = [];
+      const aroundCount = 6;
+      const verticalCount = Math.min(2, Math.floor(height / 8));
+      const radial = 9;
+
+      for (let i = 0; i < verticalCount; i++) {
+        const z = 4 + i * 8;
+        for (let j = 0; j < aroundCount; j++) {
+          const angle = (j / aroundCount) * Math.PI * 2;
+          const x = Math.cos(angle) * radial;
+          const y = Math.sin(angle) * radial;
+          const g = new THREE.CylinderGeometry(2, 2, 4, 6);
+          g.rotateX(Math.PI / 2);
+          g.translate(x, y, z);
+          holeGeoms.push(g);
+        }
+      }
+
+      if (holeGeoms.length > 0) {
+        const holes = mergeGeometries(holeGeoms, false)!;
+        result = evaluator.evaluate(new Brush(geom), new Brush(holes), SUBTRACTION) as THREE.Mesh;
+        geom = (result.geometry as THREE.BufferGeometry).clone();
       }
     }
-    if (holeGeoms.length > 0) {
-      const holes = mergeGeometries(holeGeoms, false)!;
-      result = evaluator.evaluate(result, new Brush(holes), SUBTRACTION) as THREE.Mesh;
-    }
 
+    // --- bottom slots arranged like triangle medians ---
     const slotLength = 12;
     const slotWidth = 3;
     const slotRadius = slotWidth / 2;
@@ -71,6 +79,7 @@ export default function InsertObject({ props, color }: { props: WavePlanterProps
       .lineTo(-halfLen, -slotRadius)
       .absarc(-halfLen, 0, slotRadius, -Math.PI / 2, Math.PI / 2, false);
     slotShape.closePath();
+
     const slotGeom = new THREE.ExtrudeGeometry(slotShape, {
       depth: 2,
       steps: 1,
@@ -78,16 +87,20 @@ export default function InsertObject({ props, color }: { props: WavePlanterProps
       curveSegments: 8,
     });
 
+    const slotBrushes: Brush[] = [];
     for (let i = 0; i < 3; i++) {
-      const angle = (i / 3) * Math.PI * 2;
-      const brush = new Brush(slotGeom.clone());
-      brush.position.set(0, 0, 0);
-      brush.rotation.set(0, 0, angle);
-      brush.updateMatrixWorld();
-      result = evaluator.evaluate(result, brush, SUBTRACTION) as THREE.Mesh;
+      const g = slotGeom.clone();
+      const b = new Brush(g);
+      b.rotation.set(0, 0, (i / 3) * Math.PI * 2);
+      b.updateMatrixWorld();
+      slotBrushes.push(b);
     }
 
-    const geom = (result.geometry as THREE.BufferGeometry).clone();
+    for (const b of slotBrushes) {
+      result = evaluator.evaluate(new Brush(geom), b, SUBTRACTION) as THREE.Mesh;
+      geom = (result.geometry as THREE.BufferGeometry).clone();
+    }
+
     const merged = mergeVerts(geom, 1e-5);
     merged.computeVertexNormals();
     return merged;
