@@ -4,7 +4,8 @@ import ModelLayout from "@/layouts/modelLayout";
 import { STLExporter } from "three-stdlib";
 import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
-import { WavePlanterProps, MODEL_NAME, DEFAULT_PROPS } from "./props";
+import type { WavePlanterProps } from "./props";
+import { MODEL_NAME, DEFAULT_PROPS } from "./props";
 import WavePlanter from "./top";
 import BasePlanter from "./base";
 
