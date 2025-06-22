@@ -25,10 +25,6 @@ export interface ModelLayoutProps<T extends Record<string, number>> {
     meshRef?: React.RefObject<THREE.Group>
   }>
   children?: React.ReactNode
-  /**
-   * Optional render function to customize export controls.
-   * Receives the default export handler and the mesh reference.
-   */
   renderExport?: (args: {
     exportModel: () => void
     meshRef: React.RefObject<THREE.Group>
