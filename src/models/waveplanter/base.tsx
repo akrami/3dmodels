@@ -46,14 +46,8 @@ export default function BasePlanter({
       .lineTo(0, 10)
       .closePath();
 
-    const geom = new THREE.ExtrudeGeometry(shape, {
-      depth: 16,
-      bevelEnabled: true,
-      bevelThickness: 3,
-      bevelSize: 3,
-      bevelSegments: 16,
-    });
-
+    // Extrude without bevels to avoid non-manifold edges when used in CSG ops
+    const geom = extrude(shape, 16);
     const merged = mergeVerts(geom);
     merged.computeVertexNormals();
     return merged;
