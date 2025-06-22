@@ -4,7 +4,7 @@ import {
   mergeGeometries,
   mergeVertices as mergeVerts,
 } from "three/examples/jsm/utils/BufferGeometryUtils.js";
-import { Geometry, Base, Subtraction } from "@react-three/csg";
+import { Brush, Evaluator, SUBTRACTION } from "three-bvh-csg";
 import { useMemo } from "react";
 import { circle, extrude, useRingGearGeometry } from "./ringGear";
 import type { WavePlanterProps } from "./props";
@@ -38,6 +38,16 @@ export default function BasePlanter({
     topCutDepth: 2,
   });
 
+  const cleanGeometry = React.useCallback(
+    (geometry: THREE.BufferGeometry) => {
+      const nonIndexed = geometry.toNonIndexed();
+      const merged = mergeVerts(nonIndexed, 1e-5);
+      merged.computeVertexNormals();
+      return merged;
+    },
+    []
+  );
+
   const taghExt = useMemo(() => {
     const shape = new THREE.Shape()
       .moveTo(0, 0)
@@ -46,18 +56,75 @@ export default function BasePlanter({
       .lineTo(0, 10)
       .closePath();
 
-    const geom = new THREE.ExtrudeGeometry(shape, {
-      depth: 16,
-      bevelEnabled: true,
-      bevelThickness: 3,
-      bevelSize: 3,
-      bevelSegments: 16,
-    });
-
+    // Extrude without bevels to avoid non-manifold edges when used in CSG ops
+    const geom = extrude(shape, 16);
     const merged = mergeVerts(geom);
     merged.computeVertexNormals();
     return merged;
   }, []);
+
+  const ringCutGeometry = useMemo(() => {
+    const evaluator = new Evaluator();
+    evaluator.useGroups = false;
+
+    const ringGeomClone = ringGeom.clone();
+    ringGeomClone.clearGroups();
+    const ringBrush = new Brush(ringGeomClone);
+    ringBrush.updateMatrixWorld();
+
+    const cutGeom = taghExt.clone();
+    cutGeom.clearGroups();
+    const cutBrush = new Brush(cutGeom);
+    cutBrush.position.set(-5, props.radius - 5, props.baseDepth - 5.5);
+    cutBrush.scale.set(0.76, 0.76, 1.1);
+    cutBrush.updateMatrixWorld();
+
+    const result = evaluator.evaluate(
+      ringBrush,
+      cutBrush,
+      SUBTRACTION
+    ) as THREE.Mesh;
+    const geom = (result.geometry as THREE.BufferGeometry).clone();
+    return cleanGeometry(geom);
+  }, [ringGeom, taghExt, props.radius, props.baseDepth]);
+
+  const taghCutGeometry = useMemo(() => {
+    const evaluator = new Evaluator();
+    evaluator.useGroups = false;
+
+    const baseGeom = taghExt.clone();
+    baseGeom.clearGroups();
+    const baseBrush = new Brush(baseGeom);
+    baseBrush.updateMatrixWorld();
+
+    const boxBrush = new Brush(new THREE.BoxGeometry(30, 10, 30));
+    boxBrush.position.set(7, 12, 7);
+    boxBrush.updateMatrixWorld();
+
+    const innerGeom = taghExt.clone();
+    innerGeom.clearGroups();
+    const innerBrush = new Brush(innerGeom);
+    innerBrush.position.set(2, 2, 2);
+    innerBrush.scale.set(0.75, 0.75, 0.75);
+    innerBrush.updateMatrixWorld();
+
+    const cylBrush = new Brush(
+      new THREE.CylinderGeometry(props.radius - 2.5, props.radius - 2.5, 30, 64)
+    );
+    cylBrush.position.set(7, 0, props.radius + 7.5);
+    cylBrush.updateMatrixWorld();
+
+    let result = evaluator.evaluate(
+      baseBrush,
+      boxBrush,
+      SUBTRACTION
+    ) as THREE.Mesh;
+    result = evaluator.evaluate(result, innerBrush, SUBTRACTION) as THREE.Mesh;
+    result = evaluator.evaluate(result, cylBrush, SUBTRACTION) as THREE.Mesh;
+
+    const geom = (result.geometry as THREE.BufferGeometry).clone();
+    return cleanGeometry(geom);
+  }, [taghExt, props.radius]);
 
   return (
     <group
@@ -67,15 +134,7 @@ export default function BasePlanter({
       receiveShadow
     >
       <group>
-        <mesh castShadow receiveShadow>
-          <Geometry showOperations={false} computeVertexNormals>
-            <Base geometry={ringGeom} />
-            <Subtraction
-              geometry={taghExt}
-              position={[-5, props.radius - 5, props.baseDepth - 5]}
-              scale={[0.75, 0.75, 0.75]}
-            />
-          </Geometry>
+        <mesh castShadow receiveShadow geometry={ringCutGeometry}>
           <meshStandardMaterial color={color} />
         </mesh>
       </group>
@@ -83,17 +142,7 @@ export default function BasePlanter({
         <meshStandardMaterial color={color} />
       </mesh>
       <group position={[-7, props.radius + 7.5, props.baseDepth - 7]} rotation={[Math.PI / 2, 0, 0]}>
-        <mesh castShadow receiveShadow>
-          <Geometry showOperations={false}>
-            <Base geometry={taghExt} />
-            <Subtraction position={[7, 12, 7]}>
-              <boxGeometry args={[30, 10, 30]} />
-            </Subtraction>
-            <Subtraction geometry={taghExt} position={[2, 2, 2]} scale={[0.75, 0.75, 0.75]} />
-            <Subtraction position={[7, 0, props.radius + 7.5]}>
-              <cylinderGeometry args={[props.radius - 2.5, props.radius - 2.5, 30, 64]} />
-            </Subtraction>
-          </Geometry>
+        <mesh castShadow receiveShadow geometry={taghCutGeometry}>
           <meshStandardMaterial color={color} />
         </mesh>
       </group>
