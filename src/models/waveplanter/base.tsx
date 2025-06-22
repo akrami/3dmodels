@@ -69,10 +69,15 @@ export default function BasePlanter({
     cutBrush.scale.set(0.75, 0.75, 0.75);
     cutBrush.updateMatrixWorld();
 
-    const result = evaluator.evaluate(ringBrush, cutBrush, SUBTRACTION) as THREE.Mesh;
+    const result = evaluator.evaluate(
+      ringBrush,
+      cutBrush,
+      SUBTRACTION
+    ) as THREE.Mesh;
     const geom = (result.geometry as THREE.BufferGeometry).clone();
-    geom.computeVertexNormals();
-    return geom;
+    const merged = mergeVerts(geom);
+    merged.computeVertexNormals();
+    return merged;
   }, [ringGeom, taghExt, props.radius, props.baseDepth]);
 
   const taghCutGeometry = useMemo(() => {
@@ -101,13 +106,18 @@ export default function BasePlanter({
     cylBrush.position.set(7, 0, props.radius + 7.5);
     cylBrush.updateMatrixWorld();
 
-    let result = evaluator.evaluate(baseBrush, boxBrush, SUBTRACTION) as THREE.Mesh;
+    let result = evaluator.evaluate(
+      baseBrush,
+      boxBrush,
+      SUBTRACTION
+    ) as THREE.Mesh;
     result = evaluator.evaluate(result, innerBrush, SUBTRACTION) as THREE.Mesh;
     result = evaluator.evaluate(result, cylBrush, SUBTRACTION) as THREE.Mesh;
 
     const geom = (result.geometry as THREE.BufferGeometry).clone();
-    geom.computeVertexNormals();
-    return geom;
+    const merged = mergeVerts(geom);
+    merged.computeVertexNormals();
+    return merged;
   }, [taghExt, props.radius]);
 
   return (
