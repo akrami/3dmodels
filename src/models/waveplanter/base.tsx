@@ -61,10 +61,16 @@ export default function BasePlanter({
 
   const ringCutGeometry = useMemo(() => {
     const evaluator = new Evaluator();
-    const ringBrush = new Brush(ringGeom.clone());
+    evaluator.useGroups = false;
+
+    const ringGeomClone = ringGeom.clone();
+    ringGeomClone.clearGroups();
+    const ringBrush = new Brush(ringGeomClone);
     ringBrush.updateMatrixWorld();
 
-    const cutBrush = new Brush(taghExt.clone());
+    const cutGeom = taghExt.clone();
+    cutGeom.clearGroups();
+    const cutBrush = new Brush(cutGeom);
     cutBrush.position.set(-5, props.radius - 5, props.baseDepth - 5);
     cutBrush.scale.set(0.75, 0.75, 0.75);
     cutBrush.updateMatrixWorld();
@@ -77,15 +83,20 @@ export default function BasePlanter({
 
   const taghCutGeometry = useMemo(() => {
     const evaluator = new Evaluator();
+    evaluator.useGroups = false;
 
-    const baseBrush = new Brush(taghExt.clone());
+    const baseGeom = taghExt.clone();
+    baseGeom.clearGroups();
+    const baseBrush = new Brush(baseGeom);
     baseBrush.updateMatrixWorld();
 
     const boxBrush = new Brush(new THREE.BoxGeometry(30, 10, 30));
     boxBrush.position.set(7, 12, 7);
     boxBrush.updateMatrixWorld();
 
-    const innerBrush = new Brush(taghExt.clone());
+    const innerGeom = taghExt.clone();
+    innerGeom.clearGroups();
+    const innerBrush = new Brush(innerGeom);
     innerBrush.position.set(2, 2, 2);
     innerBrush.scale.set(0.75, 0.75, 0.75);
     innerBrush.updateMatrixWorld();
