@@ -8,6 +8,7 @@ import { Brush, Evaluator, SUBTRACTION } from "three-bvh-csg";
 import { useMemo } from "react";
 import { circle, extrude, useRingGearGeometry } from "./ringGear";
 import type { WavePlanterProps } from "./props";
+import InsertObject from "./insert";
 
 export default function BasePlanter({
   props,
@@ -141,6 +142,7 @@ export default function BasePlanter({
       <mesh position={[0, 0, 2]} geometry={bottomGeometry} castShadow receiveShadow>
         <meshStandardMaterial color={color} />
       </mesh>
+      <InsertObject props={props} color={color} />
       <group position={[-7, props.radius + 7.5, props.baseDepth - 7]} rotation={[Math.PI / 2, 0, 0]}>
         <mesh castShadow receiveShadow geometry={taghCutGeometry}>
           <meshStandardMaterial color={color} />
