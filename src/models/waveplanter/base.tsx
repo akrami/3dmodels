@@ -38,6 +38,16 @@ export default function BasePlanter({
     topCutDepth: 2,
   });
 
+  const cleanGeometry = React.useCallback(
+    (geometry: THREE.BufferGeometry) => {
+      const nonIndexed = geometry.toNonIndexed();
+      const merged = mergeVerts(nonIndexed, 1e-5);
+      merged.computeVertexNormals();
+      return merged;
+    },
+    []
+  );
+
   const taghExt = useMemo(() => {
     const shape = new THREE.Shape()
       .moveTo(0, 0)
@@ -65,8 +75,8 @@ export default function BasePlanter({
     const cutGeom = taghExt.clone();
     cutGeom.clearGroups();
     const cutBrush = new Brush(cutGeom);
-    cutBrush.position.set(-5, props.radius - 5, props.baseDepth - 5);
-    cutBrush.scale.set(0.75, 0.75, 0.75);
+    cutBrush.position.set(-5, props.radius - 5, props.baseDepth - 5.5);
+    cutBrush.scale.set(0.76, 0.76, 1.1);
     cutBrush.updateMatrixWorld();
 
     const result = evaluator.evaluate(
@@ -75,9 +85,7 @@ export default function BasePlanter({
       SUBTRACTION
     ) as THREE.Mesh;
     const geom = (result.geometry as THREE.BufferGeometry).clone();
-    const merged = mergeVerts(geom);
-    merged.computeVertexNormals();
-    return merged;
+    return cleanGeometry(geom);
   }, [ringGeom, taghExt, props.radius, props.baseDepth]);
 
   const taghCutGeometry = useMemo(() => {
@@ -115,9 +123,7 @@ export default function BasePlanter({
     result = evaluator.evaluate(result, cylBrush, SUBTRACTION) as THREE.Mesh;
 
     const geom = (result.geometry as THREE.BufferGeometry).clone();
-    const merged = mergeVerts(geom);
-    merged.computeVertexNormals();
-    return merged;
+    return cleanGeometry(geom);
   }, [taghExt, props.radius]);
 
   return (
