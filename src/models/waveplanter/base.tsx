@@ -20,10 +20,7 @@ export default function BasePlanter({
 }) {
   const createBaseBottomGeometry = React.useCallback(() => {
     const shape = circle(props.radius - 4);
-    const bottom = extrude(shape.clone(), 2);
-    bottom.translate(0, 0, -2);
-    const top = extrude(shape, 2);
-    return mergeGeometries([bottom, top], false)!;
+    return extrude(shape, 4);
   }, [props.radius]);
 
   const bottomGeometry = React.useMemo(
