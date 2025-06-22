@@ -11,13 +11,13 @@ export default function InsertObject({ props, color }: { props: WavePlanterProps
   const geometry = React.useMemo(() => {
     const height = Math.max(props.baseDepth - 12, 0);
 
-    const ringGeom = new THREE.CylinderGeometry(10, 10, 2, 16, 1, true);
+    const ringGeom = new THREE.CylinderGeometry(10, 10, 2, 8, 1, true);
     ringGeom.translate(0, 0, height + 3);
 
-    const cylGeom = new THREE.CylinderGeometry(10, 10, height, 16, 1, true);
+    const cylGeom = new THREE.CylinderGeometry(10, 10, height, 8, 1, true);
     cylGeom.translate(0, 0, 2 + height / 2);
 
-    const diskGeom = new THREE.CylinderGeometry(8, 8, 2, 16);
+    const diskGeom = new THREE.CylinderGeometry(8, 8, 2, 8);
     diskGeom.translate(0, 0, 1);
 
     const outer = mergeGeometries([diskGeom, cylGeom, ringGeom], false)!;
@@ -25,7 +25,7 @@ export default function InsertObject({ props, color }: { props: WavePlanterProps
     const evaluator = new Evaluator();
     evaluator.useGroups = false;
 
-    const innerGeom = new THREE.CylinderGeometry(8, 8, height + 2, 16, 1, true);
+    const innerGeom = new THREE.CylinderGeometry(8, 8, height + 2, 8, 1, true);
     innerGeom.translate(0, 0, 3 + height / 2);
     let result = evaluator.evaluate(
       new Brush(outer),
@@ -37,9 +37,9 @@ export default function InsertObject({ props, color }: { props: WavePlanterProps
     const holeSpacing = 8;
     const radial = 9;
     const circumference = 2 * Math.PI * radial;
-    const aroundCount = Math.max(3, Math.floor(circumference / holeSpacing));
+    const aroundCount = Math.min(20, Math.max(3, Math.floor(circumference / holeSpacing)));
     const angleStep = (2 * Math.PI) / aroundCount;
-    const verticalCount = Math.max(1, Math.floor(height / holeSpacing));
+    const verticalCount = Math.min(10, Math.max(1, Math.floor(height / holeSpacing)));
 
     const holeGeoms: THREE.BufferGeometry[] = [];
     for (let i = 0; i < verticalCount; i++) {
@@ -49,7 +49,7 @@ export default function InsertObject({ props, color }: { props: WavePlanterProps
         const angle = j * angleStep + offset;
         const x = Math.cos(angle) * radial;
         const y = Math.sin(angle) * radial;
-        const g = new THREE.CylinderGeometry(holeRadius, holeRadius, 4, 8);
+        const g = new THREE.CylinderGeometry(holeRadius, holeRadius, 4, 6);
         g.rotateX(Math.PI / 2);
         g.translate(x, y, z);
         holeGeoms.push(g);
@@ -75,7 +75,7 @@ export default function InsertObject({ props, color }: { props: WavePlanterProps
       depth: 2,
       steps: 1,
       bevelEnabled: false,
-      curveSegments: 16,
+      curveSegments: 8,
     });
 
     for (let i = 0; i < 3; i++) {
