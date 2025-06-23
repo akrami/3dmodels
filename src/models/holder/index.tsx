@@ -2,7 +2,7 @@ import * as React from "react";
 import * as THREE from "three";
 import ModelLayout from "@/layouts/modelLayout";
 import * as CSG from "three-bvh-csg";
-const { Brush, Evaluator, SUBTRACTION, UNION } = CSG as any;
+const { Brush, Evaluator, SUBTRACTION, ADDITION } = CSG as any;
 import { mergeVertices as mergeVerts } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import type { HolderProps } from "./props";
 import { MODEL_NAME, DEFAULT_PROPS } from "./props";
@@ -34,7 +34,7 @@ function useHolderGeometry() {
     flangeBrush.position.set(0, -BODY_H / 2 - FLANGE_H / 2 + 0.1, 0);
     flangeBrush.updateMatrixWorld();
 
-    let result = evaluator.evaluate(bodyBrush, flangeBrush, UNION) as THREE.Mesh;
+  let result = evaluator.evaluate(bodyBrush, flangeBrush, ADDITION) as THREE.Mesh;
 
     // side slots
     const slotGeom = new THREE.BoxGeometry(SLOT_W, SLOT_H, SLOT_D);
