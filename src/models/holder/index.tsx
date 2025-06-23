@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as THREE from "three";
 import ModelLayout from "@/layouts/modelLayout";
-import CSG from "three-bvh-csg";
+import * as CSG from "three-bvh-csg";
 const { Brush, Evaluator, SUBTRACTION, UNION } = CSG as any;
 import { mergeVertices as mergeVerts } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import type { HolderProps } from "./props";

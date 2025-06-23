@@ -4,7 +4,7 @@ import {
   mergeGeometries,
   mergeVertices as mergeVerts,
 } from "three/examples/jsm/utils/BufferGeometryUtils.js";
-import CSG from "three-bvh-csg";
+import * as CSG from "three-bvh-csg";
 const { Brush, Evaluator, SUBTRACTION } = CSG as any;
 import { useMemo } from "react";
 import { circle, extrude, useRingGearGeometry } from "./ringGear";
