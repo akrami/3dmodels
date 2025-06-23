@@ -58,8 +58,8 @@ function useHolderGeometry() {
       result = evaluator.evaluate(result, holeBrush, SUBTRACTION) as THREE.Mesh;
     }
 
-    const geom = (result.geometry as THREE.BufferGeometry).clone();
-    const nonIndexed = geom.toNonIndexed();
+    const geom = result.geometry as THREE.BufferGeometry;
+    const nonIndexed = geom.index ? geom.toNonIndexed() : geom.clone();
     const merged = mergeVerts(nonIndexed, 1e-5);
     merged.computeVertexNormals();
     return merged;

@@ -41,8 +41,8 @@ export default function BasePlanter({
 
   const cleanGeometry = React.useCallback(
     (geometry: THREE.BufferGeometry) => {
-      const nonIndexed = geometry.toNonIndexed();
-      const merged = mergeVerts(nonIndexed, 1e-5);
+      const toUse = geometry.index ? geometry.toNonIndexed() : geometry.clone();
+      const merged = mergeVerts(toUse, 1e-5);
       merged.computeVertexNormals();
       return merged;
     },
