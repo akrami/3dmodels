@@ -20,11 +20,12 @@ export function WavePlanterMesh({
   color?: string;
 }) {
   const distance = props.radius * 2.5;
+  const triangleHeight = Math.sqrt(3) / 2 * distance;
 
   return (
     <group ref={meshRef} rotation={[-Math.PI / 2, 0, 0]}>
       <HolderMesh
-        position={[0, 0, BOTTOM_TO_CENTER]}
+        position={[0, -triangleHeight, BOTTOM_TO_CENTER]}
         rotation={[Math.PI / 2, 0, 0]}
         color={color}
       />
