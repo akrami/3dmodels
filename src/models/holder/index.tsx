@@ -17,6 +17,7 @@ const SLOT_D = 5;
 const HOLE_R = 4;
 const HOLE_D = 12;
 const HOLE_OFF = 8;
+export const BOTTOM_TO_CENTER = BODY_H / 2 + FLANGE_H - 0.1;
 
 function useHolderGeometry() {
   return React.useMemo(() => {
