@@ -8,7 +8,7 @@ import type { WavePlanterProps } from "./props";
 import { MODEL_NAME, DEFAULT_PROPS } from "./props";
 import WavePlanter from "./top";
 import BasePlanter from "./base";
-import { HolderMesh, BOTTOM_TO_CENTER } from "@/models/holder";
+import { HolderMesh, BOTTOM_TO_CENTER, FLANGE_R } from "@/models/holder";
 
 export function WavePlanterMesh({
   props = DEFAULT_PROPS,
@@ -21,12 +21,15 @@ export function WavePlanterMesh({
 }) {
   const distance = props.radius * 2.5;
   const triangleHeight = Math.sqrt(3) / 2 * distance;
+  const holeRadius = 10;
+  const holderScale = holeRadius / FLANGE_R;
 
   return (
     <group ref={meshRef} rotation={[-Math.PI / 2, 0, 0]}>
       <HolderMesh
-        position={[0, -triangleHeight, BOTTOM_TO_CENTER]}
+        position={[0, -triangleHeight, BOTTOM_TO_CENTER * holderScale]}
         rotation={[Math.PI / 2, 0, 0]}
+        scale={holderScale}
         color={color}
       />
       <WavePlanter props={props} color={color} distance={distance} />

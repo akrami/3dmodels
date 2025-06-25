@@ -9,7 +9,7 @@ import { MODEL_NAME, DEFAULT_PROPS } from "./props";
 
 const BODY_R = 20;
 const BODY_H = 40;
-const FLANGE_R = 25;
+export const FLANGE_R = 25;
 const FLANGE_H = 4;
 const SLOT_W = 6;
 const SLOT_H = 30;
@@ -72,17 +72,19 @@ export function HolderMesh({
   color = "#ff7f0e",
   position,
   rotation = [-Math.PI / 2, 0, 0],
+  scale = 1,
 }: {
   props?: HolderProps;
   meshRef?: React.RefObject<THREE.Group>;
   color?: string;
   position?: [number, number, number];
   rotation?: [number, number, number];
+  scale?: number | [number, number, number];
 }) {
   const geometry = useHolderGeometry();
 
   return (
-    <group ref={meshRef} position={position} rotation={rotation}>
+    <group ref={meshRef} position={position} rotation={rotation} scale={scale}>
       <mesh geometry={geometry} castShadow receiveShadow>
         <meshStandardMaterial color={color} metalness={0.05} roughness={0.55} />
       </mesh>
