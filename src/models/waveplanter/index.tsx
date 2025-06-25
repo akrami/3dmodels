@@ -24,7 +24,7 @@ export function WavePlanterMesh({
   return (
     <group ref={meshRef} rotation={[-Math.PI / 2, 0, 0]}>
       <HolderMesh
-        position={[distance, 0, BOTTOM_TO_CENTER]}
+        position={[0, 0, BOTTOM_TO_CENTER]}
         rotation={[Math.PI / 2, 0, 0]}
         color={color}
       />
