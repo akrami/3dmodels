@@ -25,7 +25,7 @@ export function WavePlanterMesh({
     <group ref={meshRef} rotation={[-Math.PI / 2, 0, 0]}>
       <HolderMesh
         position={[distance, 23.9, 0]}
-        rotation={[Math.PI / 2 + (128 * Math.PI) / 180, 0, 0]}
+        rotation={[Math.PI / 2, 0, 0]}
         color={color}
       />
       <WavePlanter props={props} color={color} distance={distance} />
@@ -38,7 +38,12 @@ export default function WavePlanterModel() {
   const [color, setColor] = React.useState("#add8e6");
   const meshElement = <WavePlanterMesh color={color} />;
   const renderExport = React.useCallback(
-    ({ meshRef }: { exportModel: () => void; meshRef: React.RefObject<THREE.Group> }) => {
+    ({
+      meshRef,
+    }: {
+      exportModel: () => void;
+      meshRef: React.RefObject<THREE.Group>;
+    }) => {
       const exportGroup = (name: string, file: string) => {
         const obj = meshRef.current?.getObjectByName(name);
         if (!obj) return;
@@ -61,16 +66,22 @@ export default function WavePlanterModel() {
 
       return (
         <div className="flex flex-col gap-2 mt-4">
-          <Button onClick={() => exportGroup("waveplanter", "waveplanter")} className="w-full">
+          <Button
+            onClick={() => exportGroup("waveplanter", "waveplanter")}
+            className="w-full"
+          >
             <Download /> Download Top
           </Button>
-          <Button onClick={() => exportGroup("baseplanter", "baseplanter")} className="w-full">
+          <Button
+            onClick={() => exportGroup("baseplanter", "baseplanter")}
+            className="w-full"
+          >
             <Download /> Download Base
           </Button>
         </div>
       );
     },
-    []
+    [],
   );
   return (
     <ModelLayout
