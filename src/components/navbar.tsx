@@ -15,6 +15,7 @@ export function Navbar() {
       url: "/planter",
       items: [
         { title: "Wave", url: "/planter/wave" },
+        { title: "Wavy", url: "/planter/wavy" },
       ],
     },
   ]
