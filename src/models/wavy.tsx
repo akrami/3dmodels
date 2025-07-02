@@ -7,21 +7,25 @@ import { OrbitControls } from "@react-three/drei";
 import {
     mergeGeometries,
     mergeVertices
-  } from "three/examples/jsm/utils/BufferGeometryUtils.js";
+} from "three/examples/jsm/utils/BufferGeometryUtils.js";
 
 
 export default function WavyPlanter() {
     const [properties, setProperties] = React.useState({
-        color: "#add8e6",
+        color: '#56AE57',
         radius: 75,
-        topHeight: 50,
-        bottomHeight: 25,
-        waveDensity: 0.4,
+        topHeight: 100,
+        bottomHeight: 50,
+        waveDensity: 0.3,
     });
 
     const positionOffset = 20;
 
-    const globalMaterial = new THREE.MeshNormalMaterial();
+    const globalMaterial = new THREE.MeshStandardMaterial({
+        color: new THREE.Color(properties.color),
+        roughness: 0.8,
+        metalness: 0.2,
+    });
     return (
         <AppLayout>
             <SidebarProvider>
@@ -48,12 +52,12 @@ export default function WavyPlanter() {
                                 <mesh
                                     geometry={getTopGeometry()}
                                     material={globalMaterial}
-                                    position={[-(properties.radius + positionOffset), properties.topHeight / 2, -(properties.radius + positionOffset)]} />
+                                    position={[-(properties.radius + positionOffset), 0, -(properties.radius + positionOffset)]} />
 
                                 <mesh
                                     geometry={getBottomGeometry()}
                                     material={globalMaterial}
-                                    position={[properties.radius + positionOffset, properties.bottomHeight / 2, -(properties.radius + positionOffset)]} />
+                                    position={[properties.radius + positionOffset, 0, -(properties.radius + positionOffset)]} />
 
                                 <mesh
                                     geometry={getConnectorGeometry()}
@@ -68,12 +72,12 @@ export default function WavyPlanter() {
         </AppLayout>
     )
 
-    function getBottomGeometry(): THREE.BufferGeometry<THREE.NormalBufferAttributes> {
-        return createWavyGeometry(properties.radius, 0.4, properties.waveDensity, properties.topHeight, 1);
+    function getTopGeometry(): THREE.BufferGeometry<THREE.NormalBufferAttributes> {
+        return createWavyGeometry(properties.radius, 0.4, properties.waveDensity, properties.topHeight, .1, 1024, false);
     }
 
-    function getTopGeometry(): THREE.BufferGeometry<THREE.NormalBufferAttributes> {
-        return new THREE.CylinderGeometry(properties.radius, properties.radius, properties.topHeight, 32);
+    function getBottomGeometry(): THREE.BufferGeometry<THREE.NormalBufferAttributes> {
+        return createWavyGeometry(properties.radius, 0.4, properties.waveDensity, properties.bottomHeight, .1, 1024, true);
     }
 
     function getConnectorGeometry(): THREE.BufferGeometry<THREE.NormalBufferAttributes> {
@@ -94,7 +98,6 @@ export default function WavyPlanter() {
         const k = Math.round(radius * density);
         const rOuter = (t: number) => radius + amplitude - Math.abs(Math.sin(k * t));
         const rInner = radius - (amplitude + 4);
-        const rInnerCut = radius - 4;
 
         const makeOuterShape = () => {
             const shape = new THREE.Shape();
@@ -109,33 +112,16 @@ export default function WavyPlanter() {
             return shape;
         };
 
-        const bottomDepth = Math.max(depth - topCutDepth, 0);
-        const bottomSteps = Math.max(1, Math.round((bottomDepth / depth) * 32));
-        const topSteps = Math.max(1, 32 - bottomSteps);
-
         const outerShape = makeOuterShape();
         const holeBottom = new THREE.Path().absarc(0, 0, rInner, 0, Math.PI * 2, true);
-        const bottomShape = outerShape.clone();
-        bottomShape.holes.push(holeBottom);
-        const bottomGeom = extrude(bottomShape, bottomDepth, bottomSteps);
+        outerShape.holes.push(holeBottom);
+        const geometry = extrude(outerShape, depth, 32);
 
-        const geoms: THREE.BufferGeometry[] = [bottomGeom];
+        twistGeometry(geometry, depth, twistWaves, reverseTwist);
 
-        if (topCutDepth > 0) {
-            const outerShapeTop = makeOuterShape();
-            const holeTop = new THREE.Path().absarc(0, 0, rInnerCut, 0, Math.PI * 2, true);
-            outerShapeTop.holes.push(holeTop);
-            const topGeom = extrude(outerShapeTop, topCutDepth, topSteps);
-            topGeom.translate(0, 0, bottomDepth);
-            geoms.push(topGeom);
-        }
-
-        const geom = mergeGeometries(geoms, false)!;
-
-        twistGeometry(geom, depth, twistWaves, reverseTwist);
-
-        const merged = mergeVertices(geom);
+        const merged = mergeVertices(geometry);
         merged.computeVertexNormals();
+        merged.rotateX(-Math.PI / 2);
         return merged;
     }
 
@@ -161,6 +147,6 @@ export default function WavyPlanter() {
     }
 
     function extrude(shape: THREE.Shape, depth: number, steps = 1) {
-      return new THREE.ExtrudeGeometry(shape, { bevelEnabled: false, curveSegments: 32, depth, steps });
+        return new THREE.ExtrudeGeometry(shape, { bevelEnabled: false, curveSegments: 32, depth, steps });
     }
 }
