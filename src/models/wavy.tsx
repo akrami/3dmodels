@@ -5,14 +5,15 @@ import { Sidebar, SidebarContent, SidebarHeader, SidebarProvider } from "@/compo
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import {
-    mergeGeometries,
     mergeVertices
 } from "three/examples/jsm/utils/BufferGeometryUtils.js";
+import { ADDITION, Brush, Evaluator, SUBTRACTION } from "three-bvh-csg";
+import { STLExporter } from "three-stdlib";
 
 
 export default function WavyPlanter() {
     const [properties, setProperties] = React.useState({
-        color: '#56AE57',
+        color: '#ffffff',
         radius: 75,
         topHeight: 100,
         bottomHeight: 50,
@@ -26,16 +27,18 @@ export default function WavyPlanter() {
         roughness: 0.8,
         metalness: 0.2,
     });
+
+    const meshRef = React.useRef(null);
     return (
         <AppLayout>
             <SidebarProvider>
                 <div className="flex flex-1">
                     <Sidebar collapsible="none" className="border-r w-64">
                         <SidebarHeader>
-                            <h2 className="text-lg font-semibold">Properties</h2>
+                            <h2>Wavy Model</h2>
                         </SidebarHeader>
                         <SidebarContent className="p-4">
-                            <li>something</li>
+                            <button onClick={exportStl}>Download</button>
                         </SidebarContent>
                     </Sidebar>
                     <div className="flex-1 relative">
@@ -55,6 +58,7 @@ export default function WavyPlanter() {
                                     position={[-(properties.radius + positionOffset), 0, -(properties.radius + positionOffset)]} />
 
                                 <mesh
+                                    ref={meshRef}
                                     geometry={getBottomGeometry()}
                                     material={globalMaterial}
                                     position={[properties.radius + positionOffset, 0, -(properties.radius + positionOffset)]} />
@@ -76,8 +80,50 @@ export default function WavyPlanter() {
         return createWavyGeometry(properties.radius, 0.4, properties.waveDensity, properties.topHeight, .1, 1024, false);
     }
 
+    function exportStl() {
+        if (!meshRef.current) return;
+
+        const exporter = new STLExporter();
+        const arrayBuffer = exporter.parse(meshRef.current, {binary: true});
+
+        const blob = new Blob([arrayBuffer], { type: 'application/octet-stream'});
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `export.stl`;
+        link.click();
+    }
+
     function getBottomGeometry(): THREE.BufferGeometry<THREE.NormalBufferAttributes> {
-        return createWavyGeometry(properties.radius, 0.4, properties.waveDensity, properties.bottomHeight, .1, 1024, true);
+        const bodyGeometry = createWavyGeometry(properties.radius, 0.4, properties.waveDensity, properties.bottomHeight, .1 * (properties.bottomHeight/properties.topHeight), 1024, true);
+        const bodyBrush = new Brush(bodyGeometry);
+
+        const floorGeometry = new THREE.CylinderGeometry(properties.radius - 3, properties.radius - 3, 4, 32);
+        floorGeometry.translate(0, 2, 0);
+        const floorBrush = new Brush(floorGeometry);
+
+        const waterHoleGeometry = new THREE.BoxGeometry(20, 10, 20);
+        waterHoleGeometry.translate(properties.radius - 5 ,properties.bottomHeight ,0);
+        const waterHoleBrush = new Brush(waterHoleGeometry);
+
+        const waterEntryGeometry = new THREE.BoxGeometry(25, 7.5, 25);
+        waterEntryGeometry.translate(properties.radius - 5 ,properties.bottomHeight -3.7 ,0);
+        const waterEntryBrush = new Brush(waterEntryGeometry);
+
+        const cylinderHoleGeometry = new THREE.CylinderGeometry(properties.radius - 3, properties.radius - 3, properties.bottomHeight, 32);
+        cylinderHoleGeometry.translate(0, (properties.bottomHeight / 2) + 4, 0);
+        const cylinderHoleBrush = new Brush(cylinderHoleGeometry);
+        
+        const evaluator = new Evaluator()
+        let result = evaluator.evaluate(bodyBrush, floorBrush, ADDITION);
+        result = evaluator.evaluate(result, waterEntryBrush, ADDITION);
+        result = evaluator.evaluate(result, waterHoleBrush, SUBTRACTION);
+        result = evaluator.evaluate(result, cylinderHoleBrush, SUBTRACTION);
+        result.geometry = mergeVertices(result.geometry, 1e-5);
+        result.geometry.deleteAttribute('normal');
+        result.geometry.computeVertexNormals();
+        
+        return result.geometry;
     }
 
     function getConnectorGeometry(): THREE.BufferGeometry<THREE.NormalBufferAttributes> {
