@@ -12,6 +12,8 @@ import { STLExporter } from "three-stdlib";
 
 
 export default function WavyPlanter() {
+    type Point = { x: number, z: number }
+
     const [properties, setProperties] = React.useState({
         color: '#ffffff',
         radius: 75,
@@ -53,12 +55,12 @@ export default function WavyPlanter() {
                             <axesHelper args={[500]} />
                             <group>
                                 <mesh
+                                    ref={meshRef}
                                     geometry={getTopGeometry()}
                                     material={globalMaterial}
                                     position={[-(properties.radius + positionOffset), 0, -(properties.radius + positionOffset)]} />
 
                                 <mesh
-                                    ref={meshRef}
                                     geometry={getBottomGeometry()}
                                     material={globalMaterial}
                                     position={[properties.radius + positionOffset, 0, -(properties.radius + positionOffset)]} />
@@ -76,17 +78,13 @@ export default function WavyPlanter() {
         </AppLayout>
     )
 
-    function getTopGeometry(): THREE.BufferGeometry<THREE.NormalBufferAttributes> {
-        return createWavyGeometry(properties.radius, 0.4, properties.waveDensity, properties.topHeight, .1, 1024, false);
-    }
-
     function exportStl() {
         if (!meshRef.current) return;
 
         const exporter = new STLExporter();
-        const arrayBuffer = exporter.parse(meshRef.current, {binary: true});
+        const arrayBuffer = exporter.parse(meshRef.current, { binary: true });
 
-        const blob = new Blob([arrayBuffer], { type: 'application/octet-stream'});
+        const blob = new Blob([arrayBuffer], { type: 'application/octet-stream' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = url;
@@ -94,8 +92,59 @@ export default function WavyPlanter() {
         link.click();
     }
 
+    function getTopGeometry(): THREE.BufferGeometry<THREE.NormalBufferAttributes> {
+        const bodyGeometry = createWavyGeometry(properties.radius, 0.4, properties.waveDensity, properties.topHeight, .1, 1024, false);
+        const bodyBrush = new Brush(bodyGeometry);
+
+        const floorGeometry = new THREE.CylinderGeometry(properties.radius - 3, properties.radius - 3, 4, 32);
+        const floorBrush = new Brush(floorGeometry);
+
+        const waterHoleTopGeometry = new THREE.CylinderGeometry(10, 10, 2);
+        waterHoleTopGeometry.translate(0, 1, 0);
+        const waterHoleTopBrush = new Brush(waterHoleTopGeometry);
+
+        const waterHoleBottomGeometry = new THREE.CylinderGeometry(8, 8, 2);
+        waterHoleBottomGeometry.translate(0, -1, 0);
+        const waterHoleBottomBrush = new Brush(waterHoleBottomGeometry);
+
+        let holeCount = 1;
+        switch (true) {
+            case properties.radius >= 50 && properties.radius < 100:
+                holeCount = 3;
+                break;
+            case properties.radius >= 100:
+                holeCount = 5;
+                break;
+        }
+
+        const evaluator = new Evaluator()
+        let result = evaluator.evaluate(bodyBrush, floorBrush, ADDITION);
+
+        const waterHoleResult = evaluator.evaluate(waterHoleTopBrush, waterHoleBottomBrush, ADDITION);
+        if (holeCount == 1) {
+            result = evaluator.evaluate(result, waterHoleResult, SUBTRACTION);
+        } else {
+            const points = getPointsOnCircle(properties.radius, holeCount);
+            for (let index = 0; index < points.length; index++) {
+                const point = points[index];
+                const waterHoleBrush = waterHoleResult.clone();
+                waterHoleBrush.translateX(point.x);
+                waterHoleBrush.translateZ(point.z);
+                waterHoleBrush.updateMatrixWorld(true);
+                result = evaluator.evaluate(result, waterHoleBrush, SUBTRACTION);
+            }
+        }
+        
+
+        result.geometry = mergeVertices(result.geometry, 1e-5);
+        result.geometry.deleteAttribute('normal');
+        result.geometry.computeVertexNormals();
+
+        return result.geometry;
+    }
+
     function getBottomGeometry(): THREE.BufferGeometry<THREE.NormalBufferAttributes> {
-        const bodyGeometry = createWavyGeometry(properties.radius, 0.4, properties.waveDensity, properties.bottomHeight, .1 * (properties.bottomHeight/properties.topHeight), 1024, true);
+        const bodyGeometry = createWavyGeometry(properties.radius, 0.4, properties.waveDensity, properties.bottomHeight, .1 * (properties.bottomHeight / properties.topHeight), 1024, true);
         const bodyBrush = new Brush(bodyGeometry);
 
         const floorGeometry = new THREE.CylinderGeometry(properties.radius - 3, properties.radius - 3, 4, 32);
@@ -103,17 +152,17 @@ export default function WavyPlanter() {
         const floorBrush = new Brush(floorGeometry);
 
         const waterHoleGeometry = new THREE.BoxGeometry(20, 10, 20);
-        waterHoleGeometry.translate(properties.radius - 5 ,properties.bottomHeight ,0);
+        waterHoleGeometry.translate(properties.radius - 5, properties.bottomHeight, 0);
         const waterHoleBrush = new Brush(waterHoleGeometry);
 
         const waterEntryGeometry = new THREE.BoxGeometry(25, 7.5, 25);
-        waterEntryGeometry.translate(properties.radius - 5 ,properties.bottomHeight -3.7 ,0);
+        waterEntryGeometry.translate(properties.radius - 5, properties.bottomHeight - 3.7, 0);
         const waterEntryBrush = new Brush(waterEntryGeometry);
 
         const cylinderHoleGeometry = new THREE.CylinderGeometry(properties.radius - 3, properties.radius - 3, properties.bottomHeight, 32);
         cylinderHoleGeometry.translate(0, (properties.bottomHeight / 2) + 4, 0);
         const cylinderHoleBrush = new Brush(cylinderHoleGeometry);
-        
+
         const evaluator = new Evaluator()
         let result = evaluator.evaluate(bodyBrush, floorBrush, ADDITION);
         result = evaluator.evaluate(result, waterEntryBrush, ADDITION);
@@ -122,7 +171,7 @@ export default function WavyPlanter() {
         result.geometry = mergeVertices(result.geometry, 1e-5);
         result.geometry.deleteAttribute('normal');
         result.geometry.computeVertexNormals();
-        
+
         return result.geometry;
     }
 
@@ -194,5 +243,19 @@ export default function WavyPlanter() {
 
     function extrude(shape: THREE.Shape, depth: number, steps = 1) {
         return new THREE.ExtrudeGeometry(shape, { bevelEnabled: false, curveSegments: 32, depth, steps });
+    }
+
+    function getPointsOnCircle(radius: number, n: number): Point[] {
+        const r = radius / 2;
+        const points: Point[] = [];
+
+        for (let i = 0; i < n; i++) {
+            const angle = (2 * Math.PI * i) / n;
+            const x = r * Math.cos(angle);
+            const z = r * Math.sin(angle);
+            points.push({ x, z });
+        }
+
+        return points;
     }
 }
