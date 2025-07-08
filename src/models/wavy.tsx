@@ -192,15 +192,49 @@ export default function WavyPlanter() {
         let result = evaluator.evaluate(bodyBrush, headBrush, ADDITION);
         result = evaluator.evaluate(result, mainHoleBrush, SUBTRACTION);
 
-        // const miniBottomHoleGeometry = new THREE.CylinderGeometry(2, 2, 2, 32);
-        // for (let index = 0; index < 4; index++) {
-        //     const tempMiniBottomHoleGeometry = miniBottomHoleGeometry.clone();
-        //     tempMiniBottomHoleGeometry.translate(2 * index,-(properties.bottomHeight - 5)/2 + 1, 2 * index);
-        //     const miniBottomHoleBrush = new Brush(tempMiniBottomHoleGeometry);
-        //     result = evaluator.evaluate(result, miniBottomHoleBrush, SUBTRACTION);
-        // }
+        const points = getPointsOnCircle(7, 4);
 
+        const miniBottomHoleGeometry = new THREE.CylinderGeometry(1.5, 1.5, 2, 32);
+        for (let index = 0; index < points.length; index++) {
+            const tempMiniBottomHoleGeometry = miniBottomHoleGeometry.clone();
+            const miniBottomHoleBrush = new Brush(tempMiniBottomHoleGeometry);
+            miniBottomHoleBrush.position.set(points[index].x, -(properties.bottomHeight - 5) / 2 + 1, points[index].z);
+            miniBottomHoleBrush.updateMatrixWorld(true);
+            result = evaluator.evaluate(result, miniBottomHoleBrush, SUBTRACTION);
+        }
+
+        // console.log(Math.floor(properties.bottomHeight/5 - 2))
+        // let meshBrush = new Brush();
+        // for (let offset = 0; offset < 2; offset++) {
+        //     const capsuleHoleBrush = getMeshBrush(evaluator);
+        //     capsuleHoleBrush.translateY(5 * offset);
+        //     capsuleHoleBrush.updateMatrixWorld(true);
+        //     meshBrush = evaluator.evaluate(meshBrush, capsuleHoleBrush, ADDITION);
+        // }
         return result.geometry;
+    }
+
+    function getMeshBrush(evaluator: Evaluator) {
+        const capsuleHoleGeometry = new THREE.CapsuleGeometry(1.5, 20, 1, 6, 1);
+        let capsuleHoleBrush01 = new Brush(capsuleHoleGeometry);
+        capsuleHoleBrush01.rotateX(Math.PI / 2).position.setY(-(properties.bottomHeight - 5) / 2 + 5);
+        capsuleHoleBrush01.updateMatrixWorld(true);
+        const capsuleHoleBrush02 = capsuleHoleBrush01.clone();
+        capsuleHoleBrush02.rotateZ(Math.PI / 2);
+        capsuleHoleBrush02.updateMatrixWorld(true);
+        capsuleHoleBrush01 = evaluator.evaluate(capsuleHoleBrush01, capsuleHoleBrush02, ADDITION);
+
+        const capsuleHoleBrush03 = capsuleHoleBrush01.clone();
+        capsuleHoleBrush03.rotateY(Math.PI / 4);
+        capsuleHoleBrush03.updateMatrixWorld(true);
+        capsuleHoleBrush01 = evaluator.evaluate(capsuleHoleBrush01, capsuleHoleBrush03, ADDITION);
+
+        const capsuleHoleBrush04 = capsuleHoleBrush01.clone();
+        capsuleHoleBrush04.rotateY(Math.PI / 8).translateY(2);
+        capsuleHoleBrush04.updateMatrixWorld(true);
+        capsuleHoleBrush01 = evaluator.evaluate(capsuleHoleBrush01, capsuleHoleBrush04, ADDITION);
+
+        return capsuleHoleBrush01;
     }
 
     function createWavyGeometry(
