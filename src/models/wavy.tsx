@@ -55,7 +55,6 @@ export default function WavyPlanter() {
                             <axesHelper args={[500]} />
                             <group>
                                 <mesh
-                                    ref={meshRef}
                                     geometry={getTopGeometry()}
                                     material={globalMaterial}
                                     position={[-(properties.radius + positionOffset), 0, -(properties.radius + positionOffset)]} />
@@ -66,9 +65,10 @@ export default function WavyPlanter() {
                                     position={[properties.radius + positionOffset, 0, -(properties.radius + positionOffset)]} />
 
                                 <mesh
+                                    ref={meshRef}
                                     geometry={getConnectorGeometry()}
                                     material={globalMaterial}
-                                    position={[0, (properties.bottomHeight - 10) / 2, properties.radius + positionOffset]} />
+                                    position={[0, (properties.bottomHeight - 5) / 2, properties.radius + positionOffset]} />
                             </group>
                             <OrbitControls />
                         </Canvas>
@@ -134,7 +134,7 @@ export default function WavyPlanter() {
                 result = evaluator.evaluate(result, waterHoleBrush, SUBTRACTION);
             }
         }
-        
+
 
         result.geometry = mergeVertices(result.geometry, 1e-5);
         result.geometry.deleteAttribute('normal');
@@ -163,7 +163,7 @@ export default function WavyPlanter() {
         cylinderHoleGeometry.translate(0, (properties.bottomHeight / 2) + 4, 0);
         const cylinderHoleBrush = new Brush(cylinderHoleGeometry);
 
-        const evaluator = new Evaluator()
+        const evaluator = new Evaluator();
         let result = evaluator.evaluate(bodyBrush, floorBrush, ADDITION);
         result = evaluator.evaluate(result, waterEntryBrush, ADDITION);
         result = evaluator.evaluate(result, waterHoleBrush, SUBTRACTION);
@@ -176,7 +176,31 @@ export default function WavyPlanter() {
     }
 
     function getConnectorGeometry(): THREE.BufferGeometry<THREE.NormalBufferAttributes> {
-        return new THREE.CylinderGeometry(25, 25, properties.bottomHeight - 10, 32);
+        const bodyGeometry = new THREE.CylinderGeometry(8, 8, properties.bottomHeight - 5, 32);
+        bodyGeometry.translate(0, 0, 0);
+        const bodyBrush = new Brush(bodyGeometry);
+
+        const headGeometry = new THREE.CylinderGeometry(10, 10, 2, 32);
+        headGeometry.translate(0, (properties.bottomHeight - 5) / 2, 0);
+        const headBrush = new Brush(headGeometry);
+
+        const mainHoleGeometry = new THREE.CylinderGeometry(6, 6, properties.bottomHeight - 5, 32);
+        mainHoleGeometry.translate(0, 2, 0);
+        const mainHoleBrush = new Brush(mainHoleGeometry);
+
+        const evaluator = new Evaluator();
+        let result = evaluator.evaluate(bodyBrush, headBrush, ADDITION);
+        result = evaluator.evaluate(result, mainHoleBrush, SUBTRACTION);
+
+        // const miniBottomHoleGeometry = new THREE.CylinderGeometry(2, 2, 2, 32);
+        // for (let index = 0; index < 4; index++) {
+        //     const tempMiniBottomHoleGeometry = miniBottomHoleGeometry.clone();
+        //     tempMiniBottomHoleGeometry.translate(2 * index,-(properties.bottomHeight - 5)/2 + 1, 2 * index);
+        //     const miniBottomHoleBrush = new Brush(tempMiniBottomHoleGeometry);
+        //     result = evaluator.evaluate(result, miniBottomHoleBrush, SUBTRACTION);
+        // }
+
+        return result.geometry;
     }
 
     function createWavyGeometry(
