@@ -203,21 +203,16 @@ export default function WavyPlanter() {
             result = evaluator.evaluate(result, miniBottomHoleBrush, SUBTRACTION);
         }
 
-        // console.log(Math.floor(properties.bottomHeight/5 - 2))
-        // let meshBrush = new Brush();
-        // for (let offset = 0; offset < 2; offset++) {
-        //     const capsuleHoleBrush = getMeshBrush(evaluator);
-        //     capsuleHoleBrush.translateY(5 * offset);
-        //     capsuleHoleBrush.updateMatrixWorld(true);
-        //     meshBrush = evaluator.evaluate(meshBrush, capsuleHoleBrush, ADDITION);
-        // }
+        const sideHolesBrush = getMeshBrush(evaluator);
+        result = evaluator.evaluate(result, sideHolesBrush, SUBTRACTION);
+        
         return result.geometry;
     }
 
     function getMeshBrush(evaluator: Evaluator) {
-        const capsuleHoleGeometry = new THREE.CapsuleGeometry(1.5, 20, 1, 6, 1);
+        const capsuleHoleGeometry = new THREE.BoxGeometry(2, 20, properties.bottomHeight - 15);
         let capsuleHoleBrush01 = new Brush(capsuleHoleGeometry);
-        capsuleHoleBrush01.rotateX(Math.PI / 2).position.setY(-(properties.bottomHeight - 5) / 2 + 5);
+        capsuleHoleBrush01.rotateX(Math.PI / 2);
         capsuleHoleBrush01.updateMatrixWorld(true);
         const capsuleHoleBrush02 = capsuleHoleBrush01.clone();
         capsuleHoleBrush02.rotateZ(Math.PI / 2);
@@ -228,12 +223,6 @@ export default function WavyPlanter() {
         capsuleHoleBrush03.rotateY(Math.PI / 4);
         capsuleHoleBrush03.updateMatrixWorld(true);
         capsuleHoleBrush01 = evaluator.evaluate(capsuleHoleBrush01, capsuleHoleBrush03, ADDITION);
-
-        const capsuleHoleBrush04 = capsuleHoleBrush01.clone();
-        capsuleHoleBrush04.rotateY(Math.PI / 8).translateY(2);
-        capsuleHoleBrush04.updateMatrixWorld(true);
-        capsuleHoleBrush01 = evaluator.evaluate(capsuleHoleBrush01, capsuleHoleBrush04, ADDITION);
-
         return capsuleHoleBrush01;
     }
 
