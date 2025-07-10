@@ -32,7 +32,7 @@ export default function WavyConnector() {
                 <div className="flex flex-1">
                     <Sidebar collapsible="none" className="border-r w-64">
                         <SidebarHeader>
-                            <h2>Wavy Top</h2>
+                            <h2>Wavy Connector</h2>
                         </SidebarHeader>
                         <SidebarContent className="p-4">
                             <Button onClick={() => exportStl(meshRef.current)}>Download</Button>
