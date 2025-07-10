@@ -9,16 +9,20 @@ import * as THREE from "three";
 import { ADDITION, Brush, Evaluator, SUBTRACTION } from "three-bvh-csg";
 import { mergeVertices } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { Button } from "@/components/ui/button";
+import { wavyProperties } from "@/utils/properties";
+import { Slider } from "@/components/ui/slider";
+import { Label } from "@radix-ui/react-dropdown-menu";
+import { Download } from "lucide-react";
 
 export default function WavyBottom() {
 
-    const [properties, setProperties] = React.useState({
-        color: '#ffffff',
-        radius: 75,
-        topHeight: 100,
-        bottomHeight: 50,
-        waveDensity: 0.3,
+    const [properties, setProperties] = React.useState(() => {
+        const saved = localStorage.getItem('wavyProperties');
+        return saved ? JSON.parse(saved) : wavyProperties;
     });
+    React.useEffect(() => {
+        localStorage.setItem('wavyProperties', JSON.stringify(properties));
+    }, [properties]);
 
     const globalMaterial = new THREE.MeshStandardMaterial({
         color: new THREE.Color(properties.color),
@@ -32,11 +36,32 @@ export default function WavyBottom() {
             <SidebarProvider>
                 <div className="flex flex-1">
                     <Sidebar collapsible="none" className="border-r w-64">
-                        <SidebarHeader>
-                            <h2>Wavy Bottom</h2>
-                        </SidebarHeader>
                         <SidebarContent className="p-4">
-                            <Button onClick={() => exportStl(meshRef.current)}>Download</Button>
+                            <Label>Radius ({properties.radius})</Label>
+                            <Slider
+                                defaultValue={[properties.radius]}
+                                max={200}
+                                step={5}
+                                min={5}
+                                onValueChange={(valueArray) => setProperties({...properties, radius: valueArray[0]})}
+                            />
+                            <Label>Height ({properties.bottomHeight})</Label>
+                            <Slider
+                                defaultValue={[properties.bottomHeight]}
+                                max={200}
+                                step={5}
+                                min={5}
+                                onValueChange={(valueArray) => setProperties({...properties, bottomHeight: valueArray[0]})}
+                            />
+                            <Label>Wave Density ({properties.waveDensity})</Label>
+                            <Slider
+                                defaultValue={[properties.waveDensity]}
+                                max={1}
+                                step={0.1}
+                                min={0.1}
+                                onValueChange={(valueArray) => setProperties({...properties, waveDensity: valueArray[0]})}
+                            />
+                            <Button onClick={() => exportStl(meshRef.current)}><Download/> Download STL</Button>
                         </SidebarContent>
                     </Sidebar>
                     <div className="flex-1 relative">

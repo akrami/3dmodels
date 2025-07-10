@@ -8,16 +8,20 @@ import * as React from "react";
 import * as THREE from "three";
 import { ADDITION, Brush, Evaluator, SUBTRACTION } from "three-bvh-csg";
 import { Button } from "@/components/ui/button";
+import { wavyProperties } from "@/utils/properties";
+import { Label } from "@radix-ui/react-dropdown-menu";
+import { Slider } from "@/components/ui/slider";
+import { Download } from "lucide-react";
 
 export default function WavyConnector() {
 
-    const [properties, setProperties] = React.useState({
-        color: '#ffffff',
-        radius: 75,
-        topHeight: 100,
-        bottomHeight: 50,
-        waveDensity: 0.3,
+    const [properties, setProperties] = React.useState(() => {
+        const saved = localStorage.getItem('wavyProperties');
+        return saved ? JSON.parse(saved) : wavyProperties;
     });
+    React.useEffect(() => {
+        localStorage.setItem('wavyProperties', JSON.stringify(properties));
+    }, [properties]);
 
     const globalMaterial = new THREE.MeshStandardMaterial({
         color: new THREE.Color(properties.color),
@@ -31,11 +35,16 @@ export default function WavyConnector() {
             <SidebarProvider>
                 <div className="flex flex-1">
                     <Sidebar collapsible="none" className="border-r w-64">
-                        <SidebarHeader>
-                            <h2>Wavy Connector</h2>
-                        </SidebarHeader>
                         <SidebarContent className="p-4">
-                            <Button onClick={() => exportStl(meshRef.current)}>Download</Button>
+                            <Label>Height ({properties.bottomHeight - 5})</Label>
+                            <Slider
+                                defaultValue={[properties.bottomHeight]}
+                                max={200}
+                                step={5}
+                                min={5}
+                                onValueChange={(valueArray) => setProperties({ ...properties, bottomHeight: valueArray[0] })}
+                            />
+                            <Button onClick={() => exportStl(meshRef.current)}><Download/> Download STL</Button>
                         </SidebarContent>
                     </Sidebar>
                     <div className="flex-1 relative">
