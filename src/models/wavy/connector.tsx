@@ -8,14 +8,14 @@ import * as React from "react";
 import * as THREE from "three";
 import { ADDITION, Brush, Evaluator, SUBTRACTION } from "three-bvh-csg";
 import { Button } from "@/components/ui/button";
-import { wavyProperties } from "@/utils/properties";
+import { wavyProperties, type WavyProperties } from "@/utils/properties";
 import { Label } from "@radix-ui/react-dropdown-menu";
 import { Slider } from "@/components/ui/slider";
 import { Download } from "lucide-react";
 
 export default function WavyConnector() {
 
-    const [properties, setProperties] = React.useState(() => {
+    const [properties, setProperties] = React.useState<WavyProperties>(() => {
         const saved = localStorage.getItem('wavyProperties');
         return saved ? JSON.parse(saved) : wavyProperties;
     });
@@ -29,7 +29,7 @@ export default function WavyConnector() {
         metalness: 0.2,
     });
 
-    const meshRef = React.useRef(null);
+    const meshRef = React.useRef<THREE.Mesh>(null!);
     return (
         <AppLayout>
             <SidebarProvider>
@@ -107,7 +107,7 @@ function getConnectorGeometry(height: number): THREE.BufferGeometry<THREE.Normal
     return result.geometry;
 }
 
-function getMeshBrush(evaluator: Evaluator, height: number) {
+function getMeshBrush(evaluator: Evaluator, height: number): Brush {
     const capsuleHoleGeometry = new THREE.BoxGeometry(2, 20, height);
     let capsuleHoleBrush01 = new Brush(capsuleHoleGeometry);
     capsuleHoleBrush01.rotateX(Math.PI / 2);

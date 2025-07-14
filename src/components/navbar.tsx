@@ -10,7 +10,13 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
 
-function RecursiveMenu({ items }: { items: MenuItem[] }) {
+interface MenuItem {
+  title: string;
+  url?: string;
+  items?: MenuItem[];
+}
+
+function RecursiveMenu({ items }: { items: MenuItem[] }): React.ReactElement {
   return (
     <>
       {items.map(item => {
@@ -37,12 +43,6 @@ function RecursiveMenu({ items }: { items: MenuItem[] }) {
       })}
     </>
   )
-}
-
-type MenuItem = {
-  title: string
-  url?: string
-  items?: MenuItem[]
 }
 
 export function Navbar() {
