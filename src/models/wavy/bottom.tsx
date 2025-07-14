@@ -9,14 +9,14 @@ import * as THREE from "three";
 import { ADDITION, Brush, Evaluator, SUBTRACTION } from "three-bvh-csg";
 import { mergeVertices } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { Button } from "@/components/ui/button";
-import { wavyProperties } from "@/utils/properties";
+import { wavyProperties, type WavyProperties } from "@/utils/properties";
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@radix-ui/react-dropdown-menu";
 import { Download } from "lucide-react";
 
 export default function WavyBottom() {
 
-    const [properties, setProperties] = React.useState(() => {
+    const [properties, setProperties] = React.useState<WavyProperties>(() => {
         const saved = localStorage.getItem('wavyProperties');
         return saved ? JSON.parse(saved) : wavyProperties;
     });
@@ -30,7 +30,7 @@ export default function WavyBottom() {
         metalness: 0.2,
     });
 
-    const meshRef = React.useRef(null);
+    const meshRef = React.useRef<THREE.Mesh>(null!);
     return (
         <AppLayout>
             <SidebarProvider>

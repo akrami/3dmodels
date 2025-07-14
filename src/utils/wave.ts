@@ -2,15 +2,15 @@ import * as THREE from 'three';
 import { mergeVertices } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 
 export function createWavyGeometry(
-    radius: number,
-    amplitude: number,
-    density: number,
-    depth: number,
-    twistWaves: number = 1,
-    segments: number = 1024,
-    reverseTwist: boolean = false,
-    topCutDepth: number = 0,
-) {
+  radius: number,
+  amplitude: number,
+  density: number,
+  depth: number,
+  twistWaves = 1,
+  segments = 1024,
+  reverseTwist = false,
+  topCutDepth = 0,
+): THREE.BufferGeometry {
 
     const k = Math.round(radius * density);
     const rOuter = (t: number) => radius + amplitude - Math.abs(Math.sin(k * t));
@@ -43,11 +43,11 @@ export function createWavyGeometry(
 }
 
 export function twistGeometry(
-    geom: THREE.BufferGeometry,
-    depth: number,
-    twistWaves: number,
-    reverse: boolean
-) {
+  geom: THREE.BufferGeometry,
+  depth: number,
+  twistWaves: number,
+  reverse: boolean,
+): void {
     const pos = geom.attributes.position as THREE.BufferAttribute;
     const v = new THREE.Vector3();
     for (let i = 0; i < pos.count; i++) {
@@ -63,6 +63,12 @@ export function twistGeometry(
     geom.computeVertexNormals();
 }
 
-export function extrude(shape: THREE.Shape, depth: number, steps = 1) {
-    return new THREE.ExtrudeGeometry(shape, { bevelEnabled: false, curveSegments: 32, depth, steps });
+export function extrude(shape: THREE.Shape, depth: number, steps = 1): THREE.ExtrudeGeometry {
+  return new THREE.ExtrudeGeometry(shape, {
+    bevelEnabled: false,
+    curveSegments: 32,
+    depth,
+    steps,
+  });
 }
+
