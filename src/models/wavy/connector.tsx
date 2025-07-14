@@ -107,7 +107,7 @@ function getConnectorGeometry(height: number): THREE.BufferGeometry<THREE.Normal
     return result.geometry;
 }
 
-function getMeshBrush(evaluator: Evaluator, height: number) {
+function getMeshBrush(evaluator: Evaluator, height: number): Brush {
     const capsuleHoleGeometry = new THREE.BoxGeometry(2, 20, height);
     let capsuleHoleBrush01 = new Brush(capsuleHoleGeometry);
     capsuleHoleBrush01.rotateX(Math.PI / 2);
