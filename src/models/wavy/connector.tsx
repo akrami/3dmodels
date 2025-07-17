@@ -6,7 +6,7 @@ import { OrbitControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import * as React from "react";
 import * as THREE from "three";
-import { ADDITION, Brush, Evaluator, SUBTRACTION } from "three-bvh-csg";
+import { CSG } from "three-csg-ts";
 import { Button } from "@/components/ui/button";
 import { wavyProperties, type WavyProperties } from "@/utils/properties";
 import { Label } from "@radix-ui/react-dropdown-menu";
@@ -75,51 +75,52 @@ export default function WavyConnector() {
 
 function getConnectorGeometry(height: number): THREE.BufferGeometry<THREE.NormalBufferAttributes> {
     const bodyGeometry = new THREE.CylinderGeometry(8, 8, height, 32);
-    bodyGeometry.translate(0, 0, 0);
-    const bodyBrush = new Brush(bodyGeometry);
+    const bodyMesh = new THREE.Mesh(bodyGeometry);
+    bodyMesh.updateMatrix();
 
     const headGeometry = new THREE.CylinderGeometry(10, 10, 2, 32);
     headGeometry.translate(0, height / 2, 0);
-    const headBrush = new Brush(headGeometry);
+    const headMesh = new THREE.Mesh(headGeometry);
+    headMesh.updateMatrix();
 
     const mainHoleGeometry = new THREE.CylinderGeometry(6, 6, height, 32);
     mainHoleGeometry.translate(0, 2, 0);
-    const mainHoleBrush = new Brush(mainHoleGeometry);
+    const mainHoleMesh = new THREE.Mesh(mainHoleGeometry);
+    mainHoleMesh.updateMatrix();
 
-    const evaluator = new Evaluator();
-    let result = evaluator.evaluate(bodyBrush, headBrush, ADDITION);
-    result = evaluator.evaluate(result, mainHoleBrush, SUBTRACTION);
+    let resultMesh = CSG.union(bodyMesh, headMesh);
+    resultMesh = CSG.subtract(resultMesh, mainHoleMesh);
 
     const points = getPointsOnCircle(7, 4);
-
     const miniBottomHoleGeometry = new THREE.CylinderGeometry(1.5, 1.5, 2, 32);
     for (let index = 0; index < points.length; index++) {
-        const tempMiniBottomHoleGeometry = miniBottomHoleGeometry.clone();
-        const miniBottomHoleBrush = new Brush(tempMiniBottomHoleGeometry);
-        miniBottomHoleBrush.position.set(points[index].x, -height / 2 + 1, points[index].z);
-        miniBottomHoleBrush.updateMatrixWorld(true);
-        result = evaluator.evaluate(result, miniBottomHoleBrush, SUBTRACTION);
+        const holeMesh = new THREE.Mesh(miniBottomHoleGeometry.clone());
+        holeMesh.position.set(points[index].x, -height / 2 + 1, points[index].z);
+        holeMesh.updateMatrix();
+        resultMesh = CSG.subtract(resultMesh, holeMesh);
     }
 
-    const sideHolesBrush = getMeshBrush(evaluator, height - 10);
-    result = evaluator.evaluate(result, sideHolesBrush, SUBTRACTION);
+    const sideHolesMesh = getMeshMesh(height - 10);
+    resultMesh = CSG.subtract(resultMesh, sideHolesMesh);
 
-    return result.geometry;
+    const geometry = resultMesh.geometry as THREE.BufferGeometry;
+    geometry.computeVertexNormals();
+    return geometry;
 }
 
-function getMeshBrush(evaluator: Evaluator, height: number): Brush {
+function getMeshMesh(height: number): THREE.Mesh {
     const capsuleHoleGeometry = new THREE.BoxGeometry(2, 20, height);
-    let capsuleHoleBrush01 = new Brush(capsuleHoleGeometry);
-    capsuleHoleBrush01.rotateX(Math.PI / 2);
-    capsuleHoleBrush01.updateMatrixWorld(true);
-    const capsuleHoleBrush02 = capsuleHoleBrush01.clone();
-    capsuleHoleBrush02.rotateZ(Math.PI / 2);
-    capsuleHoleBrush02.updateMatrixWorld(true);
-    capsuleHoleBrush01 = evaluator.evaluate(capsuleHoleBrush01, capsuleHoleBrush02, ADDITION);
+    const mesh01 = new THREE.Mesh(capsuleHoleGeometry);
+    mesh01.rotateX(Math.PI / 2);
+    mesh01.updateMatrix();
+    const mesh02 = mesh01.clone();
+    mesh02.rotateZ(Math.PI / 2);
+    mesh02.updateMatrix();
+    let resultMesh = CSG.union(mesh01, mesh02);
 
-    const capsuleHoleBrush03 = capsuleHoleBrush01.clone();
-    capsuleHoleBrush03.rotateY(Math.PI / 4);
-    capsuleHoleBrush03.updateMatrixWorld(true);
-    capsuleHoleBrush01 = evaluator.evaluate(capsuleHoleBrush01, capsuleHoleBrush03, ADDITION);
-    return capsuleHoleBrush01;
+    const mesh03 = resultMesh.clone();
+    mesh03.rotateY(Math.PI / 4);
+    mesh03.updateMatrix();
+    resultMesh = CSG.union(resultMesh, mesh03);
+    return resultMesh;
 }
