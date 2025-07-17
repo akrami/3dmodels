@@ -7,7 +7,7 @@ import { OrbitControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import * as React from "react";
 import * as THREE from "three";
-import { ADDITION, Brush, Evaluator, SUBTRACTION } from "three-bvh-csg";
+import { CSG } from "three-csg-ts";
 import { mergeVertices } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { Button } from "@/components/ui/button";
 import { wavyProperties, type WavyProperties } from "@/utils/properties";
@@ -92,18 +92,14 @@ export default function WavyTop() {
 
 function getTopGeometry(radius: number, waveDensity: number, height: number): THREE.BufferGeometry<THREE.NormalBufferAttributes> {
     const bodyGeometry = createWavyGeometry(radius, 0.4, waveDensity, height, .1, 1024, false);
-    const bodyBrush = new Brush(bodyGeometry);
 
     const floorGeometry = new THREE.CylinderGeometry(radius - 3, radius - 3, 4, 32);
-    const floorBrush = new Brush(floorGeometry);
 
     const waterHoleTopGeometry = new THREE.CylinderGeometry(10, 10, 2);
     waterHoleTopGeometry.translate(0, 1, 0);
-    const waterHoleTopBrush = new Brush(waterHoleTopGeometry);
 
     const waterHoleBottomGeometry = new THREE.CylinderGeometry(8, 8, 2);
     waterHoleBottomGeometry.translate(0, -1, 0);
-    const waterHoleBottomBrush = new Brush(waterHoleBottomGeometry);
 
     let holeCount = 1;
     switch (true) {
@@ -115,28 +111,35 @@ function getTopGeometry(radius: number, waveDensity: number, height: number): TH
             break;
     }
 
-    const evaluator = new Evaluator()
-    let result = evaluator.evaluate(bodyBrush, floorBrush, ADDITION);
+    const bodyMesh = new THREE.Mesh(bodyGeometry);
+    bodyMesh.updateMatrix();
 
-    const waterHoleResult = evaluator.evaluate(waterHoleTopBrush, waterHoleBottomBrush, ADDITION);
+    const floorMesh = new THREE.Mesh(floorGeometry);
+    floorMesh.updateMatrix();
+
+    let result = CSG.union(bodyMesh, floorMesh);
+
+    const waterHoleTopMesh = new THREE.Mesh(waterHoleTopGeometry);
+    waterHoleTopMesh.updateMatrix();
+    const waterHoleBottomMesh = new THREE.Mesh(waterHoleBottomGeometry);
+    waterHoleBottomMesh.updateMatrix();
+    const waterHoleResult = CSG.union(waterHoleTopMesh, waterHoleBottomMesh);
+
     if (holeCount == 1) {
-        result = evaluator.evaluate(result, waterHoleResult, SUBTRACTION);
+        result = CSG.subtract(result, waterHoleResult);
     } else {
         const points = getPointsOnCircle(radius, holeCount);
-        for (let index = 0; index < points.length; index++) {
-            const point = points[index];
-            const waterHoleBrush = waterHoleResult.clone();
-            waterHoleBrush.translateX(point.x);
-            waterHoleBrush.translateZ(point.z);
-            waterHoleBrush.updateMatrixWorld(true);
-            result = evaluator.evaluate(result, waterHoleBrush, SUBTRACTION);
+        for (const point of points) {
+            const waterHoleMesh = waterHoleResult.clone();
+            waterHoleMesh.position.set(point.x, 0, point.z);
+            waterHoleMesh.updateMatrix();
+            result = CSG.subtract(result, waterHoleMesh);
         }
     }
 
+    const geometry = mergeVertices(result.geometry, 1e-5);
+    geometry.deleteAttribute('normal');
+    geometry.computeVertexNormals();
 
-    result.geometry = mergeVertices(result.geometry, 1e-5);
-    result.geometry.deleteAttribute('normal');
-    result.geometry.computeVertexNormals();
-
-    return result.geometry;
+    return geometry;
 }
