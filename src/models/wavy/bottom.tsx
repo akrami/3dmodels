@@ -6,7 +6,7 @@ import { OrbitControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import * as React from "react";
 import * as THREE from "three";
-import { ADDITION, Brush, Evaluator, SUBTRACTION } from "three-bvh-csg";
+import { CSG } from "three-csg-ts";
 import { mergeVertices } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { Button } from "@/components/ui/button";
 import { wavyProperties, type WavyProperties } from "@/utils/properties";
@@ -91,32 +91,40 @@ export default function WavyBottom() {
 
 function getBottomGeometry(radius: number, waveDensity: number, height: number, twistRatio: number): THREE.BufferGeometry<THREE.NormalBufferAttributes> {
     const bodyGeometry = createWavyGeometry(radius, 0.4, waveDensity, height, .1 * twistRatio, 1024, true);
-    const bodyBrush = new Brush(bodyGeometry);
+    const bodyMesh = new THREE.Mesh(bodyGeometry);
 
     const floorGeometry = new THREE.CylinderGeometry(radius - 3, radius - 3, 4, 32);
     floorGeometry.translate(0, 2, 0);
-    const floorBrush = new Brush(floorGeometry);
+    const floorMesh = new THREE.Mesh(floorGeometry);
 
     const waterHoleGeometry = new THREE.BoxGeometry(20, 10, 20);
     waterHoleGeometry.translate(radius - 5, height, 0);
-    const waterHoleBrush = new Brush(waterHoleGeometry);
+    const waterHoleMesh = new THREE.Mesh(waterHoleGeometry);
 
     const waterEntryGeometry = new THREE.BoxGeometry(25, 7.5, 25);
     waterEntryGeometry.translate(radius - 5, height - 3.7, 0);
-    const waterEntryBrush = new Brush(waterEntryGeometry);
+    const waterEntryMesh = new THREE.Mesh(waterEntryGeometry);
 
     const cylinderHoleGeometry = new THREE.CylinderGeometry(radius - 3, radius - 3, height, 32);
     cylinderHoleGeometry.translate(0, (height / 2) + 4, 0);
-    const cylinderHoleBrush = new Brush(cylinderHoleGeometry);
+    const cylinderHoleMesh = new THREE.Mesh(cylinderHoleGeometry);
 
-    const evaluator = new Evaluator();
-    let result = evaluator.evaluate(bodyBrush, floorBrush, ADDITION);
-    result = evaluator.evaluate(result, waterEntryBrush, ADDITION);
-    result = evaluator.evaluate(result, waterHoleBrush, SUBTRACTION);
-    result = evaluator.evaluate(result, cylinderHoleBrush, SUBTRACTION);
-    result.geometry = mergeVertices(result.geometry, 1e-5);
-    result.geometry.deleteAttribute('normal');
-    result.geometry.computeVertexNormals();
+    bodyMesh.updateMatrix();
+    floorMesh.updateMatrix();
+    let resultMesh = CSG.union(bodyMesh, floorMesh);
 
-    return result.geometry;
+    waterEntryMesh.updateMatrix();
+    resultMesh = CSG.union(resultMesh, waterEntryMesh);
+
+    waterHoleMesh.updateMatrix();
+    resultMesh = CSG.subtract(resultMesh, waterHoleMesh);
+
+    cylinderHoleMesh.updateMatrix();
+    resultMesh = CSG.subtract(resultMesh, cylinderHoleMesh);
+
+    const merged = mergeVertices(resultMesh.geometry, 1e-5);
+    merged.deleteAttribute('normal');
+    merged.computeVertexNormals();
+
+    return merged;
 }
