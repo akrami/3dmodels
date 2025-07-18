@@ -25,10 +25,9 @@ export default function WavyTop() {
         localStorage.setItem('wavyProperties', JSON.stringify(properties));
     }, [properties]);
 
-    const globalMaterial = new THREE.MeshStandardMaterial({
+    const globalMaterial = new THREE.MeshPhongMaterial({
         color: new THREE.Color(properties.color),
-        roughness: 0.8,
-        metalness: 0.2,
+        shininess: 50,
     });
 
     const meshRef = React.useRef<THREE.Mesh>(null!);
