@@ -7,6 +7,7 @@ import { Canvas } from "@react-three/fiber";
 import * as React from "react";
 import * as THREE from "three";
 import { ADDITION, Brush, Evaluator, SUBTRACTION } from "three-bvh-csg";
+import { mergeVertices } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { Button } from "@/components/ui/button";
 import { wavyProperties, type WavyProperties } from "@/utils/properties";
 import { Label } from "@radix-ui/react-dropdown-menu";
@@ -103,6 +104,11 @@ function getConnectorGeometry(height: number): THREE.BufferGeometry<THREE.Normal
 
     const sideHolesBrush = getMeshBrush(evaluator, height - 10);
     result = evaluator.evaluate(result, sideHolesBrush, SUBTRACTION);
+
+    result.geometry = result.geometry.toNonIndexed();
+    result.geometry = mergeVertices(result.geometry, 1e-5);
+    result.geometry.deleteAttribute('normal');
+    result.geometry.computeVertexNormals();
 
     return result.geometry;
 }
