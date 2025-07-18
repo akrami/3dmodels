@@ -114,8 +114,8 @@ function getBottomGeometry(radius: number, waveDensity: number, height: number, 
     result = evaluator.evaluate(result, waterEntryBrush, ADDITION);
     result = evaluator.evaluate(result, waterHoleBrush, SUBTRACTION);
     result = evaluator.evaluate(result, cylinderHoleBrush, SUBTRACTION);
-    result.geometry = mergeVertices(result.geometry, 1e-4);
     result.geometry = result.geometry.toNonIndexed();
+    result.geometry = mergeVertices(result.geometry, 1e-4);
     result.geometry.deleteAttribute('normal');
     result.geometry.computeVertexNormals();
 

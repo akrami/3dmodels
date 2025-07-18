@@ -105,8 +105,8 @@ function getConnectorGeometry(height: number): THREE.BufferGeometry<THREE.Normal
     const sideHolesBrush = getMeshBrush(evaluator, height - 9.9);
     result = evaluator.evaluate(result, sideHolesBrush, SUBTRACTION);
 
-    result.geometry = mergeVertices(result.geometry, 1e-4);
     result.geometry = result.geometry.toNonIndexed();
+    result.geometry = mergeVertices(result.geometry, 1e-4);
     result.geometry.deleteAttribute('normal');
     result.geometry.computeVertexNormals();
 

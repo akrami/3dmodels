@@ -134,8 +134,8 @@ function getTopGeometry(radius: number, waveDensity: number, height: number): TH
     }
 
 
-    result.geometry = mergeVertices(result.geometry, 1e-4);
     result.geometry = result.geometry.toNonIndexed();
+    result.geometry = mergeVertices(result.geometry, 1e-4);
     result.geometry.deleteAttribute('normal');
     result.geometry.computeVertexNormals();
 
