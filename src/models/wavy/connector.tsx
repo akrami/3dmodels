@@ -8,7 +8,7 @@ import * as React from "react";
 import * as THREE from "three";
 import { ADDITION, Brush, Evaluator, SUBTRACTION } from "three-bvh-csg";
 import { Button } from "@/components/ui/button";
-import { wavyProperties, type WavyProperties } from "@/utils/properties";
+import { getGlobalMaterial, wavyProperties, type WavyProperties } from "@/utils/properties";
 import { Label } from "@radix-ui/react-dropdown-menu";
 import { Slider } from "@/components/ui/slider";
 import { Download } from "lucide-react";
@@ -22,12 +22,6 @@ export default function WavyConnector() {
     React.useEffect(() => {
         localStorage.setItem('wavyProperties', JSON.stringify(properties));
     }, [properties]);
-
-    const globalMaterial = new THREE.MeshStandardMaterial({
-        color: new THREE.Color(properties.color),
-        roughness: 0.8,
-        metalness: 0.2,
-    });
 
     const meshRef = React.useRef<THREE.Mesh>(null!);
     return (
@@ -61,7 +55,7 @@ export default function WavyConnector() {
                                 <mesh
                                     ref={meshRef}
                                     geometry={getConnectorGeometry(properties.bottomHeight - 5)}
-                                    material={globalMaterial}
+                                    material={getGlobalMaterial(properties.color)}
                                     position={[0, (properties.bottomHeight - 5) / 2, 0]} />
                             </group>
                             <OrbitControls />

@@ -9,7 +9,7 @@ import * as THREE from "three";
 import { ADDITION, Brush, Evaluator, SUBTRACTION } from "three-bvh-csg";
 import { mergeVertices } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { Button } from "@/components/ui/button";
-import { wavyProperties, type WavyProperties } from "@/utils/properties";
+import { getGlobalMaterial, wavyProperties, type WavyProperties } from "@/utils/properties";
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@radix-ui/react-dropdown-menu";
 import { Download } from "lucide-react";
@@ -23,12 +23,6 @@ export default function WavyBottom() {
     React.useEffect(() => {
         localStorage.setItem('wavyProperties', JSON.stringify(properties));
     }, [properties]);
-
-    const globalMaterial = new THREE.MeshStandardMaterial({
-        color: new THREE.Color(properties.color),
-        roughness: 0.8,
-        metalness: 0.2,
-    });
 
     const meshRef = React.useRef<THREE.Mesh>(null!);
     return (
@@ -78,7 +72,7 @@ export default function WavyBottom() {
                                 <mesh
                                     ref={meshRef}
                                     geometry={getBottomGeometry(properties.radius, properties.waveDensity, properties.bottomHeight, (properties.bottomHeight / properties.topHeight))}
-                                    material={globalMaterial} />
+                                    material={getGlobalMaterial(properties.color)} />
                             </group>
                             <OrbitControls />
                         </Canvas>
