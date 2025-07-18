@@ -97,11 +97,11 @@ function getTopGeometry(radius: number, waveDensity: number, height: number): TH
     const floorGeometry = new THREE.CylinderGeometry(radius - 3, radius - 3, 4, 32);
     const floorBrush = new Brush(floorGeometry);
 
-    const waterHoleTopGeometry = new THREE.CylinderGeometry(10, 10, 2);
+    const waterHoleTopGeometry = new THREE.CylinderGeometry(10.05, 10.05, 2.1);
     waterHoleTopGeometry.translate(0, 1, 0);
     const waterHoleTopBrush = new Brush(waterHoleTopGeometry);
 
-    const waterHoleBottomGeometry = new THREE.CylinderGeometry(8, 8, 2);
+    const waterHoleBottomGeometry = new THREE.CylinderGeometry(8.05, 8.05, 2.1);
     waterHoleBottomGeometry.translate(0, -1, 0);
     const waterHoleBottomBrush = new Brush(waterHoleBottomGeometry);
 
@@ -134,8 +134,8 @@ function getTopGeometry(radius: number, waveDensity: number, height: number): TH
     }
 
 
+    result.geometry = mergeVertices(result.geometry, 1e-4);
     result.geometry = result.geometry.toNonIndexed();
-    result.geometry = mergeVertices(result.geometry, 1e-5);
     result.geometry.deleteAttribute('normal');
     result.geometry.computeVertexNormals();
 

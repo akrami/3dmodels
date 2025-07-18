@@ -97,15 +97,15 @@ function getBottomGeometry(radius: number, waveDensity: number, height: number, 
     floorGeometry.translate(0, 2, 0);
     const floorBrush = new Brush(floorGeometry);
 
-    const waterHoleGeometry = new THREE.BoxGeometry(20, 10, 20);
+    const waterHoleGeometry = new THREE.BoxGeometry(20.2, 10.2, 20.2);
     waterHoleGeometry.translate(radius - 5, height, 0);
     const waterHoleBrush = new Brush(waterHoleGeometry);
 
-    const waterEntryGeometry = new THREE.BoxGeometry(25, 7.5, 25);
+    const waterEntryGeometry = new THREE.BoxGeometry(25.2, 7.7, 25.2);
     waterEntryGeometry.translate(radius - 5, height - 3.7, 0);
     const waterEntryBrush = new Brush(waterEntryGeometry);
 
-    const cylinderHoleGeometry = new THREE.CylinderGeometry(radius - 3, radius - 3, height, 32);
+    const cylinderHoleGeometry = new THREE.CylinderGeometry(radius - 2.9, radius - 2.9, height + 0.2, 32);
     cylinderHoleGeometry.translate(0, (height / 2) + 4, 0);
     const cylinderHoleBrush = new Brush(cylinderHoleGeometry);
 
@@ -114,8 +114,8 @@ function getBottomGeometry(radius: number, waveDensity: number, height: number, 
     result = evaluator.evaluate(result, waterEntryBrush, ADDITION);
     result = evaluator.evaluate(result, waterHoleBrush, SUBTRACTION);
     result = evaluator.evaluate(result, cylinderHoleBrush, SUBTRACTION);
+    result.geometry = mergeVertices(result.geometry, 1e-4);
     result.geometry = result.geometry.toNonIndexed();
-    result.geometry = mergeVertices(result.geometry, 1e-5);
     result.geometry.deleteAttribute('normal');
     result.geometry.computeVertexNormals();
 
