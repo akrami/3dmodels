@@ -87,9 +87,19 @@ export default function WavyTop() {
 function getTopGeometry(radius: number, waveDensity: number, height: number): THREE.BufferGeometry<THREE.NormalBufferAttributes> {
     const bodyGeometry = createWavyGeometry(radius, 0.4, waveDensity, height, .1, 1024, false);
     const bodyBrush = new Brush(bodyGeometry);
+    const evaluator = new Evaluator()
 
-    const floorGeometry = new THREE.CylinderGeometry(radius - 3, radius - 3, 4, 32);
+    const floorGeometry = new THREE.CylinderGeometry(radius - 3, radius - 3, 2, 32);
     const floorBrush = new Brush(floorGeometry);
+    floorBrush.position.setY(1);
+    floorBrush.updateMatrixWorld(true);
+    let result = evaluator.evaluate(bodyBrush, floorBrush, ADDITION);
+
+    const lockGeometry = new THREE.CylinderGeometry(radius - 5, radius - 5, 2, 32);
+    const lockBrush = new Brush(lockGeometry);
+    lockBrush.position.setY(-1);
+    lockBrush.updateMatrixWorld(true);
+    result = evaluator.evaluate(result, lockBrush, ADDITION);
 
     const waterHoleTopGeometry = new THREE.CylinderGeometry(10, 10, 2);
     waterHoleTopGeometry.translate(0, 1, 0);
@@ -108,9 +118,6 @@ function getTopGeometry(radius: number, waveDensity: number, height: number): TH
             holeCount = 5;
             break;
     }
-
-    const evaluator = new Evaluator()
-    let result = evaluator.evaluate(bodyBrush, floorBrush, ADDITION);
 
     const waterHoleResult = evaluator.evaluate(waterHoleTopBrush, waterHoleBottomBrush, ADDITION);
     if (holeCount == 1) {
