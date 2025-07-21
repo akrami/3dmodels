@@ -25,7 +25,7 @@ function tessellate(oc: any, shape: any) {
   ) {
     const face = oc.TopoDS.Face_1(exp.Current());
     const loc = new oc.TopLoc_Location_1();
-    const tri = oc.BRep_Tool.Triangulation(face, loc, 0);
+    const tri = oc.BRep_Tool.Triangulation(face, loc);
     if (tri.IsNull()) continue;
     const t = tri.get();
     for (let i = 1; i <= t.NbNodes(); i++) {
