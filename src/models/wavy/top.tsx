@@ -24,8 +24,8 @@ export default function WavyTop() {
 
     const meshRef = React.useRef<THREE.Mesh>(null!);
     const geometry = useOcMesh((oc) => {
-        const body = new oc.BRepPrimAPI_MakeCylinder(properties.radius, properties.topHeight).Shape();
-        const inner = new oc.BRepPrimAPI_MakeCylinder(Math.max(properties.radius - 3, 1), properties.topHeight).Shape();
+        const body = new oc.BRepPrimAPI_MakeCylinder_1(properties.radius, properties.topHeight).Shape();
+        const inner = new oc.BRepPrimAPI_MakeCylinder_1(Math.max(properties.radius - 3, 1), properties.topHeight).Shape();
         return new oc.BRepAlgoAPI_Cut(body, inner).Shape();
     }, [properties.radius, properties.topHeight]);
     return (
