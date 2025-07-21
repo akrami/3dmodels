@@ -1,6 +1,6 @@
 # 3D Models
 
-This project showcases basic parametric 3D models rendered with React Three Fiber and served through Astro.
+This project showcases basic parametric 3D models rendered with React Three Fiber and served through Astro. Geometry is generated using **opencascade.js**.
 
 ## Development
 

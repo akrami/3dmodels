@@ -1,13 +1,11 @@
 import { Sidebar, SidebarContent, SidebarHeader, SidebarProvider } from "@/components/ui/sidebar";
 import AppLayout from "@/layouts/appLayout";
 import exportStl from "@/utils/export";
-import { createWavyGeometry } from "@/utils/wave";
 import { OrbitControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import * as React from "react";
 import * as THREE from "three";
-import { ADDITION, Brush, Evaluator, SUBTRACTION } from "three-bvh-csg";
-import { mergeVertices } from "three/examples/jsm/utils/BufferGeometryUtils.js";
+import { useOcMesh } from "@/hooks/use-oc-mesh";
 import { Button } from "@/components/ui/button";
 import { getGlobalMaterial, wavyProperties, type WavyProperties } from "@/utils/properties";
 import { Slider } from "@/components/ui/slider";
@@ -25,6 +23,11 @@ export default function WavyBottom() {
     }, [properties]);
 
     const meshRef = React.useRef<THREE.Mesh>(null!);
+    const geometry = useOcMesh((oc) => {
+        const body = new oc.BRepPrimAPI_MakeCylinder(properties.radius, properties.bottomHeight).Shape();
+        const inner = new oc.BRepPrimAPI_MakeCylinder(Math.max(properties.radius - 3, 1), properties.bottomHeight).Shape();
+        return new oc.BRepAlgoAPI_Cut(body, inner).Shape();
+    }, [properties.radius, properties.bottomHeight]);
     return (
         <AppLayout>
             <SidebarProvider>
@@ -71,7 +74,7 @@ export default function WavyBottom() {
                             <group>
                                 <mesh
                                     ref={meshRef}
-                                    geometry={getBottomGeometry(properties.radius, properties.waveDensity, properties.bottomHeight, (properties.bottomHeight / properties.topHeight))}
+                                    geometry={geometry ?? undefined}
                                     material={getGlobalMaterial(properties.color)} />
                             </group>
                             <OrbitControls />
@@ -83,34 +86,3 @@ export default function WavyBottom() {
     )
 }
 
-function getBottomGeometry(radius: number, waveDensity: number, height: number, twistRatio: number): THREE.BufferGeometry<THREE.NormalBufferAttributes> {
-    const bodyGeometry = createWavyGeometry(radius, 0.4, waveDensity, height, .1 * twistRatio, 1024, true);
-    const bodyBrush = new Brush(bodyGeometry);
-
-    const floorGeometry = new THREE.CylinderGeometry(radius - 3, radius - 3, 4, 32);
-    floorGeometry.translate(0, 2, 0);
-    const floorBrush = new Brush(floorGeometry);
-
-    const waterHoleGeometry = new THREE.BoxGeometry(20, 10, 20);
-    waterHoleGeometry.translate(radius - 5, height, 0);
-    const waterHoleBrush = new Brush(waterHoleGeometry);
-
-    const waterEntryGeometry = new THREE.BoxGeometry(25, 7.5, 25);
-    waterEntryGeometry.translate(radius - 5, height - 3.7, 0);
-    const waterEntryBrush = new Brush(waterEntryGeometry);
-
-    const cylinderHoleGeometry = new THREE.CylinderGeometry(radius - 3, radius - 3, height, 32);
-    cylinderHoleGeometry.translate(0, (height / 2) + 4, 0);
-    const cylinderHoleBrush = new Brush(cylinderHoleGeometry);
-
-    const evaluator = new Evaluator();
-    let result = evaluator.evaluate(bodyBrush, floorBrush, ADDITION);
-    result = evaluator.evaluate(result, waterEntryBrush, ADDITION);
-    result = evaluator.evaluate(result, waterHoleBrush, SUBTRACTION);
-    result = evaluator.evaluate(result, cylinderHoleBrush, SUBTRACTION);
-    result.geometry = mergeVertices(result.geometry, 1e-5);
-    result.geometry.deleteAttribute('normal');
-    result.geometry.computeVertexNormals();
-
-    return result.geometry;
-}

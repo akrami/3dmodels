@@ -1,12 +1,11 @@
 import { Sidebar, SidebarContent, SidebarHeader, SidebarProvider } from "@/components/ui/sidebar";
 import AppLayout from "@/layouts/appLayout";
-import { getPointsOnCircle } from "@/utils/3d";
 import exportStl from "@/utils/export";
 import { OrbitControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import * as React from "react";
 import * as THREE from "three";
-import { ADDITION, Brush, Evaluator, SUBTRACTION } from "three-bvh-csg";
+import { useOcMesh } from "@/hooks/use-oc-mesh";
 import { Button } from "@/components/ui/button";
 import { getGlobalMaterial, wavyProperties, type WavyProperties } from "@/utils/properties";
 import { Label } from "@radix-ui/react-dropdown-menu";
@@ -24,6 +23,11 @@ export default function WavyConnector() {
     }, [properties]);
 
     const meshRef = React.useRef<THREE.Mesh>(null!);
+    const geometry = useOcMesh((oc) => {
+        const body = new oc.BRepPrimAPI_MakeCylinder(8, properties.bottomHeight - 5).Shape();
+        const hole = new oc.BRepPrimAPI_MakeCylinder(6, properties.bottomHeight - 5).Shape();
+        return new oc.BRepAlgoAPI_Cut(body, hole).Shape();
+    }, [properties.bottomHeight]);
     return (
         <AppLayout>
             <SidebarProvider>
@@ -54,7 +58,7 @@ export default function WavyConnector() {
                             <group>
                                 <mesh
                                     ref={meshRef}
-                                    geometry={getConnectorGeometry(properties.bottomHeight - 5)}
+                                    geometry={geometry ?? undefined}
                                     material={getGlobalMaterial(properties.color)}
                                     position={[0, (properties.bottomHeight - 5) / 2, 0]} />
                             </group>
@@ -67,53 +71,3 @@ export default function WavyConnector() {
     )
 }
 
-function getConnectorGeometry(height: number): THREE.BufferGeometry<THREE.NormalBufferAttributes> {
-    const bodyGeometry = new THREE.CylinderGeometry(8, 8, height, 32);
-    bodyGeometry.translate(0, 0, 0);
-    const bodyBrush = new Brush(bodyGeometry);
-
-    const headGeometry = new THREE.CylinderGeometry(10, 10, 2, 32);
-    headGeometry.translate(0, height / 2, 0);
-    const headBrush = new Brush(headGeometry);
-
-    const mainHoleGeometry = new THREE.CylinderGeometry(6, 6, height, 32);
-    mainHoleGeometry.translate(0, 2, 0);
-    const mainHoleBrush = new Brush(mainHoleGeometry);
-
-    const evaluator = new Evaluator();
-    let result = evaluator.evaluate(bodyBrush, headBrush, ADDITION);
-    result = evaluator.evaluate(result, mainHoleBrush, SUBTRACTION);
-
-    const points = getPointsOnCircle(7, 4);
-
-    const miniBottomHoleGeometry = new THREE.CylinderGeometry(1.5, 1.5, 2, 32);
-    for (let index = 0; index < points.length; index++) {
-        const tempMiniBottomHoleGeometry = miniBottomHoleGeometry.clone();
-        const miniBottomHoleBrush = new Brush(tempMiniBottomHoleGeometry);
-        miniBottomHoleBrush.position.set(points[index].x, -height / 2 + 1, points[index].z);
-        miniBottomHoleBrush.updateMatrixWorld(true);
-        result = evaluator.evaluate(result, miniBottomHoleBrush, SUBTRACTION);
-    }
-
-    const sideHolesBrush = getMeshBrush(evaluator, height - 10);
-    result = evaluator.evaluate(result, sideHolesBrush, SUBTRACTION);
-
-    return result.geometry;
-}
-
-function getMeshBrush(evaluator: Evaluator, height: number): Brush {
-    const capsuleHoleGeometry = new THREE.BoxGeometry(2, 20, height);
-    let capsuleHoleBrush01 = new Brush(capsuleHoleGeometry);
-    capsuleHoleBrush01.rotateX(Math.PI / 2);
-    capsuleHoleBrush01.updateMatrixWorld(true);
-    const capsuleHoleBrush02 = capsuleHoleBrush01.clone();
-    capsuleHoleBrush02.rotateZ(Math.PI / 2);
-    capsuleHoleBrush02.updateMatrixWorld(true);
-    capsuleHoleBrush01 = evaluator.evaluate(capsuleHoleBrush01, capsuleHoleBrush02, ADDITION);
-
-    const capsuleHoleBrush03 = capsuleHoleBrush01.clone();
-    capsuleHoleBrush03.rotateY(Math.PI / 4);
-    capsuleHoleBrush03.updateMatrixWorld(true);
-    capsuleHoleBrush01 = evaluator.evaluate(capsuleHoleBrush01, capsuleHoleBrush03, ADDITION);
-    return capsuleHoleBrush01;
-}
