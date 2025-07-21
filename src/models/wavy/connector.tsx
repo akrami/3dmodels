@@ -26,7 +26,7 @@ export default function WavyConnector() {
     const geometry = useOcMesh((oc) => {
         const body = new oc.BRepPrimAPI_MakeCylinder_1(8, properties.bottomHeight - 5).Shape();
         const hole = new oc.BRepPrimAPI_MakeCylinder_1(6, properties.bottomHeight - 5).Shape();
-        return new oc.BRepAlgoAPI_Cut(body, hole).Shape();
+        return new oc.BRepAlgoAPI_Cut_2(body, hole).Shape();
     }, [properties.bottomHeight]);
     return (
         <AppLayout>
