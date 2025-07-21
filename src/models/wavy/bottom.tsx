@@ -26,7 +26,7 @@ export default function WavyBottom() {
     const geometry = useOcMesh((oc) => {
         const body = new oc.BRepPrimAPI_MakeCylinder_1(properties.radius, properties.bottomHeight).Shape();
         const inner = new oc.BRepPrimAPI_MakeCylinder_1(Math.max(properties.radius - 3, 1), properties.bottomHeight).Shape();
-        return new oc.BRepAlgoAPI_Cut_2(body, inner).Shape();
+        return new oc.BRepAlgoAPI_Cut_3(body, inner).Shape();
     }, [properties.radius, properties.bottomHeight]);
     return (
         <AppLayout>
