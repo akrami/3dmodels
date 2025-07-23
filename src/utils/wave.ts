@@ -32,7 +32,7 @@ export function createWavyShape(
   const face = faceMaker.Face();
 
   const vec = new oc.gp_Vec_4(0, 0, depth);
-  const prism = new oc.BRepPrimAPI_MakePrism_5(face, vec, true, false);
+  const prism = new oc.BRepPrimAPI_MakePrism_2(face, vec, true, false);
   return prism.Shape();
 }
 
