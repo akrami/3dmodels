@@ -1,16 +1,14 @@
 import { Sidebar, SidebarContent, SidebarHeader, SidebarProvider } from "@/components/ui/sidebar";
 import AppLayout from "@/layouts/appLayout";
-import { getPointsOnCircle } from "@/utils/3d";
 import exportStl from "@/utils/export";
-import { createWavyGeometry } from "@/utils/wave";
+import { createTop } from "@/utils/replicadWavy";
 import { OrbitControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import * as React from "react";
 import * as THREE from "three";
-import { ADDITION, Brush, Evaluator, SUBTRACTION } from "three-bvh-csg";
-import { mergeVertices } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { Button } from "@/components/ui/button";
-import { getGlobalMaterial, wavyProperties, type WavyProperties } from "@/utils/properties";
+import { wavyProperties, type WavyProperties } from "@/utils/properties";
+import ReplicadMesh from "@/components/replicadMesh";
 import { Label } from "@radix-ui/react-dropdown-menu";
 import { Slider } from "@/components/ui/slider";
 import { Download } from "lucide-react";
@@ -26,6 +24,11 @@ export default function WavyTop() {
     }, [properties]);
 
     const meshRef = React.useRef<THREE.Mesh>(null!);
+    const [mesh, setMesh] = React.useState<{faces: any; edges: any} | null>(null);
+
+    React.useEffect(() => {
+        createTop(properties.radius, properties.waveDensity, properties.topHeight).then(setMesh);
+    }, [properties]);
     return (
         <AppLayout>
             <SidebarProvider>
@@ -70,10 +73,9 @@ export default function WavyTop() {
                             <gridHelper args={[500, 50, "#888888", "#444444"]} />
                             <axesHelper args={[500]} />
                             <group>
-                                <mesh
-                                    ref={meshRef}
-                                    geometry={getTopGeometry(properties.radius, properties.waveDensity, properties.topHeight)}
-                                    material={getGlobalMaterial(properties.color)} />
+                                {mesh && (
+                                    <ReplicadMesh faces={mesh.faces} edges={mesh.edges} />
+                                )}
                             </group>
                             <OrbitControls />
                         </Canvas>
@@ -82,62 +84,4 @@ export default function WavyTop() {
             </SidebarProvider>
         </AppLayout>
     )
-}
-
-function getTopGeometry(radius: number, waveDensity: number, height: number): THREE.BufferGeometry<THREE.NormalBufferAttributes> {
-    const bodyGeometry = createWavyGeometry(radius, 0.4, waveDensity, height, .1, 1024, false);
-    const bodyBrush = new Brush(bodyGeometry);
-    const evaluator = new Evaluator()
-
-    const floorGeometry = new THREE.CylinderGeometry(radius - 3, radius - 3, 2, 32);
-    const floorBrush = new Brush(floorGeometry);
-    floorBrush.position.setY(1);
-    floorBrush.updateMatrixWorld(true);
-    let result = evaluator.evaluate(bodyBrush, floorBrush, ADDITION);
-
-    const lockGeometry = new THREE.CylinderGeometry(radius - 5, radius - 5, 2, 32);
-    const lockBrush = new Brush(lockGeometry);
-    lockBrush.position.setY(-1);
-    lockBrush.updateMatrixWorld(true);
-    result = evaluator.evaluate(result, lockBrush, ADDITION);
-
-    const waterHoleTopGeometry = new THREE.CylinderGeometry(10, 10, 2);
-    waterHoleTopGeometry.translate(0, 1, 0);
-    const waterHoleTopBrush = new Brush(waterHoleTopGeometry);
-
-    const waterHoleBottomGeometry = new THREE.CylinderGeometry(8, 8, 2);
-    waterHoleBottomGeometry.translate(0, -1, 0);
-    const waterHoleBottomBrush = new Brush(waterHoleBottomGeometry);
-
-    let holeCount = 1;
-    switch (true) {
-        case radius >= 50 && radius < 100:
-            holeCount = 3;
-            break;
-        case radius >= 100:
-            holeCount = 5;
-            break;
-    }
-
-    const waterHoleResult = evaluator.evaluate(waterHoleTopBrush, waterHoleBottomBrush, ADDITION);
-    if (holeCount == 1) {
-        result = evaluator.evaluate(result, waterHoleResult, SUBTRACTION);
-    } else {
-        const points = getPointsOnCircle(radius, holeCount);
-        for (let index = 0; index < points.length; index++) {
-            const point = points[index];
-            const waterHoleBrush = waterHoleResult.clone();
-            waterHoleBrush.translateX(point.x);
-            waterHoleBrush.translateZ(point.z);
-            waterHoleBrush.updateMatrixWorld(true);
-            result = evaluator.evaluate(result, waterHoleBrush, SUBTRACTION);
-        }
-    }
-
-
-    result.geometry = mergeVertices(result.geometry, 1e-5);
-    result.geometry.deleteAttribute('normal');
-    result.geometry.computeVertexNormals();
-
-    return result.geometry;
 }
