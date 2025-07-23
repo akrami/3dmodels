@@ -6,6 +6,7 @@ import { Canvas } from "@react-three/fiber";
 import * as React from "react";
 import * as THREE from "three";
 import { useOcMesh } from "@/hooks/use-oc-mesh";
+import { createWavyShape } from "@/utils/wave";
 import { Button } from "@/components/ui/button";
 import { getGlobalMaterial, wavyProperties, type WavyProperties } from "@/utils/properties";
 import { Label } from "@radix-ui/react-dropdown-menu";
@@ -24,10 +25,10 @@ export default function WavyTop() {
 
     const meshRef = React.useRef<THREE.Mesh>(null!);
     const geometry = useOcMesh((oc) => {
-        const body = new oc.BRepPrimAPI_MakeCylinder_1(properties.radius, properties.topHeight).Shape();
+        const body = createWavyShape(oc, properties.radius, 0.4, properties.waveDensity, properties.topHeight);
         const inner = new oc.BRepPrimAPI_MakeCylinder_1(Math.max(properties.radius - 3, 1), properties.topHeight).Shape();
         return new oc.BRepAlgoAPI_Cut_3(body, inner).Shape();
-    }, [properties.radius, properties.topHeight]);
+    }, [properties.radius, properties.topHeight, properties.waveDensity]);
     return (
         <AppLayout>
             <SidebarProvider>
