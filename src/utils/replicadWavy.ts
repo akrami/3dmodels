@@ -4,7 +4,7 @@ import { setOC, Sketcher, makeCylinder } from "replicad";
 import { getPointsOnCircle } from "@/utils/3d";
 import type { ReplicadMeshedFaces, ReplicadMeshedEdges } from "replicad-threejs-helper";
 
-function twistMesh(
+function twistMeshZ(
   faces: ReplicadMeshedFaces,
   edges: ReplicadMeshedEdges | undefined,
   height: number,
@@ -12,35 +12,58 @@ function twistMesh(
   reverse = false
 ) {
   for (let i = 0; i < faces.vertices.length; i += 3) {
-    const y = faces.vertices[i + 1];
-    const t = y / height;
+    const z = faces.vertices[i + 2];
+    const t = z / height;
     const tt = reverse ? 1 - t : t;
     const dir = reverse ? -1 : 1;
     const angle = Math.sin(tt * twistWaves * Math.PI * 2) * dir;
     const x = faces.vertices[i];
-    const z = faces.vertices[i + 2];
+    const y = faces.vertices[i + 1];
     const cs = Math.cos(angle);
     const sn = Math.sin(angle);
-    faces.vertices[i] = x * cs - z * sn;
-    faces.vertices[i + 2] = x * sn + z * cs;
+    faces.vertices[i] = x * cs - y * sn;
+    faces.vertices[i + 1] = x * sn + y * cs;
   }
 
   if (edges) {
     for (let i = 0; i < edges.lines.length; i += 3) {
-      const y = edges.lines[i + 1];
-      const t = y / height;
+      const z = edges.lines[i + 2];
+      const t = z / height;
       const tt = reverse ? 1 - t : t;
       const dir = reverse ? -1 : 1;
       const angle = Math.sin(tt * twistWaves * Math.PI * 2) * dir;
       const x = edges.lines[i];
-      const z = edges.lines[i + 2];
+      const y = edges.lines[i + 1];
       const cs = Math.cos(angle);
       const sn = Math.sin(angle);
-      edges.lines[i] = x * cs - z * sn;
-      edges.lines[i + 2] = x * sn + z * cs;
+      edges.lines[i] = x * cs - y * sn;
+      edges.lines[i + 1] = x * sn + y * cs;
     }
   }
   delete faces.normals;
+}
+
+function rotateX(
+  faces: ReplicadMeshedFaces,
+  edges: ReplicadMeshedEdges | undefined,
+  angle: number
+) {
+  const cs = Math.cos(angle);
+  const sn = Math.sin(angle);
+  for (let i = 0; i < faces.vertices.length; i += 3) {
+    const y = faces.vertices[i + 1];
+    const z = faces.vertices[i + 2];
+    faces.vertices[i + 1] = y * cs - z * sn;
+    faces.vertices[i + 2] = y * sn + z * cs;
+  }
+  if (edges) {
+    for (let i = 0; i < edges.lines.length; i += 3) {
+      const y = edges.lines[i + 1];
+      const z = edges.lines[i + 2];
+      edges.lines[i + 1] = y * cs - z * sn;
+      edges.lines[i + 2] = y * sn + z * cs;
+    }
+  }
 }
 
 let initPromise: Promise<void> | null = null;
@@ -90,9 +113,9 @@ export async function createTop(radius: number, waveDensity: number, height: num
     }
   }
 
-  shape = shape.rotate(-90, [1, 0, 0]);
   const faces = shape.mesh();
   const edges = shape.meshEdges();
-  twistMesh(faces, edges, height);
+  twistMeshZ(faces, edges, height);
+  rotateX(faces, edges, -Math.PI / 2);
   return { faces, edges };
 }
