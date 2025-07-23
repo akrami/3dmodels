@@ -14,7 +14,7 @@ export function createWavyShape(
   for (let i = 0; i <= segments; i++) {
     const t = (i / segments) * Math.PI * 2;
     const r = rOuter(t);
-    outer.Add(new oc.gp_Pnt_3(r * Math.cos(t), r * Math.sin(t), 0));
+    outer.Add_1(new oc.gp_Pnt_3(r * Math.cos(t), r * Math.sin(t), 0));
   }
   outer.Close();
   const outerWire = outer.Wire();
@@ -22,7 +22,7 @@ export function createWavyShape(
   const inner = new oc.BRepBuilderAPI_MakePolygon_1();
   for (let i = 0; i <= segments; i++) {
     const t = (i / segments) * Math.PI * 2;
-    inner.Add(new oc.gp_Pnt_3(rInner * Math.cos(t), rInner * Math.sin(t), 0));
+    inner.Add_1(new oc.gp_Pnt_3(rInner * Math.cos(t), rInner * Math.sin(t), 0));
   }
   inner.Close();
   const innerWire = inner.Wire();
