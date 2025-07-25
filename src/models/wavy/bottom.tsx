@@ -91,12 +91,12 @@ function getBottomGeometry(radius: number, waveDensity: number, height: number, 
     floorGeometry.translate(0, 2, 0);
     const floorBrush = new Brush(floorGeometry);
 
-    const waterHoleGeometry = new THREE.BoxGeometry(20, 10, 20);
-    waterHoleGeometry.translate(radius - 5, height, 0);
+    const waterHoleGeometry = new THREE.BoxGeometry(20, 15, 20);
+    waterHoleGeometry.translate(radius, height - 5.5, 0);
     const waterHoleBrush = new Brush(waterHoleGeometry);
 
-    const waterEntryGeometry = new THREE.BoxGeometry(25, 7.5, 25);
-    waterEntryGeometry.translate(radius - 5, height - 3.7, 0);
+    const waterEntryGeometry = new THREE.BoxGeometry(25, 15, 25);
+    waterEntryGeometry.translate(radius , height - 7.5, 0);
     const waterEntryBrush = new Brush(waterEntryGeometry);
 
     const cylinderHoleGeometry = new THREE.CylinderGeometry(radius - 3, radius - 3, height, 32);
