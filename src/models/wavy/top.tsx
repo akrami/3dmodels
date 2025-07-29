@@ -26,6 +26,18 @@ export default function WavyTop() {
     }, [properties]);
 
     const meshRef = React.useRef<THREE.Mesh>(null!);
+    const [geometry, setGeometry] = React.useState<THREE.BufferGeometry>();
+
+    React.useEffect(() => {
+        (async () => {
+            const geom = await getTopGeometry(
+                properties.radius,
+                properties.waveDensity,
+                properties.topHeight,
+            );
+            setGeometry(geom);
+        })();
+    }, [properties.radius, properties.waveDensity, properties.topHeight]);
     return (
         <AppLayout>
             <SidebarProvider>
@@ -72,7 +84,7 @@ export default function WavyTop() {
                             <group>
                                 <mesh
                                     ref={meshRef}
-                                    geometry={getTopGeometry(properties.radius, properties.waveDensity, properties.topHeight)}
+                                    geometry={geometry}
                                     material={getGlobalMaterial(properties.color)} />
                             </group>
                             <OrbitControls />
@@ -84,7 +96,11 @@ export default function WavyTop() {
     )
 }
 
-function getTopGeometry(radius: number, waveDensity: number, height: number): THREE.BufferGeometry<THREE.NormalBufferAttributes> {
+async function getTopGeometry(
+    radius: number,
+    waveDensity: number,
+    height: number,
+): Promise<THREE.BufferGeometry<THREE.NormalBufferAttributes>> {
     const bodyGeometry = createWavyGeometry(radius, 0.4, waveDensity, height, .1, 1024, false);
     const bodyBrush = new Brush(bodyGeometry);
     const evaluator = new Evaluator()

@@ -24,6 +24,14 @@ export default function WavyConnector() {
     }, [properties]);
 
     const meshRef = React.useRef<THREE.Mesh>(null!);
+    const [geometry, setGeometry] = React.useState<THREE.BufferGeometry>();
+
+    React.useEffect(() => {
+        (async () => {
+            const geom = await getConnectorGeometry(properties.bottomHeight - 5);
+            setGeometry(geom);
+        })();
+    }, [properties.bottomHeight]);
     return (
         <AppLayout>
             <SidebarProvider>
@@ -54,7 +62,7 @@ export default function WavyConnector() {
                             <group>
                                 <mesh
                                     ref={meshRef}
-                                    geometry={getConnectorGeometry(properties.bottomHeight - 5)}
+                                    geometry={geometry}
                                     material={getGlobalMaterial(properties.color)}
                                     position={[0, (properties.bottomHeight - 5) / 2, 0]} />
                             </group>
@@ -67,7 +75,7 @@ export default function WavyConnector() {
     )
 }
 
-function getConnectorGeometry(height: number): THREE.BufferGeometry<THREE.NormalBufferAttributes> {
+async function getConnectorGeometry(height: number): Promise<THREE.BufferGeometry<THREE.NormalBufferAttributes>> {
     const bodyGeometry = new THREE.CylinderGeometry(8, 8, height, 32);
     bodyGeometry.translate(0, 0, 0);
     const bodyBrush = new Brush(bodyGeometry);

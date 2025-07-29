@@ -25,6 +25,19 @@ export default function WavyBottom() {
     }, [properties]);
 
     const meshRef = React.useRef<THREE.Mesh>(null!);
+    const [geometry, setGeometry] = React.useState<THREE.BufferGeometry>();
+
+    React.useEffect(() => {
+        (async () => {
+            const geom = await getBottomGeometry(
+                properties.radius,
+                properties.waveDensity,
+                properties.bottomHeight,
+                properties.bottomHeight / properties.topHeight,
+            );
+            setGeometry(geom);
+        })();
+    }, [properties.radius, properties.waveDensity, properties.bottomHeight, properties.topHeight]);
     return (
         <AppLayout>
             <SidebarProvider>
@@ -71,7 +84,7 @@ export default function WavyBottom() {
                             <group>
                                 <mesh
                                     ref={meshRef}
-                                    geometry={getBottomGeometry(properties.radius, properties.waveDensity, properties.bottomHeight, (properties.bottomHeight / properties.topHeight))}
+                                    geometry={geometry}
                                     material={getGlobalMaterial(properties.color)} />
                             </group>
                             <OrbitControls />
@@ -83,7 +96,12 @@ export default function WavyBottom() {
     )
 }
 
-function getBottomGeometry(radius: number, waveDensity: number, height: number, twistRatio: number): THREE.BufferGeometry<THREE.NormalBufferAttributes> {
+async function getBottomGeometry(
+    radius: number,
+    waveDensity: number,
+    height: number,
+    twistRatio: number,
+): Promise<THREE.BufferGeometry<THREE.NormalBufferAttributes>> {
     const bodyGeometry = createWavyGeometry(radius, 0.4, waveDensity, height, .1 * twistRatio, 1024, true);
     const bodyBrush = new Brush(bodyGeometry);
 
