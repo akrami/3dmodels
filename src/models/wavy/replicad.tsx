@@ -30,7 +30,7 @@ function Scene({ faces }: { faces: any }) {
       <directionalLight position={[50, 100, 70]} intensity={1} castShadow />
       <gridHelper args={[500, 50, "#888888", "#444444"]} />
       <axesHelper args={[500]} />
-      <group>
+      <group rotation={[-Math.PI / 2, 0, 0]}>
         <mesh geometry={body.current} material={getGlobalMaterial("#A7C7E7")} />
       </group>
       <OrbitControls />
