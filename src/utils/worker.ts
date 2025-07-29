@@ -1,19 +1,20 @@
-import opencascade from "replicad-opencascadejs/src/replicad_single.js";
-import opencascadeWasm from "replicad-opencascadejs/src/replicad_single.wasm?url";
 import { drawCircle, drawPolysides, drawSingleCircle, polysideInnerRadius, setOC } from "replicad";
 
-let loaded = false;
-const init = async () => {
-    if (loaded) return Promise.resolve(true);
-    const OC = await opencascade({
-        locateFile: () => opencascadeWasm
-    });
+let started: Promise<boolean> | null = null;
 
-    loaded = true;
+const init = async () => {
+  if (started) return started;
+  started = (async () => {
+    const opencascade = (await import("replicad-opencascadejs/src/replicad_single.js")).default;
+    const opencascadeWasm = (await import("replicad-opencascadejs/src/replicad_single.wasm?url")).default;
+    const OC = await opencascade({
+      locateFile: () => opencascadeWasm,
+    });
     setOC(OC);
     return true;
-}
-const started = init();
+  })();
+  return started;
+};
 
 const getShape = () => {
     const extrusionProfile = undefined;
@@ -72,13 +73,13 @@ const getShape = () => {
 }
 
 export function createBlob() {
-    return started.then(() => {
+    return init().then(() => {
         return getShape().blobSTL();
     });
 }
 
 export function createMesh() {
-    return started.then(() => {
+    return init().then(() => {
         const shape = getShape();
         return {
             faces: shape.mesh(),

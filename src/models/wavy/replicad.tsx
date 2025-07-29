@@ -1,6 +1,5 @@
 import { SidebarProvider } from "@/components/ui/sidebar";
 import AppLayout from "@/layouts/appLayout";
-import { createMesh } from "@/utils/worker";
 import { OrbitControls } from "@react-three/drei";
 import { Canvas, useThree } from "@react-three/fiber";
 import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
@@ -42,7 +41,9 @@ export default function WavyReplicad() {
   const [mesh, setMesh] = useState<any>(null);
 
   useEffect(() => {
-    createMesh().then((m) => setMesh(m));
+    import("@/utils/worker").then(({ createMesh }) => {
+      createMesh().then((m) => setMesh(m));
+    });
   }, []);
 
   const faces = mesh?.faces;
