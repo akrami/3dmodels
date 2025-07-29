@@ -5,7 +5,7 @@ import { OrbitControls } from "@react-three/drei";
 import { Canvas, useThree } from "@react-three/fiber";
 import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
 import { BufferGeometry } from "three";
-import { syncFaces } from "replicad-threejs-helper";
+import { syncFaces } from "replicad-threejs-helper/dist/es/replicad-threejs-helper";
 import { getGlobalMaterial } from "@/utils/properties";
 
 export default function WavyReplicad() {
