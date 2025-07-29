@@ -56,6 +56,7 @@ export function Navbar() {
             { title: "Top", url: "/planter/wavy/top" },
             { title: "Bottom", url: "/planter/wavy/bottom" },
             { title: "Connector", url: "/planter/wavy/connector" },
+            { title: "Replicad", url: "/planter/wavy/replicad" },
           ],
         },
       ],
