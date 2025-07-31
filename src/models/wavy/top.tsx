@@ -1,14 +1,11 @@
 import { Sidebar, SidebarContent, SidebarHeader, SidebarProvider } from "@/components/ui/sidebar";
 import AppLayout from "@/layouts/appLayout";
-import { getPointsOnCircle } from "@/utils/3d";
 import exportStl from "@/utils/export";
-import { createWavyGeometry } from "@/utils/wave";
+import { getLowResTopGeometry, getHighResTopGeometry } from "@/utils/geometry";
 import { OrbitControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import * as React from "react";
 import * as THREE from "three";
-import { ADDITION, Brush, Evaluator, SUBTRACTION } from "three-bvh-csg";
-import { mergeVertices } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { Button } from "@/components/ui/button";
 import { getGlobalMaterial, wavyProperties, type WavyProperties } from "@/utils/properties";
 import { Label } from "@radix-ui/react-dropdown-menu";
@@ -26,6 +23,26 @@ export default function WavyTop() {
     }, [properties]);
 
     const meshRef = React.useRef<THREE.Mesh>(null!);
+    const [isGenerating, setIsGenerating] = React.useState(false);
+    
+    const handleDownload = async () => {
+        setIsGenerating(true);
+        try {
+            const highResGeometry = getHighResTopGeometry(
+                properties.radius, 
+                properties.waveDensity, 
+                properties.topHeight
+            );
+            const tempMesh = new THREE.Mesh(highResGeometry);
+            exportStl(tempMesh, 'wavy-top');
+            tempMesh.geometry.dispose();
+        } catch (error) {
+            console.error('Error generating high-res model:', error);
+        } finally {
+            setIsGenerating(false);
+        }
+    };
+    
     return (
         <AppLayout>
             <SidebarProvider>
@@ -56,7 +73,9 @@ export default function WavyTop() {
                                 min={0.1}
                                 onValueChange={(valueArray) => setProperties({ ...properties, waveDensity: valueArray[0] })}
                             />
-                            <Button onClick={() => exportStl(meshRef.current)}><Download/> Download STL</Button>
+                            <Button onClick={handleDownload} disabled={isGenerating}>
+                                <Download/> {isGenerating ? 'Generating...' : 'Download STL'}
+                            </Button>
                         </SidebarContent>
                     </Sidebar>
                     <div className="flex-1 relative">
@@ -72,7 +91,7 @@ export default function WavyTop() {
                             <group>
                                 <mesh
                                     ref={meshRef}
-                                    geometry={getTopGeometry(properties.radius, properties.waveDensity, properties.topHeight)}
+                                    geometry={getLowResTopGeometry(properties.radius, properties.waveDensity, properties.topHeight)}
                                     material={getGlobalMaterial(properties.color)} />
                             </group>
                             <OrbitControls />
@@ -84,60 +103,3 @@ export default function WavyTop() {
     )
 }
 
-function getTopGeometry(radius: number, waveDensity: number, height: number): THREE.BufferGeometry<THREE.NormalBufferAttributes> {
-    const bodyGeometry = createWavyGeometry(radius, 0.4, waveDensity, height, .1, 1024, false);
-    const bodyBrush = new Brush(bodyGeometry);
-    const evaluator = new Evaluator()
-
-    const floorGeometry = new THREE.CylinderGeometry(radius - 3, radius - 3, 2, 32);
-    const floorBrush = new Brush(floorGeometry);
-    floorBrush.position.setY(1);
-    floorBrush.updateMatrixWorld(true);
-    let result = evaluator.evaluate(bodyBrush, floorBrush, ADDITION);
-
-    const lockGeometry = new THREE.CylinderGeometry(radius - 5, radius - 5, 2, 32);
-    const lockBrush = new Brush(lockGeometry);
-    lockBrush.position.setY(-1);
-    lockBrush.updateMatrixWorld(true);
-    result = evaluator.evaluate(result, lockBrush, ADDITION);
-
-    const waterHoleTopGeometry = new THREE.CylinderGeometry(10, 10, 2);
-    waterHoleTopGeometry.translate(0, 1, 0);
-    const waterHoleTopBrush = new Brush(waterHoleTopGeometry);
-
-    const waterHoleBottomGeometry = new THREE.CylinderGeometry(8, 8, 2);
-    waterHoleBottomGeometry.translate(0, -1, 0);
-    const waterHoleBottomBrush = new Brush(waterHoleBottomGeometry);
-
-    let holeCount = 1;
-    switch (true) {
-        case radius >= 50 && radius < 100:
-            holeCount = 3;
-            break;
-        case radius >= 100:
-            holeCount = 5;
-            break;
-    }
-
-    const waterHoleResult = evaluator.evaluate(waterHoleTopBrush, waterHoleBottomBrush, ADDITION);
-    if (holeCount == 1) {
-        result = evaluator.evaluate(result, waterHoleResult, SUBTRACTION);
-    } else {
-        const points = getPointsOnCircle(radius, holeCount);
-        for (let index = 0; index < points.length; index++) {
-            const point = points[index];
-            const waterHoleBrush = waterHoleResult.clone();
-            waterHoleBrush.translateX(point.x);
-            waterHoleBrush.translateZ(point.z);
-            waterHoleBrush.updateMatrixWorld(true);
-            result = evaluator.evaluate(result, waterHoleBrush, SUBTRACTION);
-        }
-    }
-
-
-    result.geometry = mergeVertices(result.geometry, 1e-5);
-    result.geometry.deleteAttribute('normal');
-    result.geometry.computeVertexNormals();
-
-    return result.geometry;
-}
