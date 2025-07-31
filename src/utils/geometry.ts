@@ -47,10 +47,10 @@ export function getHighResBottomGeometry(
   height: number, 
   twistRatio: number
 ): THREE.BufferGeometry {
-  const bodyGeometry = createWavyGeometry(radius, 0.4, waveDensity, height, .1 * twistRatio, 1024, true);
+  const bodyGeometry = createWavyGeometry(radius, 0.4, waveDensity, height, .1 * twistRatio, 2048, true);
   const bodyBrush = new Brush(bodyGeometry);
 
-  const floorGeometry = new THREE.CylinderGeometry(radius - 3, radius - 3, 4, 32);
+  const floorGeometry = new THREE.CylinderGeometry(radius - 3, radius - 3, 4, 64);
   floorGeometry.translate(0, 2, 0);
   const floorBrush = new Brush(floorGeometry);
 
@@ -62,7 +62,7 @@ export function getHighResBottomGeometry(
   waterEntryGeometry.translate(radius, height - 7.5, 0);
   const waterEntryBrush = new Brush(waterEntryGeometry);
 
-  const cylinderHoleGeometry = new THREE.CylinderGeometry(radius - 3, radius - 3, height, 32);
+  const cylinderHoleGeometry = new THREE.CylinderGeometry(radius - 3, radius - 3, height, 64);
   cylinderHoleGeometry.translate(0, (height / 2) + 4, 0);
   const cylinderHoleBrush = new Brush(cylinderHoleGeometry);
 
@@ -144,17 +144,17 @@ export function getHighResTopGeometry(
   waveDensity: number, 
   height: number
 ): THREE.BufferGeometry {
-  const bodyGeometry = createWavyGeometry(radius, 0.4, waveDensity, height, .1, 1024, false);
+  const bodyGeometry = createWavyGeometry(radius, 0.4, waveDensity, height, .1, 2048, false);
   const bodyBrush = new Brush(bodyGeometry);
   const evaluator = new Evaluator();
 
-  const floorGeometry = new THREE.CylinderGeometry(radius - 3, radius - 3, 2, 32);
+  const floorGeometry = new THREE.CylinderGeometry(radius - 3, radius - 3, 2, 64);
   const floorBrush = new Brush(floorGeometry);
   floorBrush.position.setY(1);
   floorBrush.updateMatrixWorld(true);
   let result = evaluator.evaluate(bodyBrush, floorBrush, ADDITION);
 
-  const lockGeometry = new THREE.CylinderGeometry(radius - 5, radius - 5, 2, 32);
+  const lockGeometry = new THREE.CylinderGeometry(radius - 5, radius - 5, 2, 64);
   const lockBrush = new Brush(lockGeometry);
   lockBrush.position.setY(-1);
   lockBrush.updateMatrixWorld(true);
@@ -235,15 +235,15 @@ export function getLowResConnectorGeometry(height: number): THREE.BufferGeometry
 }
 
 export function getHighResConnectorGeometry(height: number): THREE.BufferGeometry {
-  const bodyGeometry = new THREE.CylinderGeometry(8, 8, height, 32);
+  const bodyGeometry = new THREE.CylinderGeometry(8, 8, height, 64);
   bodyGeometry.translate(0, 0, 0);
   const bodyBrush = new Brush(bodyGeometry);
 
-  const headGeometry = new THREE.CylinderGeometry(10, 10, 2, 32);
+  const headGeometry = new THREE.CylinderGeometry(10, 10, 2, 64);
   headGeometry.translate(0, height / 2, 0);
   const headBrush = new Brush(headGeometry);
 
-  const mainHoleGeometry = new THREE.CylinderGeometry(6, 6, height, 32);
+  const mainHoleGeometry = new THREE.CylinderGeometry(6, 6, height, 64);
   mainHoleGeometry.translate(0, 2, 0);
   const mainHoleBrush = new Brush(mainHoleGeometry);
 
@@ -253,7 +253,7 @@ export function getHighResConnectorGeometry(height: number): THREE.BufferGeometr
 
   const points = getPointsOnCircle(7, 4);
 
-  const miniBottomHoleGeometry = new THREE.CylinderGeometry(1.5, 1.5, 2, 32);
+  const miniBottomHoleGeometry = new THREE.CylinderGeometry(1.5, 1.5, 2, 64);
   for (let index = 0; index < points.length; index++) {
     const tempMiniBottomHoleGeometry = miniBottomHoleGeometry.clone();
     const miniBottomHoleBrush = new Brush(tempMiniBottomHoleGeometry);
