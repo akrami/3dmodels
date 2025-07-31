@@ -7,6 +7,7 @@ import { Canvas } from "@react-three/fiber";
 import * as React from "react";
 import * as THREE from "three";
 import { Button } from "@/components/ui/button";
+import { LoadingOverlay } from "@/components/ui/loading-overlay";
 import { getGlobalMaterial, wavyProperties, type WavyProperties } from "@/utils/properties";
 import { Label } from "@radix-ui/react-dropdown-menu";
 import { Slider } from "@/components/ui/slider";
@@ -27,11 +28,26 @@ export default function WavyConnector() {
     
     const handleDownload = async () => {
         setIsGenerating(true);
+        
+        // Force a delay to allow React to render the overlay
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
         try {
-            const highResGeometry = getHighResConnectorGeometry(properties.bottomHeight - 5);
-            const tempMesh = new THREE.Mesh(highResGeometry);
-            exportStl(tempMesh, 'wavy-connector');
-            tempMesh.geometry.dispose();
+            // Wrap the heavy computation in setTimeout to prevent blocking
+            await new Promise<void>((resolve) => {
+                setTimeout(() => {
+                    try {
+                        const highResGeometry = getHighResConnectorGeometry(properties.bottomHeight - 5);
+                        const tempMesh = new THREE.Mesh(highResGeometry);
+                        exportStl(tempMesh, 'wavy-connector');
+                        tempMesh.geometry.dispose();
+                        resolve();
+                    } catch (error) {
+                        console.error('Error generating high-res model:', error);
+                        resolve();
+                    }
+                }, 10);
+            });
         } catch (error) {
             console.error('Error generating high-res model:', error);
         } finally {
@@ -41,6 +57,7 @@ export default function WavyConnector() {
     
     return (
         <AppLayout>
+            <LoadingOverlay isVisible={isGenerating} message="Generating high-quality connector model..." />
             <SidebarProvider>
                 <div className="flex flex-1">
                     <Sidebar collapsible="none" className="border-r w-64">
