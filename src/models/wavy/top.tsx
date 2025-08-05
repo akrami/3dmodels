@@ -40,7 +40,8 @@ export default function WavyTop() {
                         const highResGeometry = getHighResTopGeometry(
                             properties.radius, 
                             properties.waveDensity, 
-                            properties.topHeight
+                            properties.topHeight,
+                            properties.waveTwist
                         );
                         const tempMesh = new THREE.Mesh(highResGeometry);
                         exportStl(tempMesh, 'wavy-top');
@@ -90,6 +91,21 @@ export default function WavyTop() {
                                 min={0.1}
                                 onValueChange={(valueArray) => setProperties({ ...properties, waveDensity: valueArray[0] })}
                             />
+                            <Label>Wave Twist ({properties.waveTwist})</Label>
+                            <Slider
+                                defaultValue={[properties.waveTwist]}
+                                max={1}
+                                step={0.1}
+                                min={0}
+                                onValueChange={(valueArray) => setProperties({ ...properties, waveTwist: valueArray[0] })}
+                            />
+                            <Label>Color</Label>
+                            <input
+                                type="color"
+                                value={properties.color}
+                                onChange={(e) => setProperties({ ...properties, color: e.target.value })}
+                                className="w-full h-10 rounded border"
+                            />
                             <Button onClick={handleDownload} disabled={isGenerating}>
                                 <Download/> {isGenerating ? 'Generating...' : 'Download STL'}
                             </Button>
@@ -108,7 +124,7 @@ export default function WavyTop() {
                             <group>
                                 <mesh
                                     ref={meshRef}
-                                    geometry={getLowResTopGeometry(properties.radius, properties.waveDensity, properties.topHeight)}
+                                    geometry={getLowResTopGeometry(properties.radius, properties.waveDensity, properties.topHeight, properties.waveTwist)}
                                     material={getGlobalMaterial(properties.color)} />
                             </group>
                             <OrbitControls />

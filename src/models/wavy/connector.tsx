@@ -70,6 +70,13 @@ export default function WavyConnector() {
                                 min={5}
                                 onValueChange={(valueArray) => setProperties({ ...properties, bottomHeight: valueArray[0] })}
                             />
+                            <Label>Color</Label>
+                            <input
+                                type="color"
+                                value={properties.color}
+                                onChange={(e) => setProperties({ ...properties, color: e.target.value })}
+                                className="w-full h-10 rounded border"
+                            />
                             <Button onClick={handleDownload} disabled={isGenerating}>
                                 <Download/> {isGenerating ? 'Generating...' : 'Download STL'}
                             </Button>

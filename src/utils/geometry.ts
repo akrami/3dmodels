@@ -8,9 +8,10 @@ export function getLowResBottomGeometry(
   radius: number, 
   waveDensity: number, 
   height: number, 
-  twistRatio: number
+  twistRatio: number,
+  waveTwist: number
 ): THREE.BufferGeometry {
-  const bodyGeometry = createLowResWavyGeometry(radius, 0.4, waveDensity, height, .1 * twistRatio, true);
+  const bodyGeometry = createLowResWavyGeometry(radius, 0.4, waveDensity, height, waveTwist * twistRatio, true);
   const bodyBrush = new Brush(bodyGeometry);
 
   const floorGeometry = new THREE.CylinderGeometry(radius - 3, radius - 3, 4, 28);
@@ -45,9 +46,10 @@ export function getHighResBottomGeometry(
   radius: number, 
   waveDensity: number, 
   height: number, 
-  twistRatio: number
+  twistRatio: number,
+  waveTwist: number
 ): THREE.BufferGeometry {
-  const bodyGeometry = createWavyGeometry(radius, 0.4, waveDensity, height, .1 * twistRatio, 2048, true);
+  const bodyGeometry = createWavyGeometry(radius, 0.4, waveDensity, height, waveTwist * twistRatio, 2048, true);
   const bodyBrush = new Brush(bodyGeometry);
 
   const floorGeometry = new THREE.CylinderGeometry(radius - 3, radius - 3, 4, 64);
@@ -81,9 +83,10 @@ export function getHighResBottomGeometry(
 export function getLowResTopGeometry(
   radius: number, 
   waveDensity: number, 
-  height: number
+  height: number,
+  waveTwist: number
 ): THREE.BufferGeometry {
-  const bodyGeometry = createLowResWavyGeometry(radius, 0.4, waveDensity, height, .1, false);
+  const bodyGeometry = createLowResWavyGeometry(radius, 0.4, waveDensity, height, waveTwist, false);
   const bodyBrush = new Brush(bodyGeometry);
   const evaluator = new Evaluator();
 
@@ -142,9 +145,10 @@ export function getLowResTopGeometry(
 export function getHighResTopGeometry(
   radius: number, 
   waveDensity: number, 
-  height: number
+  height: number,
+  waveTwist: number
 ): THREE.BufferGeometry {
-  const bodyGeometry = createWavyGeometry(radius, 0.4, waveDensity, height, .1, 2048, false);
+  const bodyGeometry = createWavyGeometry(radius, 0.4, waveDensity, height, waveTwist, 2048, false);
   const bodyBrush = new Brush(bodyGeometry);
   const evaluator = new Evaluator();
 
