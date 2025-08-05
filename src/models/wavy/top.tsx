@@ -1,7 +1,7 @@
 import { Sidebar, SidebarContent, SidebarHeader, SidebarProvider } from "@/components/ui/sidebar";
 import AppLayout from "@/layouts/appLayout";
 import exportStl from "@/utils/export";
-import { getLowResTopGeometry, getHighResTopGeometry } from "@/utils/geometry";
+import { getTopGeometry } from "@/utils/geometry";
 import { OrbitControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import * as React from "react";
@@ -37,11 +37,12 @@ export default function WavyTop() {
             await new Promise<void>((resolve) => {
                 setTimeout(() => {
                     try {
-                        const highResGeometry = getHighResTopGeometry(
+                        const highResGeometry = getTopGeometry(
                             properties.radius, 
                             properties.waveDensity, 
                             properties.topHeight,
-                            properties.waveTwist
+                            properties.waveTwist,
+                            true
                         );
                         const tempMesh = new THREE.Mesh(highResGeometry);
                         exportStl(tempMesh, 'wavy-top');
@@ -124,7 +125,7 @@ export default function WavyTop() {
                             <group>
                                 <mesh
                                     ref={meshRef}
-                                    geometry={getLowResTopGeometry(properties.radius, properties.waveDensity, properties.topHeight, properties.waveTwist)}
+                                    geometry={getTopGeometry(properties.radius, properties.waveDensity, properties.topHeight, properties.waveTwist, false)}
                                     material={getGlobalMaterial(properties.color)} />
                             </group>
                             <OrbitControls />

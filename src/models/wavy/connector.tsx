@@ -1,7 +1,7 @@
 import { Sidebar, SidebarContent, SidebarHeader, SidebarProvider } from "@/components/ui/sidebar";
 import AppLayout from "@/layouts/appLayout";
 import exportStl from "@/utils/export";
-import { getLowResConnectorGeometry, getHighResConnectorGeometry } from "@/utils/geometry";
+import { getConnectorGeometry } from "@/utils/geometry";
 import { OrbitControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import * as React from "react";
@@ -37,7 +37,7 @@ export default function WavyConnector() {
             await new Promise<void>((resolve) => {
                 setTimeout(() => {
                     try {
-                        const highResGeometry = getHighResConnectorGeometry(properties.bottomHeight - 5);
+                        const highResGeometry = getConnectorGeometry(properties.bottomHeight - 5, true);
                         const tempMesh = new THREE.Mesh(highResGeometry);
                         exportStl(tempMesh, 'wavy-connector');
                         tempMesh.geometry.dispose();
@@ -95,7 +95,7 @@ export default function WavyConnector() {
                             <group>
                                 <mesh
                                     ref={meshRef}
-                                    geometry={getLowResConnectorGeometry(properties.bottomHeight - 5)}
+                                    geometry={getConnectorGeometry(properties.bottomHeight - 5, false)}
                                     material={getGlobalMaterial(properties.color)}
                                     position={[0, (properties.bottomHeight - 5) / 2, 0]} />
                             </group>

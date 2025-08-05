@@ -1,7 +1,7 @@
 import { Sidebar, SidebarContent, SidebarHeader, SidebarProvider } from "@/components/ui/sidebar";
 import AppLayout from "@/layouts/appLayout";
 import exportStl from "@/utils/export";
-import { getLowResBottomGeometry, getHighResBottomGeometry } from "@/utils/geometry";
+import { getBottomGeometry } from "@/utils/geometry";
 import { OrbitControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import * as React from "react";
@@ -37,12 +37,13 @@ export default function WavyBottom() {
             await new Promise<void>((resolve) => {
                 setTimeout(() => {
                     try {
-                        const highResGeometry = getHighResBottomGeometry(
+                        const highResGeometry = getBottomGeometry(
                             properties.radius, 
                             properties.waveDensity, 
                             properties.bottomHeight, 
                             properties.bottomHeight / properties.topHeight,
-                            properties.waveTwist
+                            properties.waveTwist,
+                            true
                         );
                         const tempMesh = new THREE.Mesh(highResGeometry);
                         exportStl(tempMesh, 'wavy-bottom');
@@ -126,7 +127,7 @@ export default function WavyBottom() {
                             <group>
                                 <mesh
                                     ref={meshRef}
-                                    geometry={getLowResBottomGeometry(properties.radius, properties.waveDensity, properties.bottomHeight, properties.bottomHeight / properties.topHeight, properties.waveTwist)}
+                                    geometry={getBottomGeometry(properties.radius, properties.waveDensity, properties.bottomHeight, properties.bottomHeight / properties.topHeight, properties.waveTwist, false)}
                                     material={getGlobalMaterial(properties.color)} />
                             </group>
                             <OrbitControls />
