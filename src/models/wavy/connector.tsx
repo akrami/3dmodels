@@ -1,13 +1,13 @@
 import { Sidebar, SidebarContent, SidebarHeader, SidebarProvider } from "@/components/ui/sidebar";
 import AppLayout from "@/layouts/appLayout";
-import { getPointsOnCircle } from "@/utils/3d";
 import exportStl from "@/utils/export";
+import { getConnectorGeometry } from "@/utils/geometry";
 import { OrbitControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import * as React from "react";
 import * as THREE from "three";
-import { ADDITION, Brush, Evaluator, SUBTRACTION } from "three-bvh-csg";
 import { Button } from "@/components/ui/button";
+import { LoadingOverlay } from "@/components/ui/loading-overlay";
 import { getGlobalMaterial, wavyProperties, type WavyProperties } from "@/utils/properties";
 import { Label } from "@radix-ui/react-dropdown-menu";
 import { Slider } from "@/components/ui/slider";
@@ -17,15 +17,47 @@ export default function WavyConnector() {
 
     const [properties, setProperties] = React.useState<WavyProperties>(() => {
         const saved = localStorage.getItem('wavyProperties');
-        return saved ? JSON.parse(saved) : wavyProperties;
+        return saved ? { ...wavyProperties, ...JSON.parse(saved) } : wavyProperties;
     });
     React.useEffect(() => {
         localStorage.setItem('wavyProperties', JSON.stringify(properties));
     }, [properties]);
 
     const meshRef = React.useRef<THREE.Mesh>(null!);
+    const [isGenerating, setIsGenerating] = React.useState(false);
+    
+    const handleDownload = async () => {
+        setIsGenerating(true);
+        
+        // Force a delay to allow React to render the overlay
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        try {
+            // Wrap the heavy computation in setTimeout to prevent blocking
+            await new Promise<void>((resolve) => {
+                setTimeout(() => {
+                    try {
+                        const highResGeometry = getConnectorGeometry(properties.bottomHeight - 5, true);
+                        const tempMesh = new THREE.Mesh(highResGeometry);
+                        exportStl(tempMesh, 'wavy-connector');
+                        tempMesh.geometry.dispose();
+                        resolve();
+                    } catch (error) {
+                        console.error('Error generating high-res model:', error);
+                        resolve();
+                    }
+                }, 10);
+            });
+        } catch (error) {
+            console.error('Error generating high-res model:', error);
+        } finally {
+            setIsGenerating(false);
+        }
+    };
+    
     return (
         <AppLayout>
+            <LoadingOverlay isVisible={isGenerating} message="Generating high-quality connector model..." />
             <SidebarProvider>
                 <div className="flex flex-1">
                     <Sidebar collapsible="none" className="border-r w-64">
@@ -38,7 +70,16 @@ export default function WavyConnector() {
                                 min={5}
                                 onValueChange={(valueArray) => setProperties({ ...properties, bottomHeight: valueArray[0] })}
                             />
-                            <Button onClick={() => exportStl(meshRef.current)}><Download/> Download STL</Button>
+                            <Label>Color</Label>
+                            <input
+                                type="color"
+                                value={properties.color}
+                                onChange={(e) => setProperties({ ...properties, color: e.target.value })}
+                                className="w-full h-10 rounded border"
+                            />
+                            <Button onClick={handleDownload} disabled={isGenerating}>
+                                <Download/> {isGenerating ? 'Generating...' : 'Download STL'}
+                            </Button>
                         </SidebarContent>
                     </Sidebar>
                     <div className="flex-1 relative">
@@ -54,7 +95,7 @@ export default function WavyConnector() {
                             <group>
                                 <mesh
                                     ref={meshRef}
-                                    geometry={getConnectorGeometry(properties.bottomHeight - 5)}
+                                    geometry={getConnectorGeometry(properties.bottomHeight - 5, false)}
                                     material={getGlobalMaterial(properties.color)}
                                     position={[0, (properties.bottomHeight - 5) / 2, 0]} />
                             </group>
@@ -67,53 +108,3 @@ export default function WavyConnector() {
     )
 }
 
-function getConnectorGeometry(height: number): THREE.BufferGeometry<THREE.NormalBufferAttributes> {
-    const bodyGeometry = new THREE.CylinderGeometry(8, 8, height, 32);
-    bodyGeometry.translate(0, 0, 0);
-    const bodyBrush = new Brush(bodyGeometry);
-
-    const headGeometry = new THREE.CylinderGeometry(10, 10, 2, 32);
-    headGeometry.translate(0, height / 2, 0);
-    const headBrush = new Brush(headGeometry);
-
-    const mainHoleGeometry = new THREE.CylinderGeometry(6, 6, height, 32);
-    mainHoleGeometry.translate(0, 2, 0);
-    const mainHoleBrush = new Brush(mainHoleGeometry);
-
-    const evaluator = new Evaluator();
-    let result = evaluator.evaluate(bodyBrush, headBrush, ADDITION);
-    result = evaluator.evaluate(result, mainHoleBrush, SUBTRACTION);
-
-    const points = getPointsOnCircle(7, 4);
-
-    const miniBottomHoleGeometry = new THREE.CylinderGeometry(1.5, 1.5, 2, 32);
-    for (let index = 0; index < points.length; index++) {
-        const tempMiniBottomHoleGeometry = miniBottomHoleGeometry.clone();
-        const miniBottomHoleBrush = new Brush(tempMiniBottomHoleGeometry);
-        miniBottomHoleBrush.position.set(points[index].x, -height / 2 + 1, points[index].z);
-        miniBottomHoleBrush.updateMatrixWorld(true);
-        result = evaluator.evaluate(result, miniBottomHoleBrush, SUBTRACTION);
-    }
-
-    const sideHolesBrush = getMeshBrush(evaluator, height - 10);
-    result = evaluator.evaluate(result, sideHolesBrush, SUBTRACTION);
-
-    return result.geometry;
-}
-
-function getMeshBrush(evaluator: Evaluator, height: number): Brush {
-    const capsuleHoleGeometry = new THREE.BoxGeometry(2, 20, height);
-    let capsuleHoleBrush01 = new Brush(capsuleHoleGeometry);
-    capsuleHoleBrush01.rotateX(Math.PI / 2);
-    capsuleHoleBrush01.updateMatrixWorld(true);
-    const capsuleHoleBrush02 = capsuleHoleBrush01.clone();
-    capsuleHoleBrush02.rotateZ(Math.PI / 2);
-    capsuleHoleBrush02.updateMatrixWorld(true);
-    capsuleHoleBrush01 = evaluator.evaluate(capsuleHoleBrush01, capsuleHoleBrush02, ADDITION);
-
-    const capsuleHoleBrush03 = capsuleHoleBrush01.clone();
-    capsuleHoleBrush03.rotateY(Math.PI / 4);
-    capsuleHoleBrush03.updateMatrixWorld(true);
-    capsuleHoleBrush01 = evaluator.evaluate(capsuleHoleBrush01, capsuleHoleBrush03, ADDITION);
-    return capsuleHoleBrush01;
-}

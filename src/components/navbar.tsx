@@ -9,6 +9,8 @@ import {
   DropdownMenuSubContent,
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
+import { Moon, Sun } from "lucide-react"
+import { useTheme } from "@/hooks/use-theme"
 
 interface MenuItem {
   title: string;
@@ -46,6 +48,7 @@ function RecursiveMenu({ items }: { items: MenuItem[] }): React.ReactElement {
 }
 
 export function Navbar() {
+  const { isDark, toggleTheme } = useTheme()
   const menu: MenuItem[] = [
     {
       title: "Planter",
@@ -80,6 +83,16 @@ export function Navbar() {
             </DropdownMenu>
           ))}
         </nav>
+        <div className="ml-auto">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={toggleTheme}
+            className="px-2"
+          >
+            {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          </Button>
+        </div>
       </div>
     </header>
   )

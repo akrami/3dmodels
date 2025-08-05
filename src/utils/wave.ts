@@ -7,7 +7,7 @@ export function createWavyGeometry(
   density: number,
   depth: number,
   twistWaves = 1,
-  segments = 1024,
+  segments = 2048,
   reverseTwist = false,
   topCutDepth = 0,
 ): THREE.BufferGeometry {
@@ -32,7 +32,7 @@ export function createWavyGeometry(
     const outerShape = makeOuterShape();
     const holeBottom = new THREE.Path().absarc(0, 0, rInner, 0, Math.PI * 2, true);
     outerShape.holes.push(holeBottom);
-    const geometry = extrude(outerShape, depth, 32);
+    const geometry = extrude(outerShape, depth, 64);
 
     twistGeometry(geometry, depth, twistWaves, reverseTwist);
 
@@ -66,9 +66,49 @@ export function twistGeometry(
 export function extrude(shape: THREE.Shape, depth: number, steps = 1): THREE.ExtrudeGeometry {
   return new THREE.ExtrudeGeometry(shape, {
     bevelEnabled: false,
-    curveSegments: 32,
+    curveSegments: 64,
     depth,
     steps,
   });
+}
+
+export function createLowResWavyGeometry(
+  radius: number,
+  amplitude: number,
+  density: number,
+  depth: number,
+  twistWaves = 1,
+  reverseTwist = false,
+): THREE.BufferGeometry {
+  const lowResSegments = 384;
+  
+  const k = Math.round(radius * density);
+  const rOuter = (t: number) => radius + amplitude - Math.abs(Math.sin(k * t));
+  const rInner = radius - (amplitude + 4);
+
+  const makeOuterShape = () => {
+    const shape = new THREE.Shape();
+    for (let i = 0; i <= lowResSegments; i++) {
+      const t = (i / lowResSegments) * Math.PI * 2;
+      const r = rOuter(t);
+      const x = r * Math.cos(t);
+      const y = r * Math.sin(t);
+      i === 0 ? shape.moveTo(x, y) : shape.lineTo(x, y);
+    }
+    shape.closePath();
+    return shape;
+  };
+
+  const outerShape = makeOuterShape();
+  const holeBottom = new THREE.Path().absarc(0, 0, rInner, 0, Math.PI * 2, true);
+  outerShape.holes.push(holeBottom);
+  const geometry = extrude(outerShape, depth, 20);
+
+  twistGeometry(geometry, depth, twistWaves, reverseTwist);
+
+  const merged = mergeVertices(geometry);
+  merged.computeVertexNormals();
+  merged.rotateX(-Math.PI / 2);
+  return merged;
 }
 

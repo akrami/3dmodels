@@ -6,6 +6,7 @@ export interface WavyProperties {
   topHeight: number;
   bottomHeight: number;
   waveDensity: number;
+  waveTwist: number;
 }
 
 export const wavyProperties: WavyProperties = {
@@ -14,6 +15,7 @@ export const wavyProperties: WavyProperties = {
   topHeight: 100,
   bottomHeight: 50,
   waveDensity: 0.3,
+  waveTwist: 0.1,
 };
 
 export const getGlobalMaterial = (color: string) => new THREE.MeshMatcapMaterial({
