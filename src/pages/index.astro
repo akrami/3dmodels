@@ -1,9 +1,10 @@
 ---
 import PageLayout from "@/layouts/pageLayout.astro";
 import AppLayout from "@/layouts/appLayout";
+import HomeCards from "@/components/home-cards";
 ---
-<PageLayout title="Tools">
+<PageLayout title="3D Models">
   <AppLayout client:idle>
-    <p>Home page</p>
+    <HomeCards client:load />
   </AppLayout>
 </PageLayout>

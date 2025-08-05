@@ -17,7 +17,7 @@ export default function WavyConnector() {
 
     const [properties, setProperties] = React.useState<WavyProperties>(() => {
         const saved = localStorage.getItem('wavyProperties');
-        return saved ? JSON.parse(saved) : wavyProperties;
+        return saved ? { ...wavyProperties, ...JSON.parse(saved) } : wavyProperties;
     });
     React.useEffect(() => {
         localStorage.setItem('wavyProperties', JSON.stringify(properties));
