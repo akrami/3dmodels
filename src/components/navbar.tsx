@@ -9,7 +9,7 @@ import {
   DropdownMenuSubContent,
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
-import { Moon, Sun } from "lucide-react"
+import { Moon, Sun, Cone } from "lucide-react"
 import { useTheme } from "@/hooks/use-theme"
 
 interface MenuItem {
@@ -51,7 +51,7 @@ export function Navbar() {
   const { isDark, toggleTheme } = useTheme()
   const menu: MenuItem[] = [
     {
-      title: "Planter",
+      title: "Planters",
       items: [
         {
           title: "Wavy",
@@ -67,8 +67,11 @@ export function Navbar() {
 
   return (
     <header className="border-b bg-background">
-      <div className="mx-auto flex h-12 max-w-screen-xl items-center gap-4 px-4">
-        <a href="/" className="font-bold">3D Models</a>
+      <div className="flex h-12 w-full items-center gap-4 px-4">
+        <a href="/" className="font-bold flex items-center gap-2">
+          <Cone className="h-4 w-4" />
+          3D Models
+        </a>
         <nav className="flex gap-2">
           {menu.map(item => (
             <DropdownMenu key={item.title}>
