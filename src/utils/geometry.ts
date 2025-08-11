@@ -72,7 +72,8 @@ export function getTopGeometry(
   floorBrush.updateMatrixWorld(true);
   let result = evaluator.evaluate(bodyBrush, floorBrush, ADDITION);
 
-  const lockGeometry = new THREE.CylinderGeometry(radius - 5, radius - 5, 2, segmentCount);
+  const lockRadius = radius - 3.15;
+  const lockGeometry = new THREE.CylinderGeometry(lockRadius, lockRadius, 2, segmentCount);
   const lockBrush = new Brush(lockGeometry);
   lockBrush.position.setY(-1);
   lockBrush.updateMatrixWorld(true);
