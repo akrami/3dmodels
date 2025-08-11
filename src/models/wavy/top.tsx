@@ -19,6 +19,16 @@ export default function WavyTop() {
         const saved = localStorage.getItem('wavyProperties');
         return saved ? { ...wavyProperties, ...JSON.parse(saved) } : wavyProperties;
     });
+
+    const getContrastColor = (hexColor: string) => {
+        const hex = hexColor.replace('#', '');
+        const r = parseInt(hex.substr(0, 2), 16);
+        const g = parseInt(hex.substr(2, 2), 16);
+        const b = parseInt(hex.substr(4, 2), 16);
+        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+        return brightness > 128 ? '#000000' : '#ffffff';
+    };
+
     React.useEffect(() => {
         localStorage.setItem('wavyProperties', JSON.stringify(properties));
     }, [properties]);
@@ -68,45 +78,73 @@ export default function WavyTop() {
                 <div className="flex flex-1">
                     <Sidebar collapsible="none" className="border-r w-64">
                         <SidebarContent className="p-4">
-                            <Label>Radius ({properties.radius})</Label>
-                            <Slider
-                                defaultValue={[properties.radius]}
-                                max={200}
-                                step={5}
-                                min={5}
-                                onValueChange={(valueArray) => setProperties({ ...properties, radius: valueArray[0] })}
-                            />
-                            <Label>Height ({properties.topHeight})</Label>
-                            <Slider
-                                defaultValue={[properties.topHeight]}
-                                max={200}
-                                step={5}
-                                min={5}
-                                onValueChange={(valueArray) => setProperties({ ...properties, topHeight: valueArray[0] })}
-                            />
-                            <Label>Wave Density ({properties.waveDensity})</Label>
-                            <Slider
-                                defaultValue={[properties.waveDensity]}
-                                max={1}
-                                step={0.1}
-                                min={0.1}
-                                onValueChange={(valueArray) => setProperties({ ...properties, waveDensity: valueArray[0] })}
-                            />
-                            <Label>Wave Twist ({properties.waveTwist})</Label>
-                            <Slider
-                                defaultValue={[properties.waveTwist]}
-                                max={1}
-                                step={0.1}
-                                min={0}
-                                onValueChange={(valueArray) => setProperties({ ...properties, waveTwist: valueArray[0] })}
-                            />
-                            <Label>Color</Label>
-                            <input
-                                type="color"
-                                value={properties.color}
-                                onChange={(e) => setProperties({ ...properties, color: e.target.value })}
-                                className="w-full h-10 rounded border"
-                            />
+                            <div className="space-y-2">
+                                <Label className="text-sm">Radius ({properties.radius})</Label>
+                                <Slider
+                                    defaultValue={[properties.radius]}
+                                    max={200}
+                                    step={5}
+                                    min={5}
+                                    onValueChange={(valueArray) => setProperties({ ...properties, radius: valueArray[0] })}
+                                    className="w-full"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label className="text-sm">Height ({properties.topHeight})</Label>
+                                <Slider
+                                    defaultValue={[properties.topHeight]}
+                                    max={200}
+                                    step={5}
+                                    min={5}
+                                    onValueChange={(valueArray) => setProperties({ ...properties, topHeight: valueArray[0] })}
+                                    className="w-full"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label className="text-sm">Wave Density ({properties.waveDensity})</Label>
+                                <Slider
+                                    defaultValue={[properties.waveDensity]}
+                                    max={1}
+                                    step={0.1}
+                                    min={0.1}
+                                    onValueChange={(valueArray) => setProperties({ ...properties, waveDensity: valueArray[0] })}
+                                    className="w-full"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label className="text-sm">Wave Twist ({properties.waveTwist})</Label>
+                                <Slider
+                                    defaultValue={[properties.waveTwist]}
+                                    max={1}
+                                    step={0.1}
+                                    min={0}
+                                    onValueChange={(valueArray) => setProperties({ ...properties, waveTwist: valueArray[0] })}
+                                    className="w-full"
+                                />
+                            </div>
+                            <div className="space-y-2 mt-4">
+                                <div className="relative">
+                                    <Button
+                                        variant="outline"
+                                        className="w-full h-10 border-2"
+                                        style={{ 
+                                            backgroundColor: properties.color,
+                                            color: getContrastColor(properties.color),
+                                            borderColor: getContrastColor(properties.color)
+                                        }}
+                                        onClick={() => document.getElementById('color-input-top')?.click()}
+                                    >
+                                        Color
+                                    </Button>
+                                    <input
+                                        id="color-input-top"
+                                        type="color"
+                                        value={properties.color}
+                                        onChange={(e) => setProperties({ ...properties, color: e.target.value })}
+                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                    />
+                                </div>
+                            </div>
                             <Button onClick={handleDownload} disabled={isGenerating}>
                                 <Download/> {isGenerating ? 'Generating...' : 'Download STL'}
                             </Button>

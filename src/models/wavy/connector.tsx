@@ -19,6 +19,15 @@ export default function WavyConnector() {
         const saved = localStorage.getItem('wavyProperties');
         return saved ? { ...wavyProperties, ...JSON.parse(saved) } : wavyProperties;
     });
+
+    const getContrastColor = (hexColor: string) => {
+        const hex = hexColor.replace('#', '');
+        const r = parseInt(hex.substr(0, 2), 16);
+        const g = parseInt(hex.substr(2, 2), 16);
+        const b = parseInt(hex.substr(4, 2), 16);
+        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+        return brightness > 128 ? '#000000' : '#ffffff';
+    };
     React.useEffect(() => {
         localStorage.setItem('wavyProperties', JSON.stringify(properties));
     }, [properties]);
@@ -62,21 +71,40 @@ export default function WavyConnector() {
                 <div className="flex flex-1">
                     <Sidebar collapsible="none" className="border-r w-64">
                         <SidebarContent className="p-4">
-                            <Label>Height ({properties.bottomHeight - 5})</Label>
-                            <Slider
-                                defaultValue={[properties.bottomHeight]}
-                                max={200}
-                                step={5}
-                                min={5}
-                                onValueChange={(valueArray) => setProperties({ ...properties, bottomHeight: valueArray[0] })}
-                            />
-                            <Label>Color</Label>
-                            <input
-                                type="color"
-                                value={properties.color}
-                                onChange={(e) => setProperties({ ...properties, color: e.target.value })}
-                                className="w-full h-10 rounded border"
-                            />
+                            <div className="space-y-2">
+                                <Label className="text-sm">Height ({properties.bottomHeight - 5})</Label>
+                                <Slider
+                                    defaultValue={[properties.bottomHeight]}
+                                    max={200}
+                                    step={5}
+                                    min={5}
+                                    onValueChange={(valueArray) => setProperties({ ...properties, bottomHeight: valueArray[0] })}
+                                    className="w-full"
+                                />
+                            </div>
+                            <div className="space-y-2 mt-4">
+                                <div className="relative">
+                                    <Button
+                                        variant="outline"
+                                        className="w-full h-10 border-2"
+                                        style={{ 
+                                            backgroundColor: properties.color,
+                                            color: getContrastColor(properties.color),
+                                            borderColor: getContrastColor(properties.color)
+                                        }}
+                                        onClick={() => document.getElementById('color-input-connector')?.click()}
+                                    >
+                                        Color
+                                    </Button>
+                                    <input
+                                        id="color-input-connector"
+                                        type="color"
+                                        value={properties.color}
+                                        onChange={(e) => setProperties({ ...properties, color: e.target.value })}
+                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                    />
+                                </div>
+                            </div>
                             <Button onClick={handleDownload} disabled={isGenerating}>
                                 <Download/> {isGenerating ? 'Generating...' : 'Download STL'}
                             </Button>
