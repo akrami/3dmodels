@@ -8,7 +8,7 @@ import {
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu"
 import { Button } from "@/components/ui/button"
-import { Moon, Sun, Cone } from "lucide-react"
+import { Moon, Sun, Cone, Sprout } from "lucide-react"
 import { useTheme } from "@/hooks/use-theme"
 
 interface MenuItem {
@@ -57,7 +57,7 @@ export function Navbar() {
                               className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
                               href="/"
                             >
-                              <Cone className="h-6 w-6" />
+                              <Sprout className="h-6 w-6" />
                               <div className="mb-2 mt-4 text-lg font-medium">
                                 {item.title}
                               </div>

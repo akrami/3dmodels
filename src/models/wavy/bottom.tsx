@@ -116,14 +116,14 @@ export default function WavyBottom() {
                     </Sidebar>
                     <div className="flex-1 relative">
                         <Canvas
-                            camera={{ position: [200, 200, 200], fov: 60, up: [0, 1, 0] }}
+                            orthographic
+                            camera={{ position: [200, 200, 200], zoom: 2, up: [0, 1, 0] }}
                             className="bg-gradient-to-br from-gray-50 to-gray-200"
                             shadows
                         >
                             <ambientLight intensity={0.6} />
                             <directionalLight position={[50, 100, 70]} intensity={1} castShadow />
                             <gridHelper args={[500, 50, "#888888", "#444444"]} />
-                            <axesHelper args={[500]} />
                             <group>
                                 <mesh
                                     ref={meshRef}
