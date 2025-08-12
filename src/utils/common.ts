@@ -65,7 +65,7 @@ export const useModelDownload = (
 export const canvasConfig = {
     orthographic: true,
     camera: { position: [200, 200, 200] as [number, number, number], zoom: 2, up: [0, 1, 0] as [number, number, number] },
-    className: "bg-gradient-to-br from-gray-50 to-gray-200",
+    className: "bg-gradient-to-br from-gray-50 to-gray-200 w-full h-full",
     shadows: true,
 };
 
