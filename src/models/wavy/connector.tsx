@@ -1,134 +1,50 @@
-import { Sidebar, SidebarContent, SidebarHeader, SidebarProvider } from "@/components/ui/sidebar";
+import { Sidebar, SidebarContent, SidebarProvider } from "@/components/ui/sidebar";
 import AppLayout from "@/layouts/appLayout";
-import exportStl from "@/utils/export";
 import { getConnectorGeometry } from "@/utils/geometry";
-import { OrbitControls } from "@react-three/drei";
-import { Canvas } from "@react-three/fiber";
 import * as React from "react";
-import * as THREE from "three";
-import { Button } from "@/components/ui/button";
 import { LoadingOverlay } from "@/components/ui/loading-overlay";
-import { getGlobalMaterial, wavyProperties, type WavyProperties } from "@/utils/properties";
-import { Label } from "@radix-ui/react-dropdown-menu";
-import { Slider } from "@/components/ui/slider";
-import { Download } from "lucide-react";
+import { useModelProperties, useModelDownload } from "@/utils/common";
+import WavyControls from "@/components/wavy-controls";
+import Scene from "@/components/scene";
 
 export default function WavyConnector() {
-
-    const [properties, setProperties] = React.useState<WavyProperties>(() => {
-        const saved = localStorage.getItem('wavyProperties');
-        return saved ? { ...wavyProperties, ...JSON.parse(saved) } : wavyProperties;
-    });
-
-    const getContrastColor = (hexColor: string) => {
-        const hex = hexColor.replace('#', '');
-        const r = parseInt(hex.substr(0, 2), 16);
-        const g = parseInt(hex.substr(2, 2), 16);
-        const b = parseInt(hex.substr(4, 2), 16);
-        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
-        return brightness > 128 ? '#000000' : '#ffffff';
-    };
-    React.useEffect(() => {
-        localStorage.setItem('wavyProperties', JSON.stringify(properties));
-    }, [properties]);
-
-    const meshRef = React.useRef<THREE.Mesh>(null!);
-    const [isGenerating, setIsGenerating] = React.useState(false);
+    const [properties, setProperties] = useModelProperties();
     
-    const handleDownload = async () => {
-        setIsGenerating(true);
-        
-        // Force a delay to allow React to render the overlay
-        await new Promise(resolve => setTimeout(resolve, 100));
-        
-        try {
-            // Wrap the heavy computation in setTimeout to prevent blocking
-            await new Promise<void>((resolve) => {
-                setTimeout(() => {
-                    try {
-                        const highResGeometry = getConnectorGeometry(properties.bottomHeight - 5, true);
-                        const tempMesh = new THREE.Mesh(highResGeometry);
-                        exportStl(tempMesh, 'wavy-connector');
-                        tempMesh.geometry.dispose();
-                        resolve();
-                    } catch (error) {
-                        console.error('Error generating high-res model:', error);
-                        resolve();
-                    }
-                }, 10);
-            });
-        } catch (error) {
-            console.error('Error generating high-res model:', error);
-        } finally {
-            setIsGenerating(false);
-        }
-    };
+    const { isGenerating, handleDownload, loadingMessage } = useModelDownload(
+        () => getConnectorGeometry(properties.bottomHeight - 5, true),
+        'wavy-connector',
+        'Generating high-quality connector model...'
+    );
     
     return (
         <AppLayout>
-            <LoadingOverlay isVisible={isGenerating} message="Generating high-quality connector model..." />
+            <LoadingOverlay isVisible={isGenerating} message={loadingMessage} />
             <SidebarProvider>
                 <div className="flex flex-1">
                     <Sidebar collapsible="none" className="border-r w-64">
                         <SidebarContent className="p-4">
-                            <div className="space-y-2">
-                                <Label className="text-sm">Height ({properties.bottomHeight - 5})</Label>
-                                <Slider
-                                    defaultValue={[properties.bottomHeight]}
-                                    max={200}
-                                    step={5}
-                                    min={5}
-                                    onValueChange={(valueArray) => setProperties({ ...properties, bottomHeight: valueArray[0] })}
-                                    className="w-full"
-                                />
-                            </div>
-                            <div className="space-y-2 mt-4">
-                                <div className="relative">
-                                    <Button
-                                        variant="outline"
-                                        className="w-full h-10 border-2"
-                                        style={{ 
-                                            backgroundColor: properties.color,
-                                            color: getContrastColor(properties.color),
-                                            borderColor: getContrastColor(properties.color)
-                                        }}
-                                        onClick={() => document.getElementById('color-input-connector')?.click()}
-                                    >
-                                        Color
-                                    </Button>
-                                    <input
-                                        id="color-input-connector"
-                                        type="color"
-                                        value={properties.color}
-                                        onChange={(e) => setProperties({ ...properties, color: e.target.value })}
-                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                                    />
-                                </div>
-                            </div>
-                            <Button onClick={handleDownload} disabled={isGenerating}>
-                                <Download/> {isGenerating ? 'Generating...' : 'Download STL'}
-                            </Button>
+                            <WavyControls
+                                properties={properties}
+                                setProperties={setProperties}
+                                onDownload={handleDownload}
+                                isGenerating={isGenerating}
+                                colorInputId="color-input-connector"
+                                controls={{
+                                    showRadius: false,
+                                    showWaveDensity: false,
+                                    showWaveTwist: false,
+                                    customHeightLabel: "Height",
+                                    customHeightValue: properties.bottomHeight - 5
+                                }}
+                            />
                         </SidebarContent>
                     </Sidebar>
                     <div className="flex-1 relative">
-                        <Canvas
-                            orthographic
-                            camera={{ position: [200, 200, 200], zoom: 2, up: [0, 1, 0] }}
-                            className="bg-gradient-to-br from-gray-50 to-gray-200"
-                            shadows
-                        >
-                            <ambientLight intensity={0.6} />
-                            <directionalLight position={[50, 100, 70]} intensity={1} castShadow />
-                            <gridHelper args={[500, 50, "#888888", "#444444"]} />
-                            <group>
-                                <mesh
-                                    ref={meshRef}
-                                    geometry={getConnectorGeometry(properties.bottomHeight - 5, false)}
-                                    material={getGlobalMaterial(properties.color)}
-                                    position={[0, (properties.bottomHeight - 5) / 2, 0]} />
-                            </group>
-                            <OrbitControls />
-                        </Canvas>
+                        <Scene
+                            geometry={getConnectorGeometry(properties.bottomHeight - 5, false)}
+                            color={properties.color}
+                            position={[0, (properties.bottomHeight - 5) / 2, 0]}
+                        />
                     </div>
                 </div>
             </SidebarProvider>
