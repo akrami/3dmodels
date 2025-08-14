@@ -1,7 +1,7 @@
-import * as React from "react";
-import * as THREE from "three";
-import exportStl from "@/utils/export";
-import { wavyProperties, type WavyProperties } from "@/utils/properties";
+import * as React from 'react';
+import * as THREE from 'three';
+import exportStl from '@/utils/export';
+import { wavyProperties, type WavyProperties } from '@/utils/properties';
 
 export const getContrastColor = (hexColor: string) => {
     const hex = hexColor.replace('#', '');
@@ -47,12 +47,14 @@ export const useModelDownload = (
                         tempMesh.geometry.dispose();
                         resolve();
                     } catch (error) {
+                        // eslint-disable-next-line no-console
                         console.error('Error generating high-res model:', error);
                         resolve();
                     }
                 }, 10);
             });
         } catch (error) {
+            // eslint-disable-next-line no-console
             console.error('Error generating high-res model:', error);
         } finally {
             setIsGenerating(false);
@@ -65,7 +67,7 @@ export const useModelDownload = (
 export const canvasConfig = {
     orthographic: true,
     camera: { position: [200, 200, 200] as [number, number, number], zoom: 2, up: [0, 1, 0] as [number, number, number] },
-    className: "bg-gradient-to-br from-gray-50 to-gray-200 w-full h-full",
+    className: 'bg-gradient-to-br from-gray-50 to-gray-200 w-full h-full',
     shadows: true,
 };
 
@@ -75,5 +77,5 @@ export const defaultLights = [
 ];
 
 export const defaultGridHelper = {
-    args: [500, 50, "#888888", "#444444"] as [number, number, string, string],
+    args: [500, 50, '#888888', '#444444'] as [number, number, string, string],
 };

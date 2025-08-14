@@ -1,11 +1,11 @@
-import * as React from "react";
-import * as THREE from "three";
-import { Canvas } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
-import { getGlobalMaterial } from "@/utils/properties";
-import { canvasConfig, defaultLights, defaultGridHelper } from "@/utils/common";
-import { Badge } from "@/components/ui/badge";
-import { AlertTriangle } from "lucide-react";
+import * as React from 'react';
+import * as THREE from 'three';
+import { Canvas } from '@react-three/fiber';
+import { OrbitControls } from '@react-three/drei';
+import { getGlobalMaterial } from '@/utils/properties';
+import { canvasConfig, defaultLights, defaultGridHelper } from '@/utils/common';
+import { Badge } from '@/components/ui/badge';
+import { AlertTriangle } from 'lucide-react';
 
 interface SceneProps {
     geometry: THREE.BufferGeometry;

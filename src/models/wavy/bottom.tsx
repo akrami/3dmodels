@@ -1,13 +1,13 @@
-import { Sidebar, SidebarContent, SidebarProvider } from "@/components/ui/sidebar";
-import AppLayout from "@/layouts/appLayout";
+import { Sidebar, SidebarContent, SidebarProvider } from '@/components/ui/sidebar';
+import AppLayout from '@/layouts/appLayout';
 import * as THREE from 'three';
-import { LoadingOverlay } from "@/components/ui/loading-overlay";
-import { useModelProperties, useModelDownload } from "@/utils/common";
-import WavyControls from "@/components/wavy-controls";
-import Scene from "@/components/scene";
-import { mergeVertices } from "three-stdlib";
-import { ADDITION, Brush, Evaluator, SUBTRACTION } from "three-bvh-csg";
-import { createLowResWavyGeometry, createWavyGeometry } from "@/utils/wave";
+import { LoadingOverlay } from '@/components/ui/loading-overlay';
+import { useModelProperties, useModelDownload } from '@/utils/common';
+import WavyControls from '@/components/wavy-controls';
+import Scene from '@/components/scene';
+import { mergeVertices } from 'three-stdlib';
+import { ADDITION, Brush, Evaluator, SUBTRACTION } from 'three-bvh-csg';
+import { createLowResWavyGeometry, createWavyGeometry } from '@/utils/wave';
 
 export function getBottomGeometry(
     radius: number,
@@ -101,6 +101,6 @@ export default function WavyBottom() {
                 </div>
             </SidebarProvider>
         </AppLayout>
-    )
+    );
 }
 

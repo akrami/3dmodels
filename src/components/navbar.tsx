@@ -1,4 +1,4 @@
-import * as React from "react"
+import * as React from 'react';
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -6,10 +6,10 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu"
-import { Button } from "@/components/ui/button"
-import { Moon, Sun, Cone, Sprout } from "lucide-react"
-import { useTheme } from "@/hooks/use-theme"
+} from '@/components/ui/navigation-menu';
+import { Button } from '@/components/ui/button';
+import { Moon, Sun, Cone, Sprout } from 'lucide-react';
+import { useTheme } from '@/hooks/use-theme';
 
 interface MenuItem {
   title: string;
@@ -18,22 +18,22 @@ interface MenuItem {
 }
 
 export function Navbar() {
-  const { isDark, toggleTheme } = useTheme()
+  const { isDark, toggleTheme } = useTheme();
   const menu: MenuItem[] = [
     {
-      title: "Planters",
+      title: 'Planters',
       items: [
         {
-          title: "Wavy",
+          title: 'Wavy',
           items: [
-            { title: "Top", url: "/planter/wavy/top" },
-            { title: "Bottom", url: "/planter/wavy/bottom" },
-            { title: "Connector", url: "/planter/wavy/connector" },
+            { title: 'Top', url: '/planter/wavy/top' },
+            { title: 'Bottom', url: '/planter/wavy/bottom' },
+            { title: 'Connector', url: '/planter/wavy/connector' },
           ],
         },
       ],
     },
-  ]
+  ];
 
   return (
     <header className="border-b bg-background">
@@ -127,5 +127,5 @@ export function Navbar() {
         </div>
       </div>
     </header>
-  )
+  );
 }

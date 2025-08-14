@@ -9,7 +9,7 @@ export function createWavyGeometry(
   twistWaves = 1,
   segments = 2048,
   reverseTwist = false,
-  topCutDepth = 0,
+  _topCutDepth = 0,
 ): THREE.BufferGeometry {
 
     const k = Math.round(radius * density);

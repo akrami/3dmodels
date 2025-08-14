@@ -1,11 +1,11 @@
-import * as React from "react";
+import * as React from 'react';
 
 interface LoadingOverlayProps {
   isVisible: boolean;
   message?: string;
 }
 
-export function LoadingOverlay({ isVisible, message = "Generating high-quality model..." }: LoadingOverlayProps) {
+export function LoadingOverlay({ isVisible, message = 'Generating high-quality model...' }: LoadingOverlayProps) {
   if (!isVisible) return null;
 
   return (
