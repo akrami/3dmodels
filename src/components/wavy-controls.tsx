@@ -1,10 +1,10 @@
-import * as React from "react";
-import { Button } from "@/components/ui/button";
-import { Slider } from "@/components/ui/slider";
-import { Label } from "@radix-ui/react-dropdown-menu";
-import { Download } from "lucide-react";
-import { getContrastColor } from "@/utils/common";
-import { type WavyProperties } from "@/utils/properties";
+import * as React from 'react';
+import { Button } from '@/components/ui/button';
+import { Slider } from '@/components/ui/slider';
+import { Label } from '@radix-ui/react-dropdown-menu';
+import { Download } from 'lucide-react';
+import { getContrastColor } from '@/utils/common';
+import { type WavyProperties } from '@/utils/properties';
 
 interface WavyControlsProps {
     properties: WavyProperties;

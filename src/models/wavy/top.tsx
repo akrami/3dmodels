@@ -1,14 +1,14 @@
-import { Sidebar, SidebarContent, SidebarProvider } from "@/components/ui/sidebar";
-import AppLayout from "@/layouts/appLayout";
+import { Sidebar, SidebarContent, SidebarProvider } from '@/components/ui/sidebar';
+import AppLayout from '@/layouts/appLayout';
 import * as THREE from 'three';
-import { LoadingOverlay } from "@/components/ui/loading-overlay";
-import { useModelProperties, useModelDownload } from "@/utils/common";
-import WavyControls from "@/components/wavy-controls";
-import Scene from "@/components/scene";
-import { createLowResWavyGeometry, createWavyGeometry } from "@/utils/wave";
-import { ADDITION, Brush, Evaluator, SUBTRACTION } from "three-bvh-csg";
-import { getPointsOnCircle } from "@/utils/3d";
-import { mergeVertices } from "three-stdlib";
+import { LoadingOverlay } from '@/components/ui/loading-overlay';
+import { useModelProperties, useModelDownload } from '@/utils/common';
+import WavyControls from '@/components/wavy-controls';
+import Scene from '@/components/scene';
+import { createLowResWavyGeometry, createWavyGeometry } from '@/utils/wave';
+import { ADDITION, Brush, Evaluator, SUBTRACTION } from 'three-bvh-csg';
+import { getPointsOnCircle } from '@/utils/3d';
+import { mergeVertices } from 'three-stdlib';
 
 export function getTopGeometry(
     radius: number,
@@ -119,6 +119,6 @@ export default function WavyTop() {
                 </div>
             </SidebarProvider>
         </AppLayout>
-    )
+    );
 }
 

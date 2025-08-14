@@ -1,4 +1,4 @@
-import * as THREE from "three";
+import * as THREE from 'three';
 
 export interface WavyProperties {
   color: string;
@@ -10,7 +10,7 @@ export interface WavyProperties {
 }
 
 export const wavyProperties: WavyProperties = {
-  color: "#A7C7E7",
+  color: '#A7C7E7',
   radius: 75,
   topHeight: 100,
   bottomHeight: 50,

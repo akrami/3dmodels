@@ -1,12 +1,12 @@
-import { Sidebar, SidebarContent, SidebarProvider } from "@/components/ui/sidebar";
-import AppLayout from "@/layouts/appLayout";
+import { Sidebar, SidebarContent, SidebarProvider } from '@/components/ui/sidebar';
+import AppLayout from '@/layouts/appLayout';
 import * as THREE from 'three';
-import { LoadingOverlay } from "@/components/ui/loading-overlay";
-import { useModelProperties, useModelDownload } from "@/utils/common";
-import WavyControls from "@/components/wavy-controls";
-import Scene from "@/components/scene";
-import { ADDITION, Brush, Evaluator, SUBTRACTION } from "three-bvh-csg";
-import { getPointsOnCircle } from "@/utils/3d";
+import { LoadingOverlay } from '@/components/ui/loading-overlay';
+import { useModelProperties, useModelDownload } from '@/utils/common';
+import WavyControls from '@/components/wavy-controls';
+import Scene from '@/components/scene';
+import { ADDITION, Brush, Evaluator, SUBTRACTION } from 'three-bvh-csg';
+import { getPointsOnCircle } from '@/utils/3d';
 
 export function getConnectorGeometry(height: number, isHighRes: boolean = false): THREE.BufferGeometry {
     const segmentCount = isHighRes ? 64 : 28;
@@ -88,7 +88,7 @@ export default function WavyConnector() {
                                     showRadius: false,
                                     showWaveDensity: false,
                                     showWaveTwist: false,
-                                    customHeightLabel: "Height",
+                                    customHeightLabel: 'Height',
                                     customHeightValue: properties.bottomHeight - 5
                                 }}
                             />
@@ -104,5 +104,5 @@ export default function WavyConnector() {
                 </div>
             </SidebarProvider>
         </AppLayout>
-    )
+    );
 }

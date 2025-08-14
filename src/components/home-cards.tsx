@@ -1,6 +1,6 @@
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
+import * as React from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 
 export default function HomeCards() {
   return (
@@ -37,5 +37,5 @@ export default function HomeCards() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

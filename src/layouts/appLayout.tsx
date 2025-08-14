@@ -1,5 +1,5 @@
-import * as React from "react"
-import { Navbar } from "@/components/navbar"
+import * as React from 'react';
+import { Navbar } from '@/components/navbar';
 
 export default function AppLayout({ children }: { children?: React.ReactNode }) {
   return (
@@ -7,5 +7,5 @@ export default function AppLayout({ children }: { children?: React.ReactNode }) 
       <Navbar />
       <main className="flex-1">{children}</main>
     </div>
-  )
+  );
 }
