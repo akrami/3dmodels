@@ -66,6 +66,13 @@ jobs:
       - name: Install dependencies
         run: ${{ steps.detect-package-manager.outputs.manager }} ${{ steps.detect-package-manager.outputs.command }}
         working-directory: ${{ env.BUILD_PATH }}
+      - name: Run ESLint
+        run: ${{ steps.detect-package-manager.outputs.runner }} npm run lint
+        working-directory: ${{ env.BUILD_PATH }}
+      - name: Type check
+        run: ${{ steps.detect-package-manager.outputs.runner }} npm run typecheck
+        working-directory: ${{ env.BUILD_PATH }}
+        continue-on-error: true
       - name: Build with Astro
         run: |
           ${{ steps.detect-package-manager.outputs.runner }} astro build \
