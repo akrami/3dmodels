@@ -12,15 +12,15 @@ export function getConnectorGeometry(height: number, isHighRes: boolean = false)
     const segmentCount = isHighRes ? 64 : 28;
     const miniHoleSegments = isHighRes ? 64 : 16;
 
-    const bodyGeometry = new THREE.CylinderGeometry(8, 8, height, segmentCount);
+    const bodyGeometry = new THREE.CylinderGeometry(16, 16, height, segmentCount);
     bodyGeometry.translate(0, 0, 0);
     const bodyBrush = new Brush(bodyGeometry);
 
-    const headGeometry = new THREE.CylinderGeometry(10, 10, 2, segmentCount);
+    const headGeometry = new THREE.CylinderGeometry(20, 20, 2, segmentCount);
     headGeometry.translate(0, height / 2, 0);
     const headBrush = new Brush(headGeometry);
 
-    const mainHoleGeometry = new THREE.CylinderGeometry(6, 6, height, segmentCount);
+    const mainHoleGeometry = new THREE.CylinderGeometry(12, 12, height, segmentCount);
     mainHoleGeometry.translate(0, 2, 0);
     const mainHoleBrush = new Brush(mainHoleGeometry);
 
@@ -28,9 +28,9 @@ export function getConnectorGeometry(height: number, isHighRes: boolean = false)
     let result = evaluator.evaluate(bodyBrush, headBrush, ADDITION);
     result = evaluator.evaluate(result, mainHoleBrush, SUBTRACTION);
 
-    const points = getPointsOnCircle(7, 4);
+    const points = getPointsOnCircle(14, 4);
 
-    const miniBottomHoleGeometry = new THREE.CylinderGeometry(1.5, 1.5, 2, miniHoleSegments);
+    const miniBottomHoleGeometry = new THREE.CylinderGeometry(3, 3, 2, miniHoleSegments);
     for (let index = 0; index < points.length; index++) {
         const tempMiniBottomHoleGeometry = miniBottomHoleGeometry.clone();
         const miniBottomHoleBrush = new Brush(tempMiniBottomHoleGeometry);
@@ -46,7 +46,7 @@ export function getConnectorGeometry(height: number, isHighRes: boolean = false)
 }
 
 function getMeshBrush(evaluator: Evaluator, height: number): Brush {
-    const capsuleHoleGeometry = new THREE.BoxGeometry(2, 20, height);
+    const capsuleHoleGeometry = new THREE.BoxGeometry(2, 40, height);
     let capsuleHoleBrush01 = new Brush(capsuleHoleGeometry);
     capsuleHoleBrush01.rotateX(Math.PI / 2);
     capsuleHoleBrush01.updateMatrixWorld(true);

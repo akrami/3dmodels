@@ -39,11 +39,11 @@ export function getTopGeometry(
     lockBrush.updateMatrixWorld(true);
     result = evaluator.evaluate(result, lockBrush, ADDITION);
 
-    const waterHoleTopGeometry = new THREE.CylinderGeometry(10, 10, 2);
+    const waterHoleTopGeometry = new THREE.CylinderGeometry(20, 20, 2);
     waterHoleTopGeometry.translate(0, 1, 0);
     const waterHoleTopBrush = new Brush(waterHoleTopGeometry);
 
-    const waterHoleBottomGeometry = new THREE.CylinderGeometry(8, 8, 2);
+    const waterHoleBottomGeometry = new THREE.CylinderGeometry(16, 16, 2);
     waterHoleBottomGeometry.translate(0, -1, 0);
     const waterHoleBottomBrush = new Brush(waterHoleBottomGeometry);
 
